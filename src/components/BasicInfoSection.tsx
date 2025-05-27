@@ -39,12 +39,12 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
 }) => {
   return (
     <Card className="bg-gray-50 border-gray-200">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-gray-800 text-base">Informações Básicas</CardTitle>
+      <CardHeader className="pb-1 pt-3 px-3">
+        <CardTitle className="text-gray-800 text-sm">Informações Básicas</CardTitle>
         <CardDescription className="text-xs">Dados gerais da análise</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <CardContent className="space-y-2 px-3 pb-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <div>
             <Label htmlFor="location" className="text-xs font-medium">Nome do Talhão *</Label>
             <Input
@@ -52,7 +52,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
               value={location}
               onChange={(e) => onLocationChange(e.target.value)}
               placeholder="Ex: Talhão 1A, Área Norte"
-              className={`h-8 text-xs ${errors.location ? 'border-red-500' : ''}`}
+              className={`h-7 text-xs ${errors.location ? 'border-red-500' : ''}`}
             />
             {errors.location && <span className="text-red-500 text-xs">{errors.location}</span>}
           </div>
@@ -60,7 +60,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
           <div>
             <Label htmlFor="crop" className="text-xs font-medium">Cultura *</Label>
             <Select value={crop} onValueChange={onCropChange}>
-              <SelectTrigger className={`h-8 text-xs ${errors.crop ? 'border-red-500' : ''}`}>
+              <SelectTrigger className={`h-7 text-xs ${errors.crop ? 'border-red-500' : ''}`}>
                 <SelectValue placeholder="Selecione a cultura" />
               </SelectTrigger>
               <SelectContent>

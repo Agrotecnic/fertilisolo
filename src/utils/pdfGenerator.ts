@@ -1,4 +1,3 @@
-
 import { SoilData, CalculatedResults } from '@/pages/Index';
 import { calculateFertilizerRecommendations } from './soilCalculations';
 
@@ -70,7 +69,7 @@ export const generatePDFReport = (soilData: SoilData, results: CalculatedResults
     </head>
     <body>
         <div class="header">
-            <h1>SoloAnalyzer Pro</h1>
+            <h1>FertiliSolo</h1>
             <h2>Relatório de Análise de Solo e Recomendação de Adubação</h2>
             <p>Método de Saturações por Bases</p>
         </div>
@@ -180,7 +179,7 @@ export const generatePDFReport = (soilData: SoilData, results: CalculatedResults
                 <li>Incorporar uniformemente até 20 cm de profundidade</li>
                 <li>Consulte um engenheiro agrônomo para validação das recomendações</li>
             </ul>
-            <p>Relatório gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')} - SoloAnalyzer Pro</p>
+            <p>Relatório gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')} - FertiliSolo</p>
         </div>
     </body>
     </html>

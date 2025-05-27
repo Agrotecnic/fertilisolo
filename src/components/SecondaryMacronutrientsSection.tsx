@@ -15,34 +15,34 @@ export const SecondaryMacronutrientsSection: React.FC<SecondaryMacronutrientsSec
   S, organicMatter, onSChange, onOrganicMatterChange, errors
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-1 pt-2 px-2">
+        <CardHeader className="pb-0 pt-1 px-1">
           <CardTitle className="text-gray-800 text-xs">Enxofre (S)</CardTitle>
           <CardDescription className="text-[10px]">mg/dm³</CardDescription>
         </CardHeader>
-        <CardContent className="pt-0 px-2 pb-2">
+        <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
             value={S}
             onChange={onSChange}
             placeholder="0,0"
-            className={`h-7 text-xs ${errors.S ? 'border-red-500' : ''}`}
+            className={`h-6 text-xs ${errors.S ? 'border-red-500' : ''}`}
           />
           {errors.S && <span className="text-red-500 text-[10px]">{errors.S}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-1 pt-2 px-2">
+        <CardHeader className="pb-0 pt-1 px-1">
           <CardTitle className="text-gray-800 text-xs">Matéria Orgânica</CardTitle>
           <CardDescription className="text-[10px]">%</CardDescription>
         </CardHeader>
-        <CardContent className="pt-0 px-2 pb-2">
+        <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
             value={organicMatter}
             onChange={onOrganicMatterChange}
             placeholder="0,0"
-            className={`h-7 text-xs ${errors.organicMatter ? 'border-red-500' : ''}`}
+            className={`h-6 text-xs ${errors.organicMatter ? 'border-red-500' : ''}`}
           />
           {errors.organicMatter && <span className="text-red-500 text-[10px]">{errors.organicMatter}</span>}
         </CardContent>

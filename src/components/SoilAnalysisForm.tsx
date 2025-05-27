@@ -106,7 +106,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
+    <form onSubmit={handleSubmit} className="space-y-1">
       {errors.general && (
         <Alert variant="destructive">
           <AlertDescription>{errors.general}</AlertDescription>
@@ -172,11 +172,11 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
         />
       </div>
 
-      <div className="flex justify-center pt-2">
+      <div className="flex justify-center pt-1">
         <Button 
           type="submit" 
           size="lg"
-          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
         >
           Calcular Saturações e Recomendações
         </Button>
