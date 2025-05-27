@@ -13,6 +13,8 @@ export interface SoilData {
   id?: string;
   date?: string;
   location?: string;
+  crop?: string;
+  organicMatter?: number;
   T: number; // CTC
   Ca: number; // Cálcio atual
   Mg: number; // Magnésio atual

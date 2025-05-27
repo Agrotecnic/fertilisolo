@@ -3,11 +3,12 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 
 interface FormattedInputProps {
-  value: number;
-  onChange: (value: number) => void;
+  value: number | string;
+  onChange: (value: number | string) => void;
   placeholder?: string;
   className?: string;
   step?: string;
+  type?: 'numeric' | 'text';
 }
 
 export const FormattedInput: React.FC<FormattedInputProps> = ({
@@ -15,14 +16,18 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
   onChange,
   placeholder = "0,00",
   className,
-  step = "0.01"
+  step = "0.01",
+  type = 'numeric'
 }) => {
-  const formatValue = (num: number): string => {
-    if (num === 0) return '';
-    return num.toString().replace('.', ',');
+  const formatValue = (val: number | string): string => {
+    if (type === 'text') return val.toString();
+    if (typeof val === 'string') return val;
+    if (val === 0) return '';
+    return val.toString().replace('.', ',');
   };
 
-  const parseValue = (str: string): number => {
+  const parseValue = (str: string): number | string => {
+    if (type === 'text') return str;
     if (!str) return 0;
     return parseFloat(str.replace(',', '.')) || 0;
   };
@@ -30,7 +35,12 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     
-    // Permitir apenas números, vírgula e ponto
+    if (type === 'text') {
+      onChange(inputValue);
+      return;
+    }
+    
+    // Para campos numéricos, permitir apenas números, vírgula e ponto
     const sanitized = inputValue.replace(/[^0-9,]/g, '');
     
     // Garantir apenas uma vírgula
