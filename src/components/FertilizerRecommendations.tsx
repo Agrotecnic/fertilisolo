@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SoilData, CalculatedResults } from '@/pages/Index';
-import { fertilizerSources } from '@/utils/soilCalculations';
+import { fertilizerSources, calculateFertilizerRecommendations } from '@/utils/soilCalculations';
 import { generatePDFReport } from '@/utils/pdfGenerator';
 import { FileText } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';

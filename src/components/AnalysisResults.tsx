@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { SoilData, CalculatedResults } from '@/pages/Index';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 
 interface AnalysisResultsProps {
   soilData: SoilData;
