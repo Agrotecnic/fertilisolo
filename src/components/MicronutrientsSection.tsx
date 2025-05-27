@@ -23,84 +23,84 @@ export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
   errors
 }) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-gray-800 text-sm">Boro (B)</CardTitle>
-          <CardDescription className="text-xs">mg/dm³</CardDescription>
+        <CardHeader className="pb-1 pt-2 px-2">
+          <CardTitle className="text-gray-800 text-xs">Boro (B)</CardTitle>
+          <CardDescription className="text-[10px]">mg/dm³</CardDescription>
         </CardHeader>
-        <CardContent className="pt-0">
+        <CardContent className="pt-0 px-2 pb-2">
           <FormattedInput
             value={B}
             onChange={onBChange}
             placeholder="0,0"
-            className={errors.B ? 'border-red-500' : ''}
+            className={`h-7 text-xs ${errors.B ? 'border-red-500' : ''}`}
           />
-          {errors.B && <span className="text-red-500 text-xs">{errors.B}</span>}
+          {errors.B && <span className="text-red-500 text-[10px]">{errors.B}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-gray-800 text-sm">Cobre (Cu)</CardTitle>
-          <CardDescription className="text-xs">mg/dm³</CardDescription>
+        <CardHeader className="pb-1 pt-2 px-2">
+          <CardTitle className="text-gray-800 text-xs">Cobre (Cu)</CardTitle>
+          <CardDescription className="text-[10px]">mg/dm³</CardDescription>
         </CardHeader>
-        <CardContent className="pt-0">
+        <CardContent className="pt-0 px-2 pb-2">
           <FormattedInput
             value={Cu}
             onChange={onCuChange}
             placeholder="0,0"
-            className={errors.Cu ? 'border-red-500' : ''}
+            className={`h-7 text-xs ${errors.Cu ? 'border-red-500' : ''}`}
           />
-          {errors.Cu && <span className="text-red-500 text-xs">{errors.Cu}</span>}
+          {errors.Cu && <span className="text-red-500 text-[10px]">{errors.Cu}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-gray-800 text-sm">Ferro (Fe)</CardTitle>
-          <CardDescription className="text-xs">mg/dm³</CardDescription>
+        <CardHeader className="pb-1 pt-2 px-2">
+          <CardTitle className="text-gray-800 text-xs">Ferro (Fe)</CardTitle>
+          <CardDescription className="text-[10px]">mg/dm³</CardDescription>
         </CardHeader>
-        <CardContent className="pt-0">
+        <CardContent className="pt-0 px-2 pb-2">
           <FormattedInput
             value={Fe}
             onChange={onFeChange}
             placeholder="0,0"
-            className={errors.Fe ? 'border-red-500' : ''}
+            className={`h-7 text-xs ${errors.Fe ? 'border-red-500' : ''}`}
           />
-          {errors.Fe && <span className="text-red-500 text-xs">{errors.Fe}</span>}
+          {errors.Fe && <span className="text-red-500 text-[10px]">{errors.Fe}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-gray-800 text-sm">Manganês (Mn)</CardTitle>
-          <CardDescription className="text-xs">mg/dm³</CardDescription>
+        <CardHeader className="pb-1 pt-2 px-2">
+          <CardTitle className="text-gray-800 text-xs">Manganês (Mn)</CardTitle>
+          <CardDescription className="text-[10px]">mg/dm³</CardDescription>
         </CardHeader>
-        <CardContent className="pt-0">
+        <CardContent className="pt-0 px-2 pb-2">
           <FormattedInput
             value={Mn}
             onChange={onMnChange}
             placeholder="0,0"
-            className={errors.Mn ? 'border-red-500' : ''}
+            className={`h-7 text-xs ${errors.Mn ? 'border-red-500' : ''}`}
           />
-          {errors.Mn && <span className="text-red-500 text-xs">{errors.Mn}</span>}
+          {errors.Mn && <span className="text-red-500 text-[10px]">{errors.Mn}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-gray-800 text-sm">Zinco (Zn)</CardTitle>
-          <CardDescription className="text-xs">mg/dm³</CardDescription>
+        <CardHeader className="pb-1 pt-2 px-2">
+          <CardTitle className="text-gray-800 text-xs">Zinco (Zn)</CardTitle>
+          <CardDescription className="text-[10px]">mg/dm³</CardDescription>
         </CardHeader>
-        <CardContent className="pt-0">
+        <CardContent className="pt-0 px-2 pb-2">
           <FormattedInput
             value={Zn}
             onChange={onZnChange}
             placeholder="0,0"
-            className={errors.Zn ? 'border-red-500' : ''}
+            className={`h-7 text-xs ${errors.Zn ? 'border-red-500' : ''}`}
           />
-          {errors.Zn && <span className="text-red-500 text-xs">{errors.Zn}</span>}
+          {errors.Zn && <span className="text-red-500 text-[10px]">{errors.Zn}</span>}
         </CardContent>
       </Card>
     </div>

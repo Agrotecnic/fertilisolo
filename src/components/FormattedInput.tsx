@@ -41,20 +41,20 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
       return;
     }
     
-    // Permitir apenas números e uma vírgula ou ponto
+    // Permitir campo vazio
     if (inputValue === '') {
       onChange(0);
       return;
     }
     
-    // Regex para aceitar números com vírgula ou ponto
+    // Permitir apenas números, vírgula e ponto
     const regex = /^[0-9]*[,.]?[0-9]*$/;
     if (regex.test(inputValue)) {
-      // Contar vírgulas e pontos para garantir que há apenas um separador
-      const hasComma = inputValue.includes(',');
-      const hasDot = inputValue.includes('.');
+      // Verificar se há apenas um separador decimal
+      const commaCount = (inputValue.match(/,/g) || []).length;
+      const dotCount = (inputValue.match(/\./g) || []).length;
       
-      if ((hasComma && !hasDot) || (!hasComma && hasDot) || (!hasComma && !hasDot)) {
+      if (commaCount <= 1 && dotCount <= 1 && (commaCount + dotCount) <= 1) {
         onChange(parseValue(inputValue));
       }
     }

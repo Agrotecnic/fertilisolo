@@ -39,38 +39,40 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
 }) => {
   return (
     <Card className="bg-gray-50 border-gray-200">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-gray-800 text-lg">Informações Básicas</CardTitle>
-        <CardDescription>Dados gerais da análise</CardDescription>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-gray-800 text-base">Informações Básicas</CardTitle>
+        <CardDescription className="text-xs">Dados gerais da análise</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <Label htmlFor="location">Localização da Análise *</Label>
-          <FormattedInput
-            type="text"
-            value={location}
-            onChange={onLocationChange}
-            placeholder="Ex: Fazenda São José, Talhão 3"
-            className={errors.location ? 'border-red-500' : ''}
-          />
-          {errors.location && <span className="text-red-500 text-sm">{errors.location}</span>}
-        </div>
-        
-        <div>
-          <Label htmlFor="crop">Cultura *</Label>
-          <Select value={crop} onValueChange={onCropChange}>
-            <SelectTrigger className={errors.crop ? 'border-red-500' : ''}>
-              <SelectValue placeholder="Selecione a cultura" />
-            </SelectTrigger>
-            <SelectContent>
-              {crops.map((cropOption) => (
-                <SelectItem key={cropOption} value={cropOption}>
-                  {cropOption}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.crop && <span className="text-red-500 text-sm">{errors.crop}</span>}
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <Label htmlFor="location" className="text-xs font-medium">Localização da Análise *</Label>
+            <FormattedInput
+              type="text"
+              value={location}
+              onChange={onLocationChange}
+              placeholder="Ex: Fazenda São José, Talhão 3"
+              className={`h-8 text-xs ${errors.location ? 'border-red-500' : ''}`}
+            />
+            {errors.location && <span className="text-red-500 text-xs">{errors.location}</span>}
+          </div>
+          
+          <div>
+            <Label htmlFor="crop" className="text-xs font-medium">Cultura *</Label>
+            <Select value={crop} onValueChange={onCropChange}>
+              <SelectTrigger className={`h-8 text-xs ${errors.crop ? 'border-red-500' : ''}`}>
+                <SelectValue placeholder="Selecione a cultura" />
+              </SelectTrigger>
+              <SelectContent>
+                {crops.map((cropOption) => (
+                  <SelectItem key={cropOption} value={cropOption}>
+                    {cropOption}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.crop && <span className="text-red-500 text-xs">{errors.crop}</span>}
+          </div>
         </div>
       </CardContent>
     </Card>
