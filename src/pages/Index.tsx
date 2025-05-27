@@ -18,6 +18,14 @@ export interface SoilData {
   Mg: number; // Magnésio atual
   K: number; // Potássio atual
   P: number; // Fósforo em ppm
+  // Macronutrientes secundários
+  S: number; // Enxofre em ppm
+  // Micronutrientes
+  B: number; // Boro em ppm
+  Cu: number; // Cobre em ppm
+  Fe: number; // Ferro em ppm
+  Mn: number; // Manganês em ppm
+  Zn: number; // Zinco em ppm
 }
 
 export interface CalculatedResults {
@@ -32,6 +40,12 @@ export interface CalculatedResults {
     Mg: number;
     K: number;
     P: number;
+    S: number;
+    B: number;
+    Cu: number;
+    Fe: number;
+    Mn: number;
+    Zn: number;
   };
   isAdequate: {
     Ca: boolean;
@@ -39,6 +53,12 @@ export interface CalculatedResults {
     K: boolean;
     P: boolean;
     CaMgRatio: boolean;
+    S: boolean;
+    B: boolean;
+    Cu: boolean;
+    Fe: boolean;
+    Mn: boolean;
+    Zn: boolean;
   };
 }
 
