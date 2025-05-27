@@ -19,7 +19,7 @@ export const SecondaryMacronutrientsSection: React.FC<SecondaryMacronutrientsSec
       <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-2">
           <CardTitle className="text-gray-800 text-sm">Enxofre (S)</CardTitle>
-          <CardDescription className="text-xs">ppm</CardDescription>
+          <CardDescription className="text-xs">mg/dm³</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           <FormattedInput

@@ -25,9 +25,9 @@ export const PrimaryMacronutrientsSection: React.FC<PrimaryMacronutrientsSection
 }) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-      <Card className="bg-blue-50 border-blue-200">
+      <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-blue-800 text-sm">CTC (T)</CardTitle>
+          <CardTitle className="text-gray-800 text-sm">CTC (T)</CardTitle>
           <CardDescription className="text-xs">cmolc/dm³</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
@@ -41,9 +41,9 @@ export const PrimaryMacronutrientsSection: React.FC<PrimaryMacronutrientsSection
         </CardContent>
       </Card>
 
-      <Card className="bg-green-50 border-green-200">
+      <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-green-800 text-sm">Cálcio (Ca)</CardTitle>
+          <CardTitle className="text-gray-800 text-sm">Cálcio (Ca)</CardTitle>
           <CardDescription className="text-xs">cmolc/dm³</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
@@ -57,9 +57,9 @@ export const PrimaryMacronutrientsSection: React.FC<PrimaryMacronutrientsSection
         </CardContent>
       </Card>
 
-      <Card className="bg-purple-50 border-purple-200">
+      <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-purple-800 text-sm">Magnésio (Mg)</CardTitle>
+          <CardTitle className="text-gray-800 text-sm">Magnésio (Mg)</CardTitle>
           <CardDescription className="text-xs">cmolc/dm³</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
@@ -73,26 +73,26 @@ export const PrimaryMacronutrientsSection: React.FC<PrimaryMacronutrientsSection
         </CardContent>
       </Card>
 
-      <Card className="bg-orange-50 border-orange-200">
+      <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-orange-800 text-sm">Potássio (K)</CardTitle>
-          <CardDescription className="text-xs">cmolc/dm³</CardDescription>
+          <CardTitle className="text-gray-800 text-sm">Potássio (K)</CardTitle>
+          <CardDescription className="text-xs">mg/dm³</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           <FormattedInput
             value={K}
             onChange={onKChange}
-            placeholder="0,00"
+            placeholder="0,0"
             className={errors.K ? 'border-red-500' : ''}
           />
           {errors.K && <span className="text-red-500 text-xs">{errors.K}</span>}
         </CardContent>
       </Card>
 
-      <Card className="bg-red-50 border-red-200">
+      <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-red-800 text-sm">Fósforo (P)</CardTitle>
-          <CardDescription className="text-xs">ppm</CardDescription>
+          <CardTitle className="text-gray-800 text-sm">Fósforo (P)</CardTitle>
+          <CardDescription className="text-xs">mg/dm³</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           <FormattedInput
