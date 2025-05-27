@@ -16,18 +16,21 @@ export interface SoilData {
   crop?: string;
   organicMatter?: number;
   T: number; // CTC
-  Ca: number; // Cálcio atual
-  Mg: number; // Magnésio atual
-  K: number; // Potássio atual
-  P: number; // Fósforo em ppm
+  Ca: number; // Cálcio atual em cmolc/dm³
+  Mg: number; // Magnésio atual em cmolc/dm³
+  K: number; // Potássio atual em mg/dm³
+  P: number; // Fósforo em mg/dm³
   // Macronutrientes secundários
-  S: number; // Enxofre em ppm
-  // Micronutrientes
-  B: number; // Boro em ppm
-  Cu: number; // Cobre em ppm
-  Fe: number; // Ferro em ppm
-  Mn: number; // Manganês em ppm
-  Zn: number; // Zinco em ppm
+  S: number; // Enxofre em mg/dm³
+  // Micronutrientes em mg/dm³
+  B: number; // Boro
+  Cu: number; // Cobre
+  Fe: number; // Ferro
+  Mn: number; // Manganês
+  Zn: number; // Zinco
+  Mo: number; // Molibdênio
+  Cl: number; // Cloro
+  Ni: number; // Níquel
 }
 
 export interface CalculatedResults {
@@ -48,6 +51,9 @@ export interface CalculatedResults {
     Fe: number;
     Mn: number;
     Zn: number;
+    Mo: number;
+    Cl: number;
+    Ni: number;
   };
   isAdequate: {
     Ca: boolean;
@@ -61,6 +67,9 @@ export interface CalculatedResults {
     Fe: boolean;
     Mn: boolean;
     Zn: boolean;
+    Mo: boolean;
+    Cl: boolean;
+    Ni: boolean;
   };
 }
 
@@ -88,10 +97,10 @@ const Index = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <Leaf className="h-12 w-12 text-green-600 mr-3" />
-            <h1 className="text-4xl font-bold text-green-800">SoloAnalyzer Pro</h1>
+            <h1 className="text-4xl font-bold text-green-800">Fertilisolo</h1>
           </div>
           <p className="text-xl text-green-700 max-w-3xl mx-auto">
-            Análise de Solo e Recomendação de Adubação - Método de Saturações por Bases
+            Calculadora de Adubação - Método de Saturações por Bases
           </p>
           <p className="text-sm text-green-600 mt-2">
             Ferramenta profissional para agrônomos, técnicos agrícolas e produtores rurais
@@ -103,7 +112,7 @@ const Index = () => {
           <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="input" className="flex items-center gap-2">
               <Calculator className="h-4 w-4" />
-              Análise
+              Nova Análise
             </TabsTrigger>
             <TabsTrigger value="results" disabled={!results} className="flex items-center gap-2">
               <FileText className="h-4 w-4" />

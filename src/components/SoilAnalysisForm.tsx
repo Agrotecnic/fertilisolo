@@ -31,12 +31,15 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
     Fe: 0,
     Mn: 0,
     Zn: 0,
+    Mo: 0,
+    Cl: 0,
+    Ni: 0,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (field: keyof typeof formData, value: string | number) => {
-    const numericFields = ['organicMatter', 'T', 'Ca', 'Mg', 'K', 'P', 'S', 'B', 'Cu', 'Fe', 'Mn', 'Zn'];
+    const numericFields = ['organicMatter', 'T', 'Ca', 'Mg', 'K', 'P', 'S', 'B', 'Cu', 'Fe', 'Mn', 'Zn', 'Mo', 'Cl', 'Ni'];
     
     if (numericFields.includes(field)) {
       const numValue = typeof value === 'number' ? value : (parseFloat(value.toString().replace(',', '.')) || 0);
@@ -65,15 +68,12 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
     if (formData.Fe < 0) newErrors.Fe = 'Ferro não pode ser negativo';
     if (formData.Mn < 0) newErrors.Mn = 'Manganês não pode ser negativo';
     if (formData.Zn < 0) newErrors.Zn = 'Zinco não pode ser negativo';
+    if (formData.Mo < 0) newErrors.Mo = 'Molibdênio não pode ser negativo';
+    if (formData.Cl < 0) newErrors.Cl = 'Cloro não pode ser negativo';
+    if (formData.Ni < 0) newErrors.Ni = 'Níquel não pode ser negativo';
     if (formData.organicMatter < 0) newErrors.organicMatter = 'Matéria orgânica não pode ser negativa';
     if (!formData.location?.trim()) newErrors.location = 'Localização é obrigatória';
     if (!formData.crop?.trim()) newErrors.crop = 'Cultura é obrigatória';
-
-    // Validate that individual cations don't exceed CTC
-    const totalCations = formData.Ca + formData.Mg + formData.K;
-    if (totalCations > formData.T) {
-      newErrors.general = 'A soma de Ca + Mg + K não pode exceder a CTC';
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -111,7 +111,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {errors.general && (
         <Alert variant="destructive">
           <AlertDescription>{errors.general}</AlertDescription>
@@ -129,7 +129,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
 
       {/* Macronutrientes Primários */}
       <div>
-        <h3 className="text-lg font-semibold text-green-800 mb-4">Macronutrientes Primários</h3>
+        <h3 className="text-sm font-semibold text-green-800 mb-2">Macronutrientes Primários</h3>
         <PrimaryMacronutrientsSection
           T={formData.T}
           Ca={formData.Ca}
@@ -147,7 +147,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
 
       {/* Macronutrientes Secundários */}
       <div>
-        <h3 className="text-lg font-semibold text-green-800 mb-4">Macronutrientes Secundários</h3>
+        <h3 className="text-sm font-semibold text-green-800 mb-2">Macronutrientes Secundários</h3>
         <SecondaryMacronutrientsSection
           S={formData.S}
           organicMatter={formData.organicMatter}
@@ -159,23 +159,29 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
 
       {/* Micronutrientes */}
       <div>
-        <h3 className="text-lg font-semibold text-green-800 mb-4">Micronutrientes</h3>
+        <h3 className="text-sm font-semibold text-green-800 mb-2">Micronutrientes</h3>
         <MicronutrientsSection
           B={formData.B}
           Cu={formData.Cu}
           Fe={formData.Fe}
           Mn={formData.Mn}
           Zn={formData.Zn}
+          Mo={formData.Mo}
+          Cl={formData.Cl}
+          Ni={formData.Ni}
           onBChange={(value) => handleInputChange('B', value)}
           onCuChange={(value) => handleInputChange('Cu', value)}
           onFeChange={(value) => handleInputChange('Fe', value)}
           onMnChange={(value) => handleInputChange('Mn', value)}
           onZnChange={(value) => handleInputChange('Zn', value)}
+          onMoChange={(value) => handleInputChange('Mo', value)}
+          onClChange={(value) => handleInputChange('Cl', value)}
+          onNiChange={(value) => handleInputChange('Ni', value)}
           errors={errors}
         />
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex justify-center pt-4">
         <Button 
           type="submit" 
           size="lg"

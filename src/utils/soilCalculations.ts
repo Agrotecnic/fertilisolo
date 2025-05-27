@@ -1,13 +1,17 @@
+
 import { SoilData, CalculatedResults } from '@/pages/Index';
 
 export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): CalculatedResults => {
-  const { T, Ca, Mg, K, P, S, B, Cu, Fe, Mn, Zn } = data;
+  const { T, Ca, Mg, K, P, S, B, Cu, Fe, Mn, Zn, Mo, Cl, Ni } = data;
+
+  // Converter K de mg/dm³ para cmolc/dm³ (K mg/dm³ ÷ 390 = cmolc/dm³)
+  const KCmolc = K / 390;
 
   // Calcular saturações atuais (%)
   const saturations = {
     Ca: (Ca / T) * 100,
     Mg: (Mg / T) * 100,
-    K: (K / T) * 100,
+    K: (KCmolc / T) * 100,
   };
 
   // Calcular relação Ca/Mg
@@ -20,23 +24,26 @@ export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): Calc
     K: saturations.K >= 3 && saturations.K <= 5,
     P: P >= 15,
     CaMgRatio: caeMgRatio >= 3 && caeMgRatio <= 5,
-    S: S >= 10, // S adequado acima de 10 ppm
-    B: B >= 0.2 && B <= 0.6, // B adequado entre 0.2-0.6 ppm
-    Cu: Cu >= 0.8 && Cu <= 1.2, // Cu adequado entre 0.8-1.2 ppm
-    Fe: Fe >= 5, // Fe adequado acima de 5 ppm
-    Mn: Mn >= 1.2, // Mn adequado acima de 1.2 ppm
-    Zn: Zn >= 0.5 && Zn <= 1.2, // Zn adequado entre 0.5-1.2 ppm
+    S: S >= 10,
+    B: B >= 0.2 && B <= 0.6,
+    Cu: Cu >= 0.8 && Cu <= 1.2,
+    Fe: Fe >= 5,
+    Mn: Mn >= 1.2,
+    Zn: Zn >= 0.5 && Zn <= 1.2,
+    Mo: Mo >= 0.1 && Mo <= 0.2,
+    Cl: Cl >= 1 && Cl <= 10,
+    Ni: Ni >= 0.05 && Ni <= 0.5,
   };
 
   // Calcular necessidades de nutrientes
   const targetCa = 0.55 * T; // 55% da CTC para Ca
   const targetMg = 0.175 * T; // 17.5% da CTC para Mg
-  const targetK = 0.04 * T; // 4% da CTC para K
+  const targetK = 0.04 * T; // 4% da CTC para K (em cmolc/dm³)
 
   const needs = {
     Ca: Math.max(0, targetCa - Ca),
     Mg: Math.max(0, targetMg - Mg),
-    K: Math.max(0, targetK - K),
+    K: Math.max(0, (targetK - KCmolc) * 390), // Converter de volta para mg/dm³
     P: calculatePhosphorusNeed(P),
     S: calculateSulfurNeed(S),
     B: calculateBoronNeed(B),
@@ -44,6 +51,9 @@ export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): Calc
     Fe: calculateIronNeed(Fe),
     Mn: calculateManganeseNeed(Mn),
     Zn: calculateZincNeed(Zn),
+    Mo: calculateMolybdenumNeed(Mo),
+    Cl: calculateChlorineNeed(Cl),
+    Ni: calculateNickelNeed(Ni),
   };
 
   return {
@@ -55,13 +65,12 @@ export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): Calc
 };
 
 const calculatePhosphorusNeed = (currentP: number): number => {
-  const targetP = 15; // ppm mínimo para cerrados
+  const targetP = 15;
   
   if (currentP >= targetP) return 0;
 
   const pNeeded = targetP - currentP;
   
-  // Aplicar fatores por faixa usando regra de três
   let factor = 0;
   
   if (currentP <= 5) {
@@ -74,43 +83,61 @@ const calculatePhosphorusNeed = (currentP: number): number => {
     factor = 229.00;
   }
 
-  return pNeeded * factor / 100; // kg/ha
+  return pNeeded * factor / 100;
 };
 
 const calculateSulfurNeed = (currentS: number): number => {
-  const targetS = 10; // ppm mínimo para S
+  const targetS = 10;
   if (currentS >= targetS) return 0;
-  return (targetS - currentS) * 10; // kg/ha
+  return (targetS - currentS) * 10;
 };
 
 const calculateBoronNeed = (currentB: number): number => {
-  const targetB = 0.2; // ppm mínimo para B
+  const targetB = 0.2;
   if (currentB >= targetB) return 0;
-  return (targetB - currentB) * 2; // kg/ha
+  return (targetB - currentB) * 2;
 };
 
 const calculateCopperNeed = (currentCu: number): number => {
-  const targetCu = 0.8; // ppm mínimo para Cu
+  const targetCu = 0.8;
   if (currentCu >= targetCu) return 0;
-  return (targetCu - currentCu) * 3; // kg/ha
+  return (targetCu - currentCu) * 3;
 };
 
 const calculateIronNeed = (currentFe: number): number => {
-  const targetFe = 5; // ppm mínimo para Fe
+  const targetFe = 5;
   if (currentFe >= targetFe) return 0;
-  return (targetFe - currentFe) * 5; // kg/ha
+  return (targetFe - currentFe) * 5;
 };
 
 const calculateManganeseNeed = (currentMn: number): number => {
-  const targetMn = 1.2; // ppm mínimo para Mn
+  const targetMn = 1.2;
   if (currentMn >= targetMn) return 0;
-  return (targetMn - currentMn) * 4; // kg/ha
+  return (targetMn - currentMn) * 4;
 };
 
 const calculateZincNeed = (currentZn: number): number => {
-  const targetZn = 0.5; // ppm mínimo para Zn
+  const targetZn = 0.5;
   if (currentZn >= targetZn) return 0;
-  return (targetZn - currentZn) * 8; // kg/ha
+  return (targetZn - currentZn) * 8;
+};
+
+const calculateMolybdenumNeed = (currentMo: number): number => {
+  const targetMo = 0.1;
+  if (currentMo >= targetMo) return 0;
+  return (targetMo - currentMo) * 15;
+};
+
+const calculateChlorineNeed = (currentCl: number): number => {
+  const targetCl = 1;
+  if (currentCl >= targetCl) return 0;
+  return (targetCl - currentCl) * 5;
+};
+
+const calculateNickelNeed = (currentNi: number): number => {
+  const targetNi = 0.05;
+  if (currentNi >= targetNi) return 0;
+  return (targetNi - currentNi) * 20;
 };
 
 export interface FertilizerSource {
@@ -171,6 +198,21 @@ export const fertilizerSources = {
     { name: 'Óxido de Zinco', concentration: 50, unit: '% Zn', benefits: 'Alta concentração' },
     { name: 'Quelato de Zinco', concentration: 14, unit: '% Zn', benefits: 'Alta disponibilidade' },
   ],
+  Mo: [
+    { name: 'Molibdato de Sódio', concentration: 39, unit: '% Mo', benefits: 'Alta solubilidade' },
+    { name: 'Molibdato de Amônio', concentration: 54, unit: '% Mo', benefits: 'Fornece Mo e nitrogênio' },
+    { name: 'Trióxido de Molibdênio', concentration: 66, unit: '% Mo', benefits: 'Alta concentração' },
+  ],
+  Cl: [
+    { name: 'Cloreto de Potássio', concentration: 47, unit: '% Cl', benefits: 'Fornece Cl e potássio' },
+    { name: 'Cloreto de Cálcio', concentration: 64, unit: '% Cl', benefits: 'Fornece Cl e cálcio' },
+    { name: 'Cloreto de Magnésio', concentration: 74, unit: '% Cl', benefits: 'Fornece Cl e magnésio' },
+  ],
+  Ni: [
+    { name: 'Sulfato de Níquel', concentration: 22, unit: '% Ni', benefits: 'Alta solubilidade' },
+    { name: 'Óxido de Níquel', concentration: 77, unit: '% Ni', benefits: 'Alta concentração' },
+    { name: 'Quelato de Níquel', concentration: 6, unit: '% Ni', benefits: 'Alta disponibilidade' },
+  ],
 };
 
 export const calculateFertilizerRecommendations = (
@@ -183,22 +225,22 @@ export const calculateFertilizerRecommendations = (
     let recommendation = 0;
     
     if (nutrient === 'Ca') {
-      // Ca: cmolc/dm³ × 560 (fator de conversão) ÷ concentração da fonte
       recommendation = (needCmolc * 560) / (source.concentration / 100);
     } else if (nutrient === 'Mg') {
-      // Mg: cmolc/dm³ × 400 (fator de conversão) ÷ concentração da fonte
       recommendation = (needCmolc * 400) / (source.concentration / 100);
     } else if (nutrient === 'K') {
-      // K: cmolc/dm³ × 940 (fator de conversão) ÷ concentração da fonte
-      recommendation = (needCmolc * 940) / (source.concentration / 100);
+      // K já está em mg/dm³, então converter para kg/ha usando fator 2
+      recommendation = (needCmolc * 2) / (source.concentration / 100);
     } else if (nutrient === 'P') {
-      // P: kg/ha ÷ concentração da fonte
+      recommendation = needCmolc / (source.concentration / 100);
+    } else {
+      // Para micronutrientes (Mo, Cl, Ni)
       recommendation = needCmolc / (source.concentration / 100);
     }
     
     return {
       source,
-      recommendation: Math.round(recommendation * 100) / 100, // Round to 2 decimal places
+      recommendation: Math.round(recommendation * 100) / 100,
     };
   });
 };
