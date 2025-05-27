@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -29,8 +28,6 @@ export interface SoilData {
   Mn: number; // Manganês
   Zn: number; // Zinco
   Mo: number; // Molibdênio
-  Cl: number; // Cloro
-  Ni: number; // Níquel
 }
 
 export interface CalculatedResults {
@@ -52,8 +49,6 @@ export interface CalculatedResults {
     Mn: number;
     Zn: number;
     Mo: number;
-    Cl: number;
-    Ni: number;
   };
   isAdequate: {
     Ca: boolean;
@@ -68,8 +63,6 @@ export interface CalculatedResults {
     Mn: boolean;
     Zn: boolean;
     Mo: boolean;
-    Cl: boolean;
-    Ni: boolean;
   };
 }
 

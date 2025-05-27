@@ -1,8 +1,7 @@
-
 import { SoilData, CalculatedResults } from '@/pages/Index';
 
 export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): CalculatedResults => {
-  const { T, Ca, Mg, K, P, S, B, Cu, Fe, Mn, Zn, Mo, Cl, Ni } = data;
+  const { T, Ca, Mg, K, P, S, B, Cu, Fe, Mn, Zn, Mo } = data;
 
   // Converter K de mg/dm³ para cmolc/dm³ (K mg/dm³ ÷ 390 = cmolc/dm³)
   const KCmolc = K / 390;
@@ -31,8 +30,6 @@ export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): Calc
     Mn: Mn >= 1.2,
     Zn: Zn >= 0.5 && Zn <= 1.2,
     Mo: Mo >= 0.1 && Mo <= 0.2,
-    Cl: Cl >= 1 && Cl <= 10,
-    Ni: Ni >= 0.05 && Ni <= 0.5,
   };
 
   // Calcular necessidades de nutrientes
@@ -52,8 +49,6 @@ export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): Calc
     Mn: calculateManganeseNeed(Mn),
     Zn: calculateZincNeed(Zn),
     Mo: calculateMolybdenumNeed(Mo),
-    Cl: calculateChlorineNeed(Cl),
-    Ni: calculateNickelNeed(Ni),
   };
 
   return {
@@ -128,18 +123,6 @@ const calculateMolybdenumNeed = (currentMo: number): number => {
   return (targetMo - currentMo) * 15;
 };
 
-const calculateChlorineNeed = (currentCl: number): number => {
-  const targetCl = 1;
-  if (currentCl >= targetCl) return 0;
-  return (targetCl - currentCl) * 5;
-};
-
-const calculateNickelNeed = (currentNi: number): number => {
-  const targetNi = 0.05;
-  if (currentNi >= targetNi) return 0;
-  return (targetNi - currentNi) * 20;
-};
-
 export interface FertilizerSource {
   name: string;
   concentration: number;
@@ -202,16 +185,6 @@ export const fertilizerSources = {
     { name: 'Molibdato de Sódio', concentration: 39, unit: '% Mo', benefits: 'Alta solubilidade' },
     { name: 'Molibdato de Amônio', concentration: 54, unit: '% Mo', benefits: 'Fornece Mo e nitrogênio' },
     { name: 'Trióxido de Molibdênio', concentration: 66, unit: '% Mo', benefits: 'Alta concentração' },
-  ],
-  Cl: [
-    { name: 'Cloreto de Potássio', concentration: 47, unit: '% Cl', benefits: 'Fornece Cl e potássio' },
-    { name: 'Cloreto de Cálcio', concentration: 64, unit: '% Cl', benefits: 'Fornece Cl e cálcio' },
-    { name: 'Cloreto de Magnésio', concentration: 74, unit: '% Cl', benefits: 'Fornece Cl e magnésio' },
-  ],
-  Ni: [
-    { name: 'Sulfato de Níquel', concentration: 22, unit: '% Ni', benefits: 'Alta solubilidade' },
-    { name: 'Óxido de Níquel', concentration: 77, unit: '% Ni', benefits: 'Alta concentração' },
-    { name: 'Quelato de Níquel', concentration: 6, unit: '% Ni', benefits: 'Alta disponibilidade' },
   ],
 };
 

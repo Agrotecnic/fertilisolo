@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,20 +22,14 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
     return isAdequate ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200';
   };
 
-  const getProgressColor = (value: number, min: number, max: number) => {
-    if (value >= min && value <= max) return 'bg-green-600';
-    if (value < min) return 'bg-red-600';
-    return 'bg-yellow-600';
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Informações da Análise */}
       <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-        <CardHeader>
+        <CardHeader className="pb-2">
           <CardTitle className="text-green-800">Informações da Análise</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <span className="text-sm font-medium text-gray-600">Local:</span>
@@ -54,14 +49,14 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
 
       {/* Saturações Atuais */}
       <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-        <CardHeader>
+        <CardHeader className="pb-2">
           <CardTitle className="text-green-800">Saturações Atuais por Bases</CardTitle>
           <CardDescription>Porcentagem de cada nutriente em relação à CTC</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Cálcio */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {getStatusIcon(results.isAdequate.Ca)}
@@ -73,7 +68,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
               </div>
               <Progress 
                 value={Math.min(results.saturations.Ca, 100)} 
-                className="h-3"
+                className="h-2"
               />
               <div className="text-xs text-gray-600">
                 Ideal: 50-60% | Atual: {soilData.Ca} cmolc/dm³
@@ -81,7 +76,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
             </div>
 
             {/* Magnésio */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {getStatusIcon(results.isAdequate.Mg)}
@@ -93,7 +88,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
               </div>
               <Progress 
                 value={Math.min(results.saturations.Mg, 100)} 
-                className="h-3"
+                className="h-2"
               />
               <div className="text-xs text-gray-600">
                 Ideal: 15-20% | Atual: {soilData.Mg} cmolc/dm³
@@ -101,7 +96,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
             </div>
 
             {/* Potássio */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {getStatusIcon(results.isAdequate.K)}
@@ -113,10 +108,10 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
               </div>
               <Progress 
                 value={Math.min(results.saturations.K, 100)} 
-                className="h-3"
+                className="h-2"
               />
               <div className="text-xs text-gray-600">
-                Ideal: 3-5% | Atual: {soilData.K} cmolc/dm³
+                Ideal: 3-5% | Atual: {soilData.K} mg/dm³
               </div>
             </div>
           </div>
@@ -124,16 +119,16 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
       </Card>
 
       {/* Relação Ca/Mg e Fósforo */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Relação Ca/Mg */}
         <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-          <CardHeader>
+          <CardHeader className="pb-2">
             <CardTitle className="text-green-800 flex items-center gap-2">
               {getStatusIcon(results.isAdequate.CaMgRatio)}
               Relação Ca/Mg
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <div className="text-center">
               <div className="text-3xl font-bold mb-2">
                 {results.caeMgRatio.toFixed(2)}:1
@@ -150,22 +145,22 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
 
         {/* Fósforo */}
         <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-          <CardHeader>
+          <CardHeader className="pb-2">
             <CardTitle className="text-green-800 flex items-center gap-2">
               {getStatusIcon(results.isAdequate.P)}
               Fósforo (P)
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <div className="text-center">
               <div className="text-3xl font-bold mb-2">
-                {soilData.P} ppm
+                {soilData.P} mg/dm³
               </div>
               <Badge className={getStatusColor(results.isAdequate.P)}>
                 {results.isAdequate.P ? 'Adequado' : 'Baixo'}
               </Badge>
               <p className="text-sm text-gray-600 mt-2">
-                Mínimo para cerrados: 15 ppm
+                Mínimo para cerrados: 15 mg/dm³
               </p>
             </div>
           </CardContent>
@@ -174,111 +169,142 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
 
       {/* Micronutrientes */}
       <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-        <CardHeader>
+        <CardHeader className="pb-2">
           <CardTitle className="text-green-800">Micronutrientes</CardTitle>
           <CardDescription>Níveis atuais dos micronutrientes essenciais</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-center mb-2">
                 {getStatusIcon(results.isAdequate.B)}
-                <span className="ml-2 font-medium">Boro</span>
+                <span className="ml-2 font-medium text-sm">Boro</span>
               </div>
-              <div className="text-xl font-bold text-gray-800 mb-1">
-                {soilData.B} ppm
+              <div className="text-lg font-bold text-gray-800 mb-1">
+                {soilData.B} mg/dm³
               </div>
               <Badge className={getStatusColor(results.isAdequate.B)}>
                 {results.isAdequate.B ? 'Adequado' : 'Baixo'}
               </Badge>
+              <div className="text-xs text-gray-600 mt-1">
+                Ideal: 0,2-0,6
+              </div>
             </div>
             
-            <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-center mb-2">
                 {getStatusIcon(results.isAdequate.Cu)}
-                <span className="ml-2 font-medium">Cobre</span>
+                <span className="ml-2 font-medium text-sm">Cobre</span>
               </div>
-              <div className="text-xl font-bold text-gray-800 mb-1">
-                {soilData.Cu} ppm
+              <div className="text-lg font-bold text-gray-800 mb-1">
+                {soilData.Cu} mg/dm³
               </div>
               <Badge className={getStatusColor(results.isAdequate.Cu)}>
                 {results.isAdequate.Cu ? 'Adequado' : 'Baixo'}
               </Badge>
+              <div className="text-xs text-gray-600 mt-1">
+                Ideal: 0,8-1,2
+              </div>
             </div>
             
-            <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-center mb-2">
                 {getStatusIcon(results.isAdequate.Fe)}
-                <span className="ml-2 font-medium">Ferro</span>
+                <span className="ml-2 font-medium text-sm">Ferro</span>
               </div>
-              <div className="text-xl font-bold text-gray-800 mb-1">
-                {soilData.Fe} ppm
+              <div className="text-lg font-bold text-gray-800 mb-1">
+                {soilData.Fe} mg/dm³
               </div>
               <Badge className={getStatusColor(results.isAdequate.Fe)}>
                 {results.isAdequate.Fe ? 'Adequado' : 'Baixo'}
               </Badge>
+              <div className="text-xs text-gray-600 mt-1">
+                Ideal: ≥ 5
+              </div>
             </div>
             
-            <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-center mb-2">
                 {getStatusIcon(results.isAdequate.Mn)}
-                <span className="ml-2 font-medium">Manganês</span>
+                <span className="ml-2 font-medium text-sm">Manganês</span>
               </div>
-              <div className="text-xl font-bold text-gray-800 mb-1">
-                {soilData.Mn} ppm
+              <div className="text-lg font-bold text-gray-800 mb-1">
+                {soilData.Mn} mg/dm³
               </div>
               <Badge className={getStatusColor(results.isAdequate.Mn)}>
                 {results.isAdequate.Mn ? 'Adequado' : 'Baixo'}
               </Badge>
+              <div className="text-xs text-gray-600 mt-1">
+                Ideal: ≥ 1,2
+              </div>
             </div>
             
-            <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-center mb-2">
                 {getStatusIcon(results.isAdequate.Zn)}
-                <span className="ml-2 font-medium">Zinco</span>
+                <span className="ml-2 font-medium text-sm">Zinco</span>
               </div>
-              <div className="text-xl font-bold text-gray-800 mb-1">
-                {soilData.Zn} ppm
+              <div className="text-lg font-bold text-gray-800 mb-1">
+                {soilData.Zn} mg/dm³
               </div>
               <Badge className={getStatusColor(results.isAdequate.Zn)}>
                 {results.isAdequate.Zn ? 'Adequado' : 'Baixo'}
               </Badge>
+              <div className="text-xs text-gray-600 mt-1">
+                Ideal: 0,5-1,2
+              </div>
+            </div>
+
+            <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-center justify-center mb-2">
+                {getStatusIcon(results.isAdequate.Mo)}
+                <span className="ml-2 font-medium text-sm">Molibdênio</span>
+              </div>
+              <div className="text-lg font-bold text-gray-800 mb-1">
+                {soilData.Mo} mg/dm³
+              </div>
+              <Badge className={getStatusColor(results.isAdequate.Mo)}>
+                {results.isAdequate.Mo ? 'Adequado' : 'Baixo'}
+              </Badge>
+              <div className="text-xs text-gray-600 mt-1">
+                Ideal: 0,1-0,2
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Enxofre e Matéria Orgânica */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-          <CardHeader>
+          <CardHeader className="pb-2">
             <CardTitle className="text-green-800 flex items-center gap-2">
               {getStatusIcon(results.isAdequate.S)}
               Enxofre (S)
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <div className="text-center">
               <div className="text-3xl font-bold mb-2">
-                {soilData.S} ppm
+                {soilData.S} mg/dm³
               </div>
               <Badge className={getStatusColor(results.isAdequate.S)}>
                 {results.isAdequate.S ? 'Adequado' : 'Baixo'}
               </Badge>
               <p className="text-sm text-gray-600 mt-2">
-                Mínimo recomendado: 10 ppm
+                Mínimo recomendado: 10 mg/dm³
               </p>
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-          <CardHeader>
+          <CardHeader className="pb-2">
             <CardTitle className="text-green-800">
               Matéria Orgânica
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <div className="text-center">
               <div className="text-3xl font-bold mb-2">
                 {soilData.organicMatter}%
@@ -296,14 +322,14 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
 
       {/* Necessidades de Correção */}
       <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-        <CardHeader>
+        <CardHeader className="pb-2">
           <CardTitle className="text-green-800">Necessidades de Correção</CardTitle>
           <CardDescription>Quantidades necessárias para atingir os níveis ideais</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="text-2xl font-bold text-blue-800 mb-1">
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="text-xl font-bold text-blue-800 mb-1">
                 {results.needs.Ca.toFixed(2)}
               </div>
               <div className="text-sm font-medium text-blue-600">
@@ -311,8 +337,8 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
               </div>
             </div>
             
-            <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-              <div className="text-2xl font-bold text-purple-800 mb-1">
+            <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
+              <div className="text-xl font-bold text-purple-800 mb-1">
                 {results.needs.Mg.toFixed(2)}
               </div>
               <div className="text-sm font-medium text-purple-600">
@@ -320,17 +346,17 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
               </div>
             </div>
             
-            <div className="text-center p-4 bg-orange-50 rounded-lg border border-orange-200">
-              <div className="text-2xl font-bold text-orange-800 mb-1">
+            <div className="text-center p-3 bg-orange-50 rounded-lg border border-orange-200">
+              <div className="text-xl font-bold text-orange-800 mb-1">
                 {results.needs.K.toFixed(2)}
               </div>
               <div className="text-sm font-medium text-orange-600">
-                cmolc/dm³ de K
+                mg/dm³ de K
               </div>
             </div>
             
-            <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
-              <div className="text-2xl font-bold text-red-800 mb-1">
+            <div className="text-center p-3 bg-red-50 rounded-lg border border-red-200">
+              <div className="text-xl font-bold text-red-800 mb-1">
                 {results.needs.P.toFixed(1)}
               </div>
               <div className="text-sm font-medium text-red-600">

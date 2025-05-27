@@ -47,15 +47,14 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
       return;
     }
     
-    // Permitir apenas números, vírgula e ponto
+    // Permitir apenas números, vírgula e ponto (mas não ambos)
     const regex = /^[0-9]*[,.]?[0-9]*$/;
     if (regex.test(inputValue)) {
       // Verificar se há apenas um separador decimal
-      const commaCount = (inputValue.match(/,/g) || []).length;
-      const dotCount = (inputValue.match(/\./g) || []).length;
-      
-      if (commaCount <= 1 && dotCount <= 1 && (commaCount + dotCount) <= 1) {
-        onChange(parseValue(inputValue));
+      const separators = inputValue.match(/[,.]/g);
+      if (!separators || separators.length <= 1) {
+        const parsedValue = parseValue(inputValue);
+        onChange(parsedValue);
       }
     }
   };
@@ -67,6 +66,7 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
       onChange={handleChange}
       placeholder={placeholder}
       className={className}
+      inputMode="decimal"
     />
   );
 };

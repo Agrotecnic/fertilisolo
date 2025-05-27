@@ -25,82 +25,82 @@ export const PrimaryMacronutrientsSection: React.FC<PrimaryMacronutrientsSection
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-1">
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-1 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[10px]">CTC (T)</CardTitle>
-          <CardDescription className="text-[8px]">cmolc/dm³</CardDescription>
+        <CardHeader className="pb-0 pt-1 px-1">
+          <CardTitle className="text-gray-800 text-[8px]">CTC (T)</CardTitle>
+          <CardDescription className="text-[6px]">cmolc/dm³</CardDescription>
         </CardHeader>
         <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
             value={T}
             onChange={onTChange}
             placeholder="0,00"
-            className={`h-6 text-[10px] ${errors.T ? 'border-red-500' : ''}`}
+            className={`h-5 text-[8px] ${errors.T ? 'border-red-500' : ''}`}
           />
-          {errors.T && <span className="text-red-500 text-[8px]">{errors.T}</span>}
+          {errors.T && <span className="text-red-500 text-[6px]">{errors.T}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-1 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[10px]">Cálcio (Ca)</CardTitle>
-          <CardDescription className="text-[8px]">cmolc/dm³</CardDescription>
+        <CardHeader className="pb-0 pt-1 px-1">
+          <CardTitle className="text-gray-800 text-[8px]">Cálcio (Ca)</CardTitle>
+          <CardDescription className="text-[6px]">cmolc/dm³</CardDescription>
         </CardHeader>
         <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
             value={Ca}
             onChange={onCaChange}
             placeholder="0,00"
-            className={`h-6 text-[10px] ${errors.Ca ? 'border-red-500' : ''}`}
+            className={`h-5 text-[8px] ${errors.Ca ? 'border-red-500' : ''}`}
           />
-          {errors.Ca && <span className="text-red-500 text-[8px]">{errors.Ca}</span>}
+          {errors.Ca && <span className="text-red-500 text-[6px]">{errors.Ca}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-1 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[10px]">Magnésio (Mg)</CardTitle>
-          <CardDescription className="text-[8px]">cmolc/dm³</CardDescription>
+        <CardHeader className="pb-0 pt-1 px-1">
+          <CardTitle className="text-gray-800 text-[8px]">Magnésio (Mg)</CardTitle>
+          <CardDescription className="text-[6px]">cmolc/dm³</CardDescription>
         </CardHeader>
         <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
             value={Mg}
             onChange={onMgChange}
             placeholder="0,00"
-            className={`h-6 text-[10px] ${errors.Mg ? 'border-red-500' : ''}`}
+            className={`h-5 text-[8px] ${errors.Mg ? 'border-red-500' : ''}`}
           />
-          {errors.Mg && <span className="text-red-500 text-[8px]">{errors.Mg}</span>}
+          {errors.Mg && <span className="text-red-500 text-[6px]">{errors.Mg}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-1 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[10px]">Potássio (K)</CardTitle>
-          <CardDescription className="text-[8px]">mg/dm³</CardDescription>
+        <CardHeader className="pb-0 pt-1 px-1">
+          <CardTitle className="text-gray-800 text-[8px]">Potássio (K)</CardTitle>
+          <CardDescription className="text-[6px]">mg/dm³</CardDescription>
         </CardHeader>
         <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
             value={K}
             onChange={onKChange}
             placeholder="0,0"
-            className={`h-6 text-[10px] ${errors.K ? 'border-red-500' : ''}`}
+            className={`h-5 text-[8px] ${errors.K ? 'border-red-500' : ''}`}
           />
-          {errors.K && <span className="text-red-500 text-[8px]">{errors.K}</span>}
+          {errors.K && <span className="text-red-500 text-[6px]">{errors.K}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-1 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[10px]">Fósforo (P)</CardTitle>
-          <CardDescription className="text-[8px]">mg/dm³</CardDescription>
+        <CardHeader className="pb-0 pt-1 px-1">
+          <CardTitle className="text-gray-800 text-[8px]">Fósforo (P)</CardTitle>
+          <CardDescription className="text-[6px]">mg/dm³</CardDescription>
         </CardHeader>
         <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
             value={P}
             onChange={onPChange}
             placeholder="0,0"
-            className={`h-6 text-[10px] ${errors.P ? 'border-red-500' : ''}`}
+            className={`h-5 text-[8px] ${errors.P ? 'border-red-500' : ''}`}
           />
-          {errors.P && <span className="text-red-500 text-[8px]">{errors.P}</span>}
+          {errors.P && <span className="text-red-500 text-[6px]">{errors.P}</span>}
         </CardContent>
       </Card>
     </div>
