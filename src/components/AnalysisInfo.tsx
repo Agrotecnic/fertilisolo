@@ -16,7 +16,7 @@ export const AnalysisInfo: React.FC<AnalysisInfoProps> = ({ soilData }) => {
       <CardContent className="pt-0">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <span className="text-sm font-medium text-gray-600">Local:</span>
+            <span className="text-sm font-medium text-gray-600">Talhão:</span>
             <p className="text-lg font-semibold">{soilData.location}</p>
           </div>
           <div>

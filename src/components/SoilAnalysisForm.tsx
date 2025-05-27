@@ -67,7 +67,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
     if (formData.Zn < 0) newErrors.Zn = 'Zinco não pode ser negativo';
     if (formData.Mo < 0) newErrors.Mo = 'Molibdênio não pode ser negativo';
     if (formData.organicMatter < 0) newErrors.organicMatter = 'Matéria orgânica não pode ser negativa';
-    if (!formData.location?.trim()) newErrors.location = 'Localização é obrigatória';
+    if (!formData.location?.trim()) newErrors.location = 'Nome do talhão é obrigatório';
     if (!formData.crop?.trim()) newErrors.crop = 'Cultura é obrigatória';
 
     setErrors(newErrors);

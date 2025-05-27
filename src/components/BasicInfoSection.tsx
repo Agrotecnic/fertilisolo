@@ -46,12 +46,12 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
       <CardContent className="space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <Label htmlFor="location" className="text-xs font-medium">Localização da Análise *</Label>
+            <Label htmlFor="location" className="text-xs font-medium">Nome do Talhão *</Label>
             <FormattedInput
               type="text"
               value={location}
               onChange={onLocationChange}
-              placeholder="Ex: Fazenda São José, Talhão 3"
+              placeholder="Ex: Talhão 1A, Área Norte"
               className={`h-8 text-xs ${errors.location ? 'border-red-500' : ''}`}
             />
             {errors.location && <span className="text-red-500 text-xs">{errors.location}</span>}
