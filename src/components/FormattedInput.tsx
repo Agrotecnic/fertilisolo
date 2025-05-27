@@ -21,7 +21,7 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
 }) => {
   const formatValue = (val: number | string): string => {
     if (type === 'text') return val.toString();
-    if (val === 0 || val === '') return '';
+    if (val === 0 || val === '' || val === null || val === undefined) return '';
     return val.toString().replace('.', ',');
   };
 
@@ -29,7 +29,8 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
     if (type === 'text') return str;
     if (!str || str === '') return 0;
     const numericValue = str.replace(',', '.');
-    return parseFloat(numericValue) || 0;
+    const parsed = parseFloat(numericValue);
+    return isNaN(parsed) ? 0 : parsed;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,23 +41,28 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
       return;
     }
     
-    // Para campos numéricos, permitir apenas números, vírgula e ponto
-    const sanitized = inputValue.replace(/[^0-9,\.]/g, '');
-    
-    // Garantir apenas uma vírgula
-    const parts = sanitized.split(',');
-    let formatted = sanitized;
-    if (parts.length > 2) {
-      formatted = parts[0] + ',' + parts.slice(1).join('');
+    // Para campos numéricos, permitir números, vírgula, ponto e campo vazio
+    const regex = /^[0-9]*[,.]?[0-9]*$/;
+    if (inputValue === '' || regex.test(inputValue)) {
+      // Se campo vazio, definir como 0
+      if (inputValue === '') {
+        onChange(0);
+        return;
+      }
+      
+      // Garantir apenas uma vírgula ou ponto
+      const commaCount = (inputValue.match(/,/g) || []).length;
+      const dotCount = (inputValue.match(/\./g) || []).length;
+      
+      if (commaCount <= 1 && dotCount === 0) {
+        // Permitir a entrada e converter para número
+        onChange(parseValue(inputValue));
+      } else if (dotCount <= 1 && commaCount === 0) {
+        // Converter ponto para vírgula e permitir
+        const withComma = inputValue.replace('.', ',');
+        onChange(parseValue(withComma));
+      }
     }
-    
-    // Se o campo estiver vazio, definir como 0
-    if (formatted === '') {
-      onChange(0);
-      return;
-    }
-    
-    onChange(parseValue(formatted));
   };
 
   return (
