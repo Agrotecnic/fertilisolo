@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FormattedInput } from '@/components/FormattedInput';
+import { Input } from '@/components/ui/input';
 
 interface BasicInfoSectionProps {
   location: string;
@@ -47,10 +47,10 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <Label htmlFor="location" className="text-xs font-medium">Nome do Talhão *</Label>
-            <FormattedInput
+            <Input
               type="text"
               value={location}
-              onChange={onLocationChange}
+              onChange={(e) => onLocationChange(e.target.value)}
               placeholder="Ex: Talhão 1A, Área Norte"
               className={`h-8 text-xs ${errors.location ? 'border-red-500' : ''}`}
             />
