@@ -5,18 +5,20 @@ import { FormattedInput } from '@/components/FormattedInput';
 
 interface SecondaryMacronutrientsSectionProps {
   S: number;
+  organicMatter: number;
   onSChange: (value: number) => void;
+  onOrganicMatterChange: (value: number) => void;
   errors: Record<string, string>;
 }
 
 export const SecondaryMacronutrientsSection: React.FC<SecondaryMacronutrientsSectionProps> = ({
-  S, onSChange, errors
+  S, organicMatter, onSChange, onOrganicMatterChange, errors
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-      <Card className="bg-yellow-50 border-yellow-200">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-yellow-800 text-sm">Enxofre (S)</CardTitle>
+          <CardTitle className="text-gray-800 text-sm">Enxofre (S)</CardTitle>
           <CardDescription className="text-xs">ppm</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
@@ -27,6 +29,22 @@ export const SecondaryMacronutrientsSection: React.FC<SecondaryMacronutrientsSec
             className={errors.S ? 'border-red-500' : ''}
           />
           {errors.S && <span className="text-red-500 text-xs">{errors.S}</span>}
+        </CardContent>
+      </Card>
+
+      <Card className="bg-gray-50 border-gray-200">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-gray-800 text-sm">Matéria Orgânica</CardTitle>
+          <CardDescription className="text-xs">%</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <FormattedInput
+            value={organicMatter}
+            onChange={onOrganicMatterChange}
+            placeholder="0,0"
+            className={errors.organicMatter ? 'border-red-500' : ''}
+          />
+          {errors.organicMatter && <span className="text-red-500 text-xs">{errors.organicMatter}</span>}
         </CardContent>
       </Card>
     </div>

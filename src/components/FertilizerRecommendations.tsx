@@ -1,12 +1,11 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SoilData, CalculatedResults } from '@/pages/Index';
-import { calculateFertilizerRecommendations, fertilizerSources } from '@/utils/soilCalculations';
+import { fertilizerSources } from '@/utils/soilCalculations';
 import { generatePDFReport } from '@/utils/pdfGenerator';
-import { FileText, Download } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface FertilizerRecommendationsProps {
@@ -32,6 +31,66 @@ export const FertilizerRecommendations: React.FC<FertilizerRecommendationsProps>
         variant: "destructive",
       });
     }
+  };
+
+  const renderMicronutrientRecommendations = (
+    nutrient: 'S' | 'B' | 'Cu' | 'Fe' | 'Mn' | 'Zn',
+    needValue: number,
+    title: string
+  ) => {
+    if (needValue <= 0.01) {
+      return (
+        <Card key={nutrient} className="bg-green-50 border-green-200">
+          <CardHeader>
+            <CardTitle className="text-green-800 flex items-center gap-2">
+              {title}
+              <Badge className="bg-green-100 text-green-800">Adequado</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-green-700">
+              Os níveis de {title.toLowerCase()} estão adequados. Não é necessária correção.
+            </p>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    const sources = fertilizerSources[nutrient];
+
+    return (
+      <Card key={nutrient} className="bg-gray-50 border-gray-200">
+        <CardHeader>
+          <CardTitle className="text-gray-800">
+            {title} - Necessita Correção
+          </CardTitle>
+          <CardDescription>
+            Necessário: {needValue.toFixed(2)} kg/ha
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {sources.map((source, index) => {
+              const recommendation = needValue / (source.concentration / 100);
+              return (
+                <div key={index} className="p-4 bg-white rounded-lg border border-gray-200">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h4 className="font-semibold text-gray-900">{source.name}</h4>
+                      <p className="text-sm text-gray-600">{source.concentration}{source.unit}</p>
+                    </div>
+                    <Badge variant="outline" className="text-gray-700 border-gray-300">
+                      {recommendation.toFixed(1)} kg/ha
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-gray-700">{source.benefits}</p>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+    );
   };
 
   const renderNutrientRecommendations = (
@@ -112,10 +171,19 @@ export const FertilizerRecommendations: React.FC<FertilizerRecommendationsProps>
 
       {/* Recomendações por nutriente */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Macronutrientes primários */}
         {renderNutrientRecommendations('Ca', results.needs.Ca, 'Cálcio (Ca)', 'blue')}
         {renderNutrientRecommendations('Mg', results.needs.Mg, 'Magnésio (Mg)', 'purple')}
         {renderNutrientRecommendations('K', results.needs.K, 'Potássio (K)', 'orange')}
         {renderNutrientRecommendations('P', results.needs.P, 'Fósforo (P)', 'red')}
+        
+        {/* Macronutrientes secundários e micronutrientes */}
+        {renderMicronutrientRecommendations('S', results.needs.S, 'Enxofre (S)')}
+        {renderMicronutrientRecommendations('B', results.needs.B, 'Boro (B)')}
+        {renderMicronutrientRecommendations('Cu', results.needs.Cu, 'Cobre (Cu)')}
+        {renderMicronutrientRecommendations('Fe', results.needs.Fe, 'Ferro (Fe)')}
+        {renderMicronutrientRecommendations('Mn', results.needs.Mn, 'Manganês (Mn)')}
+        {renderMicronutrientRecommendations('Zn', results.needs.Zn, 'Zinco (Zn)')}
       </div>
 
       {/* Informações Adicionais */}

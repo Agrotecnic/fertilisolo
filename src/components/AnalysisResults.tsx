@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { SoilData, CalculatedResults } from '@/pages/Index';
-import { CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 interface AnalysisResultsProps {
   soilData: SoilData;
@@ -167,6 +166,128 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, resu
               </Badge>
               <p className="text-sm text-gray-600 mt-2">
                 Mínimo para cerrados: 15 ppm
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Micronutrientes */}
+      <Card className="bg-white/80 backdrop-blur-sm border-green-200">
+        <CardHeader>
+          <CardTitle className="text-green-800">Micronutrientes</CardTitle>
+          <CardDescription>Níveis atuais dos micronutrientes essenciais</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-center justify-center mb-2">
+                {getStatusIcon(results.isAdequate.B)}
+                <span className="ml-2 font-medium">Boro</span>
+              </div>
+              <div className="text-xl font-bold text-gray-800 mb-1">
+                {soilData.B} ppm
+              </div>
+              <Badge className={getStatusColor(results.isAdequate.B)}>
+                {results.isAdequate.B ? 'Adequado' : 'Baixo'}
+              </Badge>
+            </div>
+            
+            <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-center justify-center mb-2">
+                {getStatusIcon(results.isAdequate.Cu)}
+                <span className="ml-2 font-medium">Cobre</span>
+              </div>
+              <div className="text-xl font-bold text-gray-800 mb-1">
+                {soilData.Cu} ppm
+              </div>
+              <Badge className={getStatusColor(results.isAdequate.Cu)}>
+                {results.isAdequate.Cu ? 'Adequado' : 'Baixo'}
+              </Badge>
+            </div>
+            
+            <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-center justify-center mb-2">
+                {getStatusIcon(results.isAdequate.Fe)}
+                <span className="ml-2 font-medium">Ferro</span>
+              </div>
+              <div className="text-xl font-bold text-gray-800 mb-1">
+                {soilData.Fe} ppm
+              </div>
+              <Badge className={getStatusColor(results.isAdequate.Fe)}>
+                {results.isAdequate.Fe ? 'Adequado' : 'Baixo'}
+              </Badge>
+            </div>
+            
+            <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-center justify-center mb-2">
+                {getStatusIcon(results.isAdequate.Mn)}
+                <span className="ml-2 font-medium">Manganês</span>
+              </div>
+              <div className="text-xl font-bold text-gray-800 mb-1">
+                {soilData.Mn} ppm
+              </div>
+              <Badge className={getStatusColor(results.isAdequate.Mn)}>
+                {results.isAdequate.Mn ? 'Adequado' : 'Baixo'}
+              </Badge>
+            </div>
+            
+            <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-center justify-center mb-2">
+                {getStatusIcon(results.isAdequate.Zn)}
+                <span className="ml-2 font-medium">Zinco</span>
+              </div>
+              <div className="text-xl font-bold text-gray-800 mb-1">
+                {soilData.Zn} ppm
+              </div>
+              <Badge className={getStatusColor(results.isAdequate.Zn)}>
+                {results.isAdequate.Zn ? 'Adequado' : 'Baixo'}
+              </Badge>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Enxofre e Matéria Orgânica */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="bg-white/80 backdrop-blur-sm border-green-200">
+          <CardHeader>
+            <CardTitle className="text-green-800 flex items-center gap-2">
+              {getStatusIcon(results.isAdequate.S)}
+              Enxofre (S)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center">
+              <div className="text-3xl font-bold mb-2">
+                {soilData.S} ppm
+              </div>
+              <Badge className={getStatusColor(results.isAdequate.S)}>
+                {results.isAdequate.S ? 'Adequado' : 'Baixo'}
+              </Badge>
+              <p className="text-sm text-gray-600 mt-2">
+                Mínimo recomendado: 10 ppm
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/80 backdrop-blur-sm border-green-200">
+          <CardHeader>
+            <CardTitle className="text-green-800">
+              Matéria Orgânica
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center">
+              <div className="text-3xl font-bold mb-2">
+                {soilData.organicMatter}%
+              </div>
+              <Badge className={soilData.organicMatter && soilData.organicMatter >= 2.5 ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200'}>
+                {soilData.organicMatter && soilData.organicMatter >= 2.5 ? 'Adequado' : 'Baixo'}
+              </Badge>
+              <p className="text-sm text-gray-600 mt-2">
+                Ideal: acima de 2,5%
               </p>
             </div>
           </CardContent>

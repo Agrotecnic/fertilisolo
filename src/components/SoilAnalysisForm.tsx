@@ -39,7 +39,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
     const numericFields = ['organicMatter', 'T', 'Ca', 'Mg', 'K', 'P', 'S', 'B', 'Cu', 'Fe', 'Mn', 'Zn'];
     
     if (numericFields.includes(field)) {
-      const numValue = typeof value === 'number' ? value : (parseFloat(value.toString()) || 0);
+      const numValue = typeof value === 'number' ? value : (parseFloat(value.toString().replace(',', '.')) || 0);
       setFormData(prev => ({ ...prev, [field]: numValue }));
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
@@ -121,10 +121,8 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
       {/* Informações Básicas */}
       <BasicInfoSection
         location={formData.location || ''}
-        organicMatter={formData.organicMatter || 0}
         crop={formData.crop || ''}
         onLocationChange={(value) => handleInputChange('location', value)}
-        onOrganicMatterChange={(value) => handleInputChange('organicMatter', value)}
         onCropChange={(value) => handleInputChange('crop', value)}
         errors={errors}
       />
@@ -152,7 +150,9 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
         <h3 className="text-lg font-semibold text-green-800 mb-4">Macronutrientes Secundários</h3>
         <SecondaryMacronutrientsSection
           S={formData.S}
+          organicMatter={formData.organicMatter}
           onSChange={(value) => handleInputChange('S', value)}
+          onOrganicMatterChange={(value) => handleInputChange('organicMatter', value)}
           errors={errors}
         />
       </div>

@@ -2,31 +2,45 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FormattedInput } from '@/components/FormattedInput';
 
 interface BasicInfoSectionProps {
   location: string;
-  organicMatter: number;
   crop: string;
   onLocationChange: (value: string) => void;
-  onOrganicMatterChange: (value: number) => void;
   onCropChange: (value: string) => void;
   errors: Record<string, string>;
 }
 
+const crops = [
+  'Soja',
+  'Milho',
+  'Algodão',
+  'Café',
+  'Cana-de-açúcar',
+  'Feijão',
+  'Arroz',
+  'Trigo',
+  'Sorgo',
+  'Girassol',
+  'Pastagem',
+  'Citros',
+  'Eucalipto',
+  'Outros'
+];
+
 export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
   location,
-  organicMatter,
   crop,
   onLocationChange,
-  onOrganicMatterChange,
   onCropChange,
   errors
 }) => {
   return (
-    <Card className="bg-slate-50 border-slate-200">
+    <Card className="bg-gray-50 border-gray-200">
       <CardHeader className="pb-3">
-        <CardTitle className="text-slate-800 text-lg">Informações Básicas</CardTitle>
+        <CardTitle className="text-gray-800 text-lg">Informações Básicas</CardTitle>
         <CardDescription>Dados gerais da análise</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -44,25 +58,19 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
         
         <div>
           <Label htmlFor="crop">Cultura *</Label>
-          <FormattedInput
-            type="text"
-            value={crop}
-            onChange={onCropChange}
-            placeholder="Ex: Soja, Milho, Café"
-            className={errors.crop ? 'border-red-500' : ''}
-          />
+          <Select value={crop} onValueChange={onCropChange}>
+            <SelectTrigger className={errors.crop ? 'border-red-500' : ''}>
+              <SelectValue placeholder="Selecione a cultura" />
+            </SelectTrigger>
+            <SelectContent>
+              {crops.map((cropOption) => (
+                <SelectItem key={cropOption} value={cropOption}>
+                  {cropOption}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {errors.crop && <span className="text-red-500 text-sm">{errors.crop}</span>}
-        </div>
-        
-        <div>
-          <Label htmlFor="organicMatter">Matéria Orgânica (%)</Label>
-          <FormattedInput
-            value={organicMatter}
-            onChange={onOrganicMatterChange}
-            placeholder="0,0"
-            className={errors.organicMatter ? 'border-red-500' : ''}
-          />
-          {errors.organicMatter && <span className="text-red-500 text-sm">{errors.organicMatter}</span>}
         </div>
       </CardContent>
     </Card>

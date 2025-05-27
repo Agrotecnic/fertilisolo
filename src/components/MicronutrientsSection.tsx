@@ -24,9 +24,9 @@ export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-      <Card className="bg-indigo-50 border-indigo-200">
+      <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-indigo-800 text-sm">Boro (B)</CardTitle>
+          <CardTitle className="text-gray-800 text-sm">Boro (B)</CardTitle>
           <CardDescription className="text-xs">ppm</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
@@ -40,9 +40,9 @@ export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
         </CardContent>
       </Card>
 
-      <Card className="bg-amber-50 border-amber-200">
+      <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-amber-800 text-sm">Cobre (Cu)</CardTitle>
+          <CardTitle className="text-gray-800 text-sm">Cobre (Cu)</CardTitle>
           <CardDescription className="text-xs">ppm</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
@@ -56,9 +56,9 @@ export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-50 border-slate-200">
+      <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-800 text-sm">Ferro (Fe)</CardTitle>
+          <CardTitle className="text-gray-800 text-sm">Ferro (Fe)</CardTitle>
           <CardDescription className="text-xs">ppm</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
@@ -72,9 +72,9 @@ export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
         </CardContent>
       </Card>
 
-      <Card className="bg-pink-50 border-pink-200">
+      <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-pink-800 text-sm">Manganês (Mn)</CardTitle>
+          <CardTitle className="text-gray-800 text-sm">Manganês (Mn)</CardTitle>
           <CardDescription className="text-xs">ppm</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
@@ -88,9 +88,9 @@ export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
         </CardContent>
       </Card>
 
-      <Card className="bg-cyan-50 border-cyan-200">
+      <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-cyan-800 text-sm">Zinco (Zn)</CardTitle>
+          <CardTitle className="text-gray-800 text-sm">Zinco (Zn)</CardTitle>
           <CardDescription className="text-xs">ppm</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
