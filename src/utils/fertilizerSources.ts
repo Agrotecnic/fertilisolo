@@ -20,7 +20,7 @@ export const fertilizerSources = {
   P: [
     { name: 'Superfosfato Simples', concentration: 18, unit: '% P₂O₅', benefits: 'Fornece P, Ca e enxofre' },
     { name: 'Superfosfato Triplo', concentration: 45, unit: '% P₂O₅', benefits: 'Alta concentração de P solúvel' },
-    { name: 'Fosfato Natural Reativo', concentration: 28, unit: '% P₂O₅', benefits: 'Liberação gradual, efeito residual' },
+    { name: 'MAP (Fosfato Monoamônico)', concentration: 52, unit: '% P₂O₅', benefits: 'Alta concentração P + N, alta solubilidade' },
   ],
   S: [
     { name: 'Gesso Agrícola', concentration: 18, unit: '% S', benefits: 'Fornece S e Ca, melhora subsuperfície' },
