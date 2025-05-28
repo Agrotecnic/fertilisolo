@@ -6,7 +6,8 @@ import { SoilAnalysisForm } from '@/components/SoilAnalysisForm';
 import { AnalysisResults } from '@/components/AnalysisResults';
 import { FertilizerRecommendations } from '@/components/FertilizerRecommendations';
 import { AnalysisHistory } from '@/components/AnalysisHistory';
-import { Calculator, Leaf, FileText, History } from 'lucide-react';
+import { SoilInsights } from '@/components/SoilInsights';
+import { Calculator, Leaf, FileText, History, Brain } from 'lucide-react';
 
 export interface SoilData {
   id?: string;
@@ -102,7 +103,7 @@ const Index = () => {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="input" className="flex items-center gap-2">
               <Calculator className="h-4 w-4" />
               Nova Análise
@@ -110,6 +111,10 @@ const Index = () => {
             <TabsTrigger value="results" disabled={!results} className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Resultados
+            </TabsTrigger>
+            <TabsTrigger value="insights" disabled={!results} className="flex items-center gap-2">
+              <Brain className="h-4 w-4" />
+              Insights
             </TabsTrigger>
             <TabsTrigger value="recommendations" disabled={!results} className="flex items-center gap-2">
               <Leaf className="h-4 w-4" />
@@ -148,6 +153,15 @@ const Index = () => {
                   </Button>
                 </div>
                 <AnalysisResults soilData={soilData} results={results} />
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="insights">
+            {soilData && results && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-green-800">Insights da Análise</h2>
+                <SoilInsights soilData={soilData} results={results} />
               </div>
             )}
           </TabsContent>
