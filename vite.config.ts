@@ -19,4 +19,21 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Configuração para SPA (Single Page Application) - necessário para o React Router
+  build: {
+    outDir: "dist",
+    // Gera o arquivo _routes.json para o Cloudflare Pages
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: [
+            'react',
+            'react-dom',
+            'react-router-dom',
+            '@supabase/supabase-js',
+          ],
+        },
+      },
+    },
+  },
 }));

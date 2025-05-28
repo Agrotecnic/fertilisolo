@@ -1,0 +1,9 @@
+name = "fertilisolo"
+main = "./dist/index.html"
+compatibility_date = "2023-04-20"
+
+[site]
+bucket = "./dist"
+
+# Campo necessário para o Cloudflare Pages
+pages_build_output_dir = "dist" 
