@@ -1,0 +1,3 @@
+project_id = "fertilisolo"
+[auth.email]
+enable_confirmations = false
