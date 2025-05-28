@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { SoilData, CalculatedResults } from '@/pages/Index';
 import { SoilQualityScore } from './insights/SoilQualityScore';
@@ -50,12 +49,27 @@ export const SoilInsights: React.FC<SoilInsightsProps> = ({ soilData, results })
   const qualityScore = calculateSoilQualityScore(results);
 
   return (
-    <div className="space-y-6">
-      <SoilQualityScore results={results} />
-      <LimitingFactors results={results} />
-      <CriticalPatterns soilData={soilData} results={results} />
-      <StrategicRecommendations soilData={soilData} results={results} />
-      <ImplementationPlan qualityScore={qualityScore} />
+    <div className="space-y-8">
+      {/* Score principal - destaque no topo */}
+      <div className="w-full">
+        <SoilQualityScore results={results} />
+      </div>
+      
+      {/* Grid principal com fatores limitantes e padrões críticos */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <LimitingFactors results={results} />
+        <CriticalPatterns soilData={soilData} results={results} />
+      </div>
+      
+      {/* Recomendações estratégicas - largura total para melhor legibilidade */}
+      <div className="w-full">
+        <StrategicRecommendations soilData={soilData} results={results} />
+      </div>
+      
+      {/* Cronograma de implementação - largura total */}
+      <div className="w-full">
+        <ImplementationPlan qualityScore={qualityScore} />
+      </div>
     </div>
   );
 };
