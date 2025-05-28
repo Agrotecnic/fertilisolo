@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { SoilData, CalculatedResults } from '@/pages/Index';
+import { formatNumber, formatNumberOptional } from '@/utils/numberFormat';
 
 interface SaturationsCardProps {
   soilData: SoilData;
@@ -37,7 +38,7 @@ export const SaturationsCard: React.FC<SaturationsCardProps> = ({ soilData, resu
                 <span className="font-medium">Cálcio (Ca)</span>
               </div>
               <Badge className={getStatusColor(results.isAdequate.Ca)}>
-                {results.saturations.Ca.toFixed(1)}%
+                {formatNumber(results.saturations.Ca, 1)}%
               </Badge>
             </div>
             <Progress 
@@ -45,7 +46,7 @@ export const SaturationsCard: React.FC<SaturationsCardProps> = ({ soilData, resu
               className="h-2"
             />
             <div className="text-xs text-gray-600">
-              Ideal: 50-60% | Atual: {soilData.Ca} cmolc/dm³
+              Ideal: 50-60% | Atual: {formatNumberOptional(soilData.Ca)} cmolc/dm³
             </div>
           </div>
 
@@ -57,7 +58,7 @@ export const SaturationsCard: React.FC<SaturationsCardProps> = ({ soilData, resu
                 <span className="font-medium">Magnésio (Mg)</span>
               </div>
               <Badge className={getStatusColor(results.isAdequate.Mg)}>
-                {results.saturations.Mg.toFixed(1)}%
+                {formatNumber(results.saturations.Mg, 1)}%
               </Badge>
             </div>
             <Progress 
@@ -65,7 +66,7 @@ export const SaturationsCard: React.FC<SaturationsCardProps> = ({ soilData, resu
               className="h-2"
             />
             <div className="text-xs text-gray-600">
-              Ideal: 15-20% | Atual: {soilData.Mg} cmolc/dm³
+              Ideal: 15-20% | Atual: {formatNumberOptional(soilData.Mg)} cmolc/dm³
             </div>
           </div>
 
@@ -77,7 +78,7 @@ export const SaturationsCard: React.FC<SaturationsCardProps> = ({ soilData, resu
                 <span className="font-medium">Potássio (K)</span>
               </div>
               <Badge className={getStatusColor(results.isAdequate.K)}>
-                {results.saturations.K.toFixed(1)}%
+                {formatNumber(results.saturations.K, 1)}%
               </Badge>
             </div>
             <Progress 
@@ -85,7 +86,7 @@ export const SaturationsCard: React.FC<SaturationsCardProps> = ({ soilData, resu
               className="h-2"
             />
             <div className="text-xs text-gray-600">
-              Ideal: 3-5% | Atual: {soilData.K} mg/dm³
+              Ideal: 3-5% | Atual: {formatNumberOptional(soilData.K)} mg/dm³
             </div>
           </div>
         </div>

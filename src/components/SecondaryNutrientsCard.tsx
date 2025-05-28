@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { SoilData, CalculatedResults } from '@/pages/Index';
+import { formatNumberOptional } from '@/utils/numberFormat';
 
 interface SecondaryNutrientsCardProps {
   soilData: SoilData;
@@ -32,7 +33,7 @@ export const SecondaryNutrientsCard: React.FC<SecondaryNutrientsCardProps> = ({ 
         <CardContent className="pt-0">
           <div className="text-center">
             <div className="text-3xl font-bold mb-2">
-              {soilData.S} mg/dm³
+              {formatNumberOptional(soilData.S)} mg/dm³
             </div>
             <Badge className={getStatusColor(results.isAdequate.S)}>
               {results.isAdequate.S ? 'Adequado' : 'Baixo'}
@@ -53,7 +54,7 @@ export const SecondaryNutrientsCard: React.FC<SecondaryNutrientsCardProps> = ({ 
         <CardContent className="pt-0">
           <div className="text-center">
             <div className="text-3xl font-bold mb-2">
-              {soilData.organicMatter}%
+              {formatNumberOptional(soilData.organicMatter)}%
             </div>
             <Badge className={soilData.organicMatter && soilData.organicMatter >= 2.5 ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200'}>
               {soilData.organicMatter && soilData.organicMatter >= 2.5 ? 'Adequado' : 'Baixo'}

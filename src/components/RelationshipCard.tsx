@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { SoilData, CalculatedResults } from '@/pages/Index';
+import { formatNumber, formatNumberOptional } from '@/utils/numberFormat';
 
 interface RelationshipCardProps {
   soilData: SoilData;
@@ -33,7 +34,7 @@ export const RelationshipCard: React.FC<RelationshipCardProps> = ({ soilData, re
         <CardContent className="pt-0">
           <div className="text-center">
             <div className="text-3xl font-bold mb-2">
-              {results.caeMgRatio.toFixed(2)}:1
+              {formatNumber(results.caeMgRatio)}:1
             </div>
             <Badge className={getStatusColor(results.isAdequate.CaMgRatio)}>
               {results.isAdequate.CaMgRatio ? 'Adequada' : 'Inadequada'}
@@ -56,7 +57,7 @@ export const RelationshipCard: React.FC<RelationshipCardProps> = ({ soilData, re
         <CardContent className="pt-0">
           <div className="text-center">
             <div className="text-3xl font-bold mb-2">
-              {soilData.P} mg/dm³
+              {formatNumberOptional(soilData.P)} mg/dm³
             </div>
             <Badge className={getStatusColor(results.isAdequate.P)}>
               {results.isAdequate.P ? 'Adequado' : 'Baixo'}

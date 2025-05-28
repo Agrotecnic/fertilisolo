@@ -1,5 +1,7 @@
+
 import { SoilData, CalculatedResults } from '@/pages/Index';
 import { calculateFertilizerRecommendations } from './soilCalculations';
+import { formatNumber, formatNumberOptional } from './numberFormat';
 
 export const generatePDFReport = (soilData: SoilData, results: CalculatedResults) => {
   // Create a comprehensive HTML report
@@ -79,11 +81,11 @@ export const generatePDFReport = (soilData: SoilData, results: CalculatedResults
                 <h3>Informações da Análise</h3>
                 <p><strong>Local:</strong> ${soilData.location}</p>
                 <p><strong>Data:</strong> ${soilData.date}</p>
-                <p><strong>CTC (T):</strong> ${soilData.T} cmolc/dm³</p>
+                <p><strong>CTC (T):</strong> ${formatNumberOptional(soilData.T)} cmolc/dm³</p>
             </div>
             <div class="info-box">
                 <h3>Relação Ca/Mg</h3>
-                <p><strong>Atual:</strong> ${results.caeMgRatio.toFixed(2)}:1</p>
+                <p><strong>Atual:</strong> ${formatNumber(results.caeMgRatio)}:1</p>
                 <p><strong>Status:</strong> <span class="${results.isAdequate.CaMgRatio ? 'adequate' : 'inadequate'}">${results.isAdequate.CaMgRatio ? 'Adequada' : 'Inadequada'}</span></p>
                 <p><strong>Ideal:</strong> 3:1 a 5:1</p>
             </div>
@@ -104,28 +106,28 @@ export const generatePDFReport = (soilData: SoilData, results: CalculatedResults
                 <tbody>
                     <tr>
                         <td>Cálcio (Ca)</td>
-                        <td>${soilData.Ca} cmolc/dm³</td>
-                        <td>${results.saturations.Ca.toFixed(1)}%</td>
+                        <td>${formatNumberOptional(soilData.Ca)} cmolc/dm³</td>
+                        <td>${formatNumber(results.saturations.Ca, 1)}%</td>
                         <td>50-60%</td>
                         <td class="${results.isAdequate.Ca ? 'adequate' : 'inadequate'}">${results.isAdequate.Ca ? 'Adequado' : 'Baixo'}</td>
                     </tr>
                     <tr>
                         <td>Magnésio (Mg)</td>
-                        <td>${soilData.Mg} cmolc/dm³</td>
-                        <td>${results.saturations.Mg.toFixed(1)}%</td>
+                        <td>${formatNumberOptional(soilData.Mg)} cmolc/dm³</td>
+                        <td>${formatNumber(results.saturations.Mg, 1)}%</td>
                         <td>15-20%</td>
                         <td class="${results.isAdequate.Mg ? 'adequate' : 'inadequate'}">${results.isAdequate.Mg ? 'Adequado' : 'Baixo'}</td>
                     </tr>
                     <tr>
                         <td>Potássio (K)</td>
-                        <td>${soilData.K} cmolc/dm³</td>
-                        <td>${results.saturations.K.toFixed(1)}%</td>
+                        <td>${formatNumberOptional(soilData.K)} cmolc/dm³</td>
+                        <td>${formatNumber(results.saturations.K, 1)}%</td>
                         <td>3-5%</td>
                         <td class="${results.isAdequate.K ? 'adequate' : 'inadequate'}">${results.isAdequate.K ? 'Adequado' : 'Baixo'}</td>
                     </tr>
                     <tr>
                         <td>Fósforo (P)</td>
-                        <td>${soilData.P} ppm</td>
+                        <td>${formatNumberOptional(soilData.P)} ppm</td>
                         <td>-</td>
                         <td>≥ 15 ppm</td>
                         <td class="${results.isAdequate.P ? 'adequate' : 'inadequate'}">${results.isAdequate.P ? 'Adequado' : 'Baixo'}</td>
@@ -147,22 +149,22 @@ export const generatePDFReport = (soilData: SoilData, results: CalculatedResults
                 <tbody>
                     <tr>
                         <td>Cálcio (Ca)</td>
-                        <td>${results.needs.Ca.toFixed(2)}</td>
+                        <td>${formatNumber(results.needs.Ca)}</td>
                         <td>cmolc/dm³</td>
                     </tr>
                     <tr>
                         <td>Magnésio (Mg)</td>
-                        <td>${results.needs.Mg.toFixed(2)}</td>
+                        <td>${formatNumber(results.needs.Mg)}</td>
                         <td>cmolc/dm³</td>
                     </tr>
                     <tr>
                         <td>Potássio (K)</td>
-                        <td>${results.needs.K.toFixed(2)}</td>
+                        <td>${formatNumber(results.needs.K)}</td>
                         <td>cmolc/dm³</td>
                     </tr>
                     <tr>
                         <td>Fósforo (P)</td>
-                        <td>${results.needs.P.toFixed(1)}</td>
+                        <td>${formatNumber(results.needs.P, 1)}</td>
                         <td>kg/ha</td>
                     </tr>
                 </tbody>
@@ -209,7 +211,7 @@ const generateFertilizerRecommendationsHTML = (results: CalculatedResults): stri
       const recommendations = calculateFertilizerRecommendations(nutrient.key, nutrient.need);
       
       html += `
-        <h4>${nutrient.name} - Necessita ${nutrient.need.toFixed(2)} ${nutrient.key === 'P' ? 'kg/ha' : 'cmolc/dm³'}</h4>
+        <h4>${nutrient.name} - Necessita ${formatNumber(nutrient.need)} ${nutrient.key === 'P' ? 'kg/ha' : 'cmolc/dm³'}</h4>
         <table class="table">
           <thead>
             <tr>
@@ -226,8 +228,8 @@ const generateFertilizerRecommendationsHTML = (results: CalculatedResults): stri
         html += `
           <tr>
             <td>${rec.source.name}</td>
-            <td>${rec.source.concentration}${rec.source.unit}</td>
-            <td>${rec.recommendation.toFixed(1)}</td>
+            <td>${formatNumberOptional(rec.source.concentration)}${rec.source.unit}</td>
+            <td>${formatNumber(rec.recommendation, 1)}</td>
             <td>${rec.source.benefits}</td>
           </tr>
         `;

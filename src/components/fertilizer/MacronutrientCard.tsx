@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Sprout } from 'lucide-react';
 import { calculateFertilizerRecommendations } from '@/utils/soilCalculations';
+import { formatNumber, formatNumberOptional } from '@/utils/numberFormat';
 
 interface MacronutrientCardProps {
   nutrient: 'Ca' | 'Mg' | 'K' | 'P';
@@ -50,7 +51,7 @@ export const MacronutrientCard: React.FC<MacronutrientCardProps> = ({
           </Badge>
         </CardTitle>
         <CardDescription className="text-sm">
-          Necessário: {needValue.toFixed(2)} {nutrient === 'P' ? 'kg/ha' : 'cmolc/dm³'}
+          Necessário: {formatNumber(needValue)} {nutrient === 'P' ? 'kg/ha' : 'cmolc/dm³'}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
@@ -60,10 +61,10 @@ export const MacronutrientCard: React.FC<MacronutrientCardProps> = ({
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1">
                   <h4 className="font-semibold text-gray-900">{rec.source.name}</h4>
-                  <p className="text-sm text-gray-600">{rec.source.concentration}{rec.source.unit}</p>
+                  <p className="text-sm text-gray-600">{formatNumberOptional(rec.source.concentration)}{rec.source.unit}</p>
                 </div>
                 <Badge className={`bg-${color}-200 text-${color}-800 border-${color}-300`}>
-                  {rec.recommendation.toFixed(1)} kg/ha
+                  {formatNumber(rec.recommendation, 1)} kg/ha
                 </Badge>
               </div>
               <p className="text-sm text-gray-700">{rec.source.benefits}</p>
