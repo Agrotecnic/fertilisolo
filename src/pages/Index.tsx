@@ -95,23 +95,23 @@ const Index = () => {
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5 mb-8 bg-white shadow-sm">
-            <TabsTrigger value="input" className="flex items-center gap-2 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+            <TabsTrigger value="input" className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
               <Calculator className="h-4 w-4" />
               Nova Análise
             </TabsTrigger>
-            <TabsTrigger value="results" disabled={!results} className="flex items-center gap-2 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+            <TabsTrigger value="results" disabled={!results} className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
               <FileText className="h-4 w-4" />
               Resultados
             </TabsTrigger>
-            <TabsTrigger value="insights" disabled={!results} className="flex items-center gap-2 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+            <TabsTrigger value="insights" disabled={!results} className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
               <Brain className="h-4 w-4" />
               Insights
             </TabsTrigger>
-            <TabsTrigger value="recommendations" disabled={!results} className="flex items-center gap-2 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+            <TabsTrigger value="recommendations" disabled={!results} className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
               <Leaf className="h-4 w-4" />
               Recomendações
             </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+            <TabsTrigger value="history" className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
               <History className="h-4 w-4" />
               Histórico
             </TabsTrigger>

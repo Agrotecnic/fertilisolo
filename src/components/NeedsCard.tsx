@@ -22,7 +22,7 @@ export const NeedsCard: React.FC<NeedsCardProps> = ({ results }) => {
             <div className="text-xl font-bold text-primary-dark mb-1">
               {formatNumber(results.needs.Ca)}
             </div>
-            <div className="text-sm font-medium text-secondary-dark">
+            <div className="text-sm font-medium text-neutral-dark">
               cmolc/dm³ de Ca
             </div>
           </div>
@@ -31,7 +31,7 @@ export const NeedsCard: React.FC<NeedsCardProps> = ({ results }) => {
             <div className="text-xl font-bold text-primary-dark mb-1">
               {formatNumber(results.needs.Mg)}
             </div>
-            <div className="text-sm font-medium text-secondary-dark">
+            <div className="text-sm font-medium text-neutral-dark">
               cmolc/dm³ de Mg
             </div>
           </div>
@@ -40,7 +40,7 @@ export const NeedsCard: React.FC<NeedsCardProps> = ({ results }) => {
             <div className="text-xl font-bold text-primary-dark mb-1">
               {formatNumber(results.needs.K)}
             </div>
-            <div className="text-sm font-medium text-secondary-dark">
+            <div className="text-sm font-medium text-neutral-dark">
               mg/dm³ de K
             </div>
           </div>
@@ -49,7 +49,7 @@ export const NeedsCard: React.FC<NeedsCardProps> = ({ results }) => {
             <div className="text-xl font-bold text-primary-dark mb-1">
               {formatNumber(results.needs.P, 1)}
             </div>
-            <div className="text-sm font-medium text-secondary-dark">
+            <div className="text-sm font-medium text-neutral-dark">
               kg/ha de P
             </div>
           </div>

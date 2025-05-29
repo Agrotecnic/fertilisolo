@@ -9,8 +9,9 @@
   "icons": [
     {
       "src": "/icone-fertilisolo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "sizes": "512x512 384x384 256x256 192x192 128x128 96x96 72x72 48x48",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 } 

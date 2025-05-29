@@ -106,7 +106,7 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
       onBlur={handleBlur}
       onFocus={handleFocus}
       placeholder={placeholder}
-      className={className}
+      className={`text-gray-800 ${className}`}
       inputMode="decimal"
     />
   );
