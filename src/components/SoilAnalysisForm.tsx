@@ -32,6 +32,9 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
     Zn: 0,
     Mo: 0,
   });
+  
+  // Armazenar valores temporários durante a digitação
+  const [tempInputValues, setTempInputValues] = useState<Record<string, string>>({});
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -39,9 +42,40 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
     const numericFields = ['organicMatter', 'T', 'Ca', 'Mg', 'K', 'P', 'S', 'B', 'Cu', 'Fe', 'Mn', 'Zn', 'Mo'];
     
     if (numericFields.includes(field)) {
-      const numValue = typeof value === 'number' ? value : (parseFloat(value.toString().replace(',', '.')) || 0);
-      setFormData(prev => ({ ...prev, [field]: numValue }));
+      // Verificar se o valor é uma string e contém apenas uma vírgula
+      if (typeof value === 'string') {
+        // Permitir valores temporários como "0," ou ","
+        if (value === ',' || value === '.' || value.endsWith(',') || value.endsWith('.') || 
+            (value.includes(',') && !isNaN(parseFloat(value.replace(',', '.')))) ||
+            (value.includes('.') && !isNaN(parseFloat(value)))) {
+          // Armazenar o valor temporário
+          setTempInputValues(prev => ({ ...prev, [field]: value }));
+          
+          // Se o valor termina com vírgula, não converter para número ainda
+          if (value.endsWith(',') || value.endsWith('.') || value === ',' || value === '.') {
+            return;
+          }
+          
+          // Caso contrário, converter normalmente
+          const numValue = parseFloat(value.replace(',', '.')) || 0;
+          setFormData(prev => ({ ...prev, [field]: numValue }));
+        } else if (value === '') {
+          // Limpar o valor temporário quando vazio
+          setTempInputValues(prev => ({ ...prev, [field]: '' }));
+          setFormData(prev => ({ ...prev, [field]: 0 }));
+        } else {
+          // Tentar converter para número
+          const numValue = parseFloat(value.replace(',', '.')) || 0;
+          setTempInputValues(prev => ({ ...prev, [field]: value }));
+          setFormData(prev => ({ ...prev, [field]: numValue }));
+        }
+      } else {
+        // Se já for um número, atualizar diretamente
+        setFormData(prev => ({ ...prev, [field]: value }));
+        setTempInputValues(prev => ({ ...prev, [field]: value.toString() }));
+      }
     } else {
+      // Campo de texto normal
       setFormData(prev => ({ ...prev, [field]: value }));
     }
 
@@ -53,6 +87,16 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
+
+    // Converter qualquer valor temporário pendente antes da validação
+    const numericFields = ['organicMatter', 'T', 'Ca', 'Mg', 'K', 'P', 'S', 'B', 'Cu', 'Fe', 'Mn', 'Zn', 'Mo'];
+    numericFields.forEach(field => {
+      const tempValue = tempInputValues[field];
+      if (tempValue && (tempValue.endsWith(',') || tempValue.endsWith('.'))) {
+        const numValue = parseFloat(tempValue.replace(',', '.')) || 0;
+        setFormData(prev => ({ ...prev, [field]: numValue }));
+      }
+    });
 
     if (formData.T <= 0) newErrors.T = 'CTC deve ser maior que 0';
     if (formData.Ca < 0) newErrors.Ca = 'Cálcio não pode ser negativo';
@@ -105,6 +149,15 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
     }
   };
 
+  // Obter o valor a ser exibido (temporário ou final)
+  const getDisplayValue = (field: keyof typeof formData) => {
+    const numericFields = ['organicMatter', 'T', 'Ca', 'Mg', 'K', 'P', 'S', 'B', 'Cu', 'Fe', 'Mn', 'Zn', 'Mo'];
+    if (numericFields.includes(field) && tempInputValues[field] !== undefined) {
+      return tempInputValues[field];
+    }
+    return formData[field];
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-1">
       {errors.general && (
@@ -126,11 +179,11 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
       <div>
         <h3 className="text-xs font-semibold text-green-800 mb-1">Macronutrientes Primários</h3>
         <PrimaryMacronutrientsSection
-          T={formData.T}
-          Ca={formData.Ca}
-          Mg={formData.Mg}
-          K={formData.K}
-          P={formData.P}
+          T={getDisplayValue('T')}
+          Ca={getDisplayValue('Ca')}
+          Mg={getDisplayValue('Mg')}
+          K={getDisplayValue('K')}
+          P={getDisplayValue('P')}
           onTChange={(value) => handleInputChange('T', value)}
           onCaChange={(value) => handleInputChange('Ca', value)}
           onMgChange={(value) => handleInputChange('Mg', value)}
@@ -144,8 +197,8 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
       <div>
         <h3 className="text-xs font-semibold text-green-800 mb-1">Macronutrientes Secundários</h3>
         <SecondaryMacronutrientsSection
-          S={formData.S}
-          organicMatter={formData.organicMatter}
+          S={getDisplayValue('S')}
+          organicMatter={getDisplayValue('organicMatter')}
           onSChange={(value) => handleInputChange('S', value)}
           onOrganicMatterChange={(value) => handleInputChange('organicMatter', value)}
           errors={errors}
@@ -156,12 +209,12 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
       <div>
         <h3 className="text-xs font-semibold text-green-800 mb-1">Micronutrientes</h3>
         <MicronutrientsSection
-          B={formData.B}
-          Cu={formData.Cu}
-          Fe={formData.Fe}
-          Mn={formData.Mn}
-          Zn={formData.Zn}
-          Mo={formData.Mo}
+          B={getDisplayValue('B')}
+          Cu={getDisplayValue('Cu')}
+          Fe={getDisplayValue('Fe')}
+          Mn={getDisplayValue('Mn')}
+          Zn={getDisplayValue('Zn')}
+          Mo={getDisplayValue('Mo')}
           onBChange={(value) => handleInputChange('B', value)}
           onCuChange={(value) => handleInputChange('Cu', value)}
           onFeChange={(value) => handleInputChange('Fe', value)}

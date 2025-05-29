@@ -90,7 +90,7 @@ const Index = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <Leaf className="h-12 w-12 text-green-600 mr-3" />
+            <img src="/icone-fertilisolo.svg" alt="Logo FertiliSolo" className="h-12 w-12 mr-3" />
             <h1 className="text-4xl font-bold text-green-800">Fertilisolo</h1>
           </div>
           <p className="text-xl text-green-700 max-w-3xl mx-auto">

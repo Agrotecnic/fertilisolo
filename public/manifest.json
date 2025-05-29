@@ -1,0 +1,16 @@
+{
+  "name": "FertiliSolo",
+  "short_name": "FertiliSolo",
+  "description": "Sistema de análise de solo e recomendação de adubação para maximizar a produtividade agrícola",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4ade80",
+  "icons": [
+    {
+      "src": "/icone-fertilisolo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+} 

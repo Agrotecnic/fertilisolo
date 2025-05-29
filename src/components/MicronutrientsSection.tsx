@@ -1,21 +1,20 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FormattedInput } from '@/components/FormattedInput';
 
 interface MicronutrientsSectionProps {
-  B: number;
-  Cu: number;
-  Fe: number;
-  Mn: number;
-  Zn: number;
-  Mo: number;
-  onBChange: (value: number) => void;
-  onCuChange: (value: number) => void;
-  onFeChange: (value: number) => void;
-  onMnChange: (value: number) => void;
-  onZnChange: (value: number) => void;
-  onMoChange: (value: number) => void;
+  B: number | string;
+  Cu: number | string;
+  Fe: number | string;
+  Mn: number | string;
+  Zn: number | string;
+  Mo: number | string;
+  onBChange: (value: number | string) => void;
+  onCuChange: (value: number | string) => void;
+  onFeChange: (value: number | string) => void;
+  onMnChange: (value: number | string) => void;
+  onZnChange: (value: number | string) => void;
+  onMoChange: (value: number | string) => void;
   errors: Record<string, string>;
 }
 

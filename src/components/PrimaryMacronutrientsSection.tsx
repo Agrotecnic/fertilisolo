@@ -1,19 +1,18 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FormattedInput } from '@/components/FormattedInput';
 
 interface PrimaryMacronutrientsSectionProps {
-  T: number;
-  Ca: number;
-  Mg: number;
-  K: number;
-  P: number;
-  onTChange: (value: number) => void;
-  onCaChange: (value: number) => void;
-  onMgChange: (value: number) => void;
-  onKChange: (value: number) => void;
-  onPChange: (value: number) => void;
+  T: number | string;
+  Ca: number | string;
+  Mg: number | string;
+  K: number | string;
+  P: number | string;
+  onTChange: (value: number | string) => void;
+  onCaChange: (value: number | string) => void;
+  onMgChange: (value: number | string) => void;
+  onKChange: (value: number | string) => void;
+  onPChange: (value: number | string) => void;
   errors: Record<string, string>;
 }
 

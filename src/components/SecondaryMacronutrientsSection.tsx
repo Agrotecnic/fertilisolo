@@ -1,13 +1,12 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FormattedInput } from '@/components/FormattedInput';
 
 interface SecondaryMacronutrientsSectionProps {
-  S: number;
-  organicMatter: number;
-  onSChange: (value: number) => void;
-  onOrganicMatterChange: (value: number) => void;
+  S: number | string;
+  organicMatter: number | string;
+  onSChange: (value: number | string) => void;
+  onOrganicMatterChange: (value: number | string) => void;
   errors: Record<string, string>;
 }
 
