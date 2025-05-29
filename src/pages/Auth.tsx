@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { LoginForm } from '@/components/LoginForm';
 import { SignupForm } from '@/components/SignupForm';
-import { Leaf } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Header } from '@/components/layout/Header';
+import { Container, Paper } from '@mantine/core';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -18,33 +19,37 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex flex-col justify-center items-center p-4">
-      <div className="text-center mb-6">
-        <div className="flex items-center justify-center mb-4">
-          <img src="/icone-fertilisolo.svg" alt="Logo FertiliSolo" className="h-12 w-12 mr-3" />
-          <h1 className="text-4xl font-bold text-green-800">Fertilisolo</h1>
-        </div>
-        <p className="text-xl text-green-700">
-          Calculadora de Adubação
-        </p>
-      </div>
+    <div className="min-h-screen bg-bg-light flex flex-col">
+      <Header subtitle="Calculadora de Adubação" description={null} />
       
-      <div className="w-full max-w-md">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="signup">Criar Conta</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="login">
-            <LoginForm onLoginSuccess={handleLoginSuccess} />
-          </TabsContent>
-          
-          <TabsContent value="signup">
-            <SignupForm onSignupSuccess={handleSignupSuccess} />
-          </TabsContent>
-        </Tabs>
-      </div>
+      <Container size="sm" className="flex-1 flex flex-col justify-center items-center p-4">
+        <Paper shadow="xs" radius="md" p="xl" className="w-full max-w-md bg-white border border-secondary-dark/10">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6 bg-bg-lighter">
+              <TabsTrigger 
+                value="login" 
+                className="font-inter font-medium data-[state=active]:bg-primary-dark data-[state=active]:text-white"
+              >
+                Login
+              </TabsTrigger>
+              <TabsTrigger 
+                value="signup" 
+                className="font-inter font-medium data-[state=active]:bg-primary-dark data-[state=active]:text-white"
+              >
+                Criar Conta
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="login">
+              <LoginForm onLoginSuccess={handleLoginSuccess} />
+            </TabsContent>
+            
+            <TabsContent value="signup">
+              <SignupForm onSignupSuccess={handleSignupSuccess} />
+            </TabsContent>
+          </Tabs>
+        </Paper>
+      </Container>
     </div>
   );
 };

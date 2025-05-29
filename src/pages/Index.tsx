@@ -8,6 +8,7 @@ import { FertilizerRecommendations } from '@/components/FertilizerRecommendation
 import { AnalysisHistory } from '@/components/AnalysisHistory';
 import { SoilInsights } from '@/components/SoilInsights';
 import { Calculator, Leaf, FileText, History, Brain } from 'lucide-react';
+import { Header } from '@/components/layout/Header';
 
 export interface SoilData {
   id?: string;
@@ -84,60 +85,50 @@ const Index = () => {
     setActiveTab('input');
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <img src="/icone-fertilisolo.svg" alt="Logo FertiliSolo" className="h-12 w-12 mr-3" />
-            <h1 className="text-4xl font-bold text-green-800">Fertilisolo</h1>
-          </div>
-          <p className="text-xl text-green-700 max-w-3xl mx-auto">
-            Calculadora de Adubação - Método de Saturações por Bases
-          </p>
-          <p className="text-sm text-green-600 mt-2">
-            Ferramenta profissional para agrônomos, técnicos agrícolas e produtores rurais
-          </p>
-        </div>
+  const titleStyle = { fontFamily: 'Inter, sans-serif' };
 
+  return (
+    <div className="min-h-screen bg-bg-light">
+      <Header />
+      
+      <div className="container mx-auto px-4 py-8">
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
-            <TabsTrigger value="input" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-5 mb-8 bg-white shadow-sm">
+            <TabsTrigger value="input" className="flex items-center gap-2 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
               <Calculator className="h-4 w-4" />
               Nova Análise
             </TabsTrigger>
-            <TabsTrigger value="results" disabled={!results} className="flex items-center gap-2">
+            <TabsTrigger value="results" disabled={!results} className="flex items-center gap-2 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
               <FileText className="h-4 w-4" />
               Resultados
             </TabsTrigger>
-            <TabsTrigger value="insights" disabled={!results} className="flex items-center gap-2">
+            <TabsTrigger value="insights" disabled={!results} className="flex items-center gap-2 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
               <Brain className="h-4 w-4" />
               Insights
             </TabsTrigger>
-            <TabsTrigger value="recommendations" disabled={!results} className="flex items-center gap-2">
+            <TabsTrigger value="recommendations" disabled={!results} className="flex items-center gap-2 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
               <Leaf className="h-4 w-4" />
               Recomendações
             </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2">
+            <TabsTrigger value="history" className="flex items-center gap-2 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
               <History className="h-4 w-4" />
               Histórico
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="input">
-            <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-              <CardHeader>
-                <CardTitle className="text-green-800 flex items-center gap-2">
-                  <Calculator className="h-5 w-5" />
+            <Card className="bg-white border-secondary-dark/10 shadow-sm">
+              <CardHeader className="border-b border-secondary-dark/10">
+                <CardTitle className="text-primary-dark flex items-center gap-2" style={titleStyle}>
+                  <Calculator className="h-5 w-5 text-secondary-dark" />
                   Entrada de Dados da Análise do Solo
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-neutral-medium">
                   Insira os valores da análise química do solo para calcular as saturações e necessidades de adubação
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <SoilAnalysisForm onAnalysisComplete={handleAnalysisComplete} />
               </CardContent>
             </Card>
@@ -147,8 +138,8 @@ const Index = () => {
             {soilData && results && (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-bold text-green-800">Resultados da Análise</h2>
-                  <Button onClick={resetAnalysis} variant="outline" className="border-green-300 text-green-700 hover:bg-green-50">
+                  <h2 className="text-2xl font-bold text-primary-dark" style={titleStyle}>Resultados da Análise</h2>
+                  <Button onClick={resetAnalysis} variant="outline" className="border-secondary-dark/20 text-secondary-dark hover:bg-secondary-dark/5">
                     Nova Análise
                   </Button>
                 </div>
@@ -160,7 +151,7 @@ const Index = () => {
           <TabsContent value="insights">
             {soilData && results && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-green-800">Insights da Análise</h2>
+                <h2 className="text-2xl font-bold text-primary-dark" style={titleStyle}>Insights da Análise</h2>
                 <SoilInsights soilData={soilData} results={results} />
               </div>
             )}
@@ -169,24 +160,24 @@ const Index = () => {
           <TabsContent value="recommendations">
             {soilData && results && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-green-800">Recomendações de Adubação</h2>
+                <h2 className="text-2xl font-bold text-primary-dark" style={titleStyle}>Recomendações de Adubação</h2>
                 <FertilizerRecommendations soilData={soilData} results={results} />
               </div>
             )}
           </TabsContent>
 
           <TabsContent value="history">
-            <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-              <CardHeader>
-                <CardTitle className="text-green-800 flex items-center gap-2">
-                  <History className="h-5 w-5" />
+            <Card className="bg-white border-secondary-dark/10 shadow-sm">
+              <CardHeader className="border-b border-secondary-dark/10">
+                <CardTitle className="text-primary-dark flex items-center gap-2" style={titleStyle}>
+                  <History className="h-5 w-5 text-secondary-dark" />
                   Histórico de Análises
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-neutral-medium">
                   Visualize e compare análises anteriores
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <AnalysisHistory />
               </CardContent>
             </Card>

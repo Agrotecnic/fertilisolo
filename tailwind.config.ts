@@ -19,6 +19,19 @@ export default {
 		},
 		extend: {
 			colors: {
+				// Paleta profissional
+				'primary-dark': '#1B5E20', // Verde escuro primário
+				'primary-light': '#2E7D32', // Verde escuro secundário
+				'secondary-dark': '#1565C0', // Azul corporativo primário
+				'secondary-light': '#1976D2', // Azul corporativo secundário
+				'accent-dark': '#FF8F00', // Laranja terra primário
+				'accent-light': '#F57F17', // Laranja terra secundário
+				'neutral-dark': '#37474F', // Cinza elegante escuro
+				'neutral-medium': '#546E7A', // Cinza elegante médio
+				'neutral-light': '#78909C', // Cinza elegante claro
+				'bg-light': '#FAFAFA', // Background claro
+				'bg-lighter': '#F5F5F5', // Background mais claro
+				// Cores do sistema
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
