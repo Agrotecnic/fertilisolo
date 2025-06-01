@@ -11,7 +11,7 @@ const Auth = () => {
   const [activeTab, setActiveTab] = useState<string>('login');
 
   const handleLoginSuccess = () => {
-    navigate('/');
+    navigate('/dashboard');
   };
 
   const handleSignupSuccess = () => {

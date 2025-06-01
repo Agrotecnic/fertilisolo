@@ -5,20 +5,30 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 
-export const LogoutButton: React.FC = () => {
+interface LogoutButtonProps {
+  customHandler?: () => Promise<void>;
+}
+
+export const LogoutButton: React.FC<LogoutButtonProps> = ({ customHandler }) => {
   const { signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await signOut();
-      toast({
-        title: 'Logout realizado',
-        description: 'Você foi desconectado com sucesso.',
-      });
-      // Navegar para a página de login após o logout bem-sucedido
-      navigate('/login');
+      if (customHandler) {
+        // Se um manipulador personalizado foi fornecido, use-o
+        await customHandler();
+      } else {
+        // Caso contrário, use o comportamento padrão
+        await signOut();
+        toast({
+          title: 'Logout realizado',
+          description: 'Você foi desconectado com sucesso.',
+        });
+        // Navegar para a página inicial após o logout bem-sucedido
+        navigate('/');
+      }
     } catch (error) {
       toast({
         variant: 'destructive',

@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import LandingPage from "./pages/LandingPage";
 import { useAuth } from "./hooks/useAuth";
 import { AuthBox } from "./components/AuthBox";
 import { Loader2 } from "lucide-react";
@@ -30,15 +31,15 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!user) {
-    console.log("Redirecionando para /login porque o usuário não está autenticado");
+    console.log("Redirecionando para / porque o usuário não está autenticado");
     // Salva a localização atual para redirecionar de volta após o login
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;
 };
 
-// Componente para redirecionar usuários já logados para a página principal
+// Componente para redirecionar usuários já logados para a página do dashboard
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   
@@ -53,8 +54,8 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (user) {
-    console.log("Redirecionando para / porque o usuário já está autenticado");
-    return <Navigate to="/" replace />;
+    console.log("Redirecionando para /dashboard porque o usuário já está autenticado");
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
@@ -62,18 +63,37 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 
 // Componente interno que usa o hook useAuth após o BrowserRouter estar disponível
 const AppContent = () => {
-  const { user, userType, loading } = useAuth();
+  const { user, userType, loading, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      // Não precisa de navegação aqui, o hook de autenticação já vai redirecionar
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    }
+  };
 
   return (
     <>
       {user && userType && (
         <div className="fixed top-2 right-2 md:top-6 md:right-6 z-50">
-          <AuthBox user={user} userType={userType} />
+          <AuthBox user={user} userType={userType} onLogout={handleLogout} />
         </div>
       )}
       <Routes>
+        {/* Rota principal: landing page para usuários não logados */}
         <Route 
           path="/" 
+          element={
+            <PublicRoute>
+              <LandingPage />
+            </PublicRoute>
+          } 
+        />
+        {/* Rota de dashboard: para usuários logados */}
+        <Route 
+          path="/dashboard" 
           element={
             <ProtectedRoute>
               <Index />

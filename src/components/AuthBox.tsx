@@ -10,9 +10,10 @@ import { useState } from 'react';
 interface AuthBoxProps {
   user: User | null;
   userType: UserType | null;
+  onLogout?: () => Promise<void>;
 }
 
-export const AuthBox: React.FC<AuthBoxProps> = ({ user, userType }) => {
+export const AuthBox: React.FC<AuthBoxProps> = ({ user, userType, onLogout }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!user || !userType) {
@@ -61,7 +62,7 @@ export const AuthBox: React.FC<AuthBoxProps> = ({ user, userType }) => {
               </Badge>
             </CardContent>
             <CardFooter className="pt-0 pb-3">
-              <LogoutButton />
+              <LogoutButton customHandler={onLogout} />
             </CardFooter>
           </Card>
         )}
@@ -83,7 +84,7 @@ export const AuthBox: React.FC<AuthBoxProps> = ({ user, userType }) => {
             </Badge>
           </CardContent>
           <CardFooter className="pt-0 pb-3">
-            <LogoutButton />
+            <LogoutButton customHandler={onLogout} />
           </CardFooter>
         </Card>
       </div>
