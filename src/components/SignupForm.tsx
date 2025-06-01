@@ -93,7 +93,11 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
   return (
     <Card className="w-full max-w-md mx-auto bg-white/90 shadow-lg">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center text-green-800">Criar Conta</CardTitle>
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <img src="/logo-fertilisolo.png" alt="Logo FertiliSolo" className="h-12" />
+          <CardTitle className="text-2xl font-bold text-center text-green-800">FertiliSolo</CardTitle>
+        </div>
+        <CardTitle className="text-xl font-bold text-center text-green-700">Criar Conta</CardTitle>
         <CardDescription className="text-center">
           Crie uma nova conta para acessar o sistema
         </CardDescription>

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { AlertCircle, Loader2, AlertTriangle } from 'lucide-react';
+import { AlertCircle, Loader2, AlertTriangle, UserPlus } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { SUPABASE_URL } from '@/lib/env';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -21,9 +21,10 @@ type FormData = z.infer<typeof formSchema>;
 
 interface LoginFormProps {
   onLoginSuccess: () => void;
+  onCreateAccountClick?: () => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onCreateAccountClick }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSupabaseConfigured, setIsSupabaseConfigured] = useState(true);
   const { toast } = useToast();
@@ -82,7 +83,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   return (
     <Card className="w-full max-w-md mx-auto bg-white/90 shadow-lg">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center text-green-800">Login</CardTitle>
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <img src="/logo-fertilisolo.png" alt="Logo FertiliSolo" className="h-12" />
+          <CardTitle className="text-2xl font-bold text-center text-green-800">FertiliSolo</CardTitle>
+        </div>
+        <CardTitle className="text-xl font-bold text-center text-green-700">Login</CardTitle>
         <CardDescription className="text-center">
           Entre com seu email e senha para acessar o sistema
         </CardDescription>
@@ -146,10 +151,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex justify-center">
+      <CardFooter className="flex flex-col items-center space-y-4">
         <p className="text-sm text-gray-500">
-          Não tem uma conta? Entre em contato com o administrador do sistema.
+          Não tem uma conta ainda?
         </p>
+        <Button 
+          variant="outline" 
+          className="w-full border-green-600 text-green-700 hover:bg-green-50 font-medium"
+          onClick={onCreateAccountClick}
+        >
+          <UserPlus className="mr-2 h-4 w-4" />
+          Criar Nova Conta
+        </Button>
       </CardFooter>
     </Card>
   );

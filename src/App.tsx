@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import { useAuth } from "./hooks/useAuth";
 import { AuthBox } from "./components/AuthBox";
 import { Loader2 } from "lucide-react";
+import { PwaInstallPrompt } from "./components/PwaInstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -66,7 +67,7 @@ const AppContent = () => {
   return (
     <>
       {user && userType && (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-2 right-2 md:top-6 md:right-6 z-50">
           <AuthBox user={user} userType={userType} />
         </div>
       )}
@@ -90,6 +91,9 @@ const AppContent = () => {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      
+      {/* Componente para instalação do PWA */}
+      <PwaInstallPrompt />
     </>
   );
 };

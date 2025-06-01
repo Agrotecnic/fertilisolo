@@ -30,13 +30,13 @@ export const LogoutButton: React.FC = () => {
 
   return (
     <Button 
-      variant="outline" 
-      size="sm" 
-      className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+      variant="destructive" 
+      size="default" 
+      className="w-full bg-red-600 hover:bg-red-700 text-white font-medium shadow-md"
       onClick={handleLogout}
     >
-      <LogOut className="h-4 w-4 mr-2" />
-      Sair
+      <LogOut className="h-5 w-5 mr-2" />
+      Sair da Conta
     </Button>
   );
 }; 

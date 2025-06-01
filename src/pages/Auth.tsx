@@ -18,6 +18,10 @@ const Auth = () => {
     setActiveTab('login');
   };
 
+  const handleCreateAccountClick = () => {
+    setActiveTab('signup');
+  };
+
   return (
     <div className="min-h-screen bg-bg-light flex flex-col">
       <Header subtitle="Calculadora de Adubação" description={null} />
@@ -28,20 +32,23 @@ const Auth = () => {
             <TabsList className="grid w-full grid-cols-2 mb-6 bg-bg-lighter">
               <TabsTrigger 
                 value="login" 
-                className="font-inter font-medium data-[state=active]:bg-primary-dark data-[state=active]:text-white"
+                className="font-inter text-base font-medium py-3 data-[state=active]:bg-primary-dark data-[state=active]:text-white"
               >
                 Login
               </TabsTrigger>
               <TabsTrigger 
                 value="signup" 
-                className="font-inter font-medium data-[state=active]:bg-primary-dark data-[state=active]:text-white"
+                className="font-inter text-base font-medium py-3 data-[state=active]:bg-primary-dark data-[state=active]:text-white data-[state=inactive]:bg-green-100 data-[state=inactive]:text-green-800 data-[state=inactive]:font-semibold"
               >
                 Criar Conta
               </TabsTrigger>
             </TabsList>
             
             <TabsContent value="login">
-              <LoginForm onLoginSuccess={handleLoginSuccess} />
+              <LoginForm 
+                onLoginSuccess={handleLoginSuccess} 
+                onCreateAccountClick={handleCreateAccountClick}
+              />
             </TabsContent>
             
             <TabsContent value="signup">
