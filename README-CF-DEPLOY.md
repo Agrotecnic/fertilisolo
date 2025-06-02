@@ -50,16 +50,25 @@ Este comando executa o build e faz o deploy em uma única etapa.
 
 ## Configuração de Variáveis de Ambiente
 
+### Variáveis Necessárias
+
 O Supabase requer as seguintes variáveis de ambiente no Cloudflare:
 
 - `VITE_SUPABASE_URL`: URL do seu projeto Supabase
 - `VITE_SUPABASE_ANON_KEY`: Chave anônima do Supabase
+
+### Configurando no Cloudflare Pages
 
 Você pode configurá-las no painel do Cloudflare Pages:
 
 1. Acesse seu projeto no dashboard do Cloudflare Pages
 2. Vá para Settings > Environment variables
 3. Adicione as variáveis necessárias
+4. Escolha o escopo apropriado (Production, Preview ou ambos)
+5. Clique em "Save" para salvar as alterações
+
+⚠️ **IMPORTANTE: Nunca armazene chaves de API ou outros segredos diretamente no código!** ⚠️  
+Sempre use variáveis de ambiente para credenciais.
 
 ## Solução de Problemas
 
@@ -72,3 +81,4 @@ Se você encontrar problemas com o roteamento do SPA (Single Page Application), 
 
 - [Documentação do Cloudflare Pages](https://developers.cloudflare.com/pages/)
 - [Documentação do Wrangler](https://developers.cloudflare.com/workers/wrangler/)
+- [Documentação do Supabase](https://supabase.io/docs)

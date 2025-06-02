@@ -6,7 +6,7 @@
           "-y",
           "@supabase/mcp-server-supabase@latest",
           "--access-token",
-          "sbp_8586154d977e7ba3160575eb60a1d4d9f43e66b6"
+          "[SUA_CHAVE_SUPABASE_AQUI]"
         ]
       },
       "cloudflare-observability": {

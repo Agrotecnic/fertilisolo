@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Check, Leaf, BarChart, BarChart2, Beaker, Database, Shield } from 'lucide-react';
 
@@ -15,12 +15,14 @@ const LandingPage: React.FC = () => {
             <img src="/logo-fertilisolo.png" alt="FertiliSolo Logo" className="h-8 md:h-10" />
             <span className="text-green-600 font-bold text-xl md:text-2xl">FertiliSolo</span>
           </div>
-          <Button 
-            onClick={() => navigate('/login')} 
-            className="bg-green-600 hover:bg-green-700 text-white"
-          >
-            Entrar
-          </Button>
+          <div className="flex items-center space-x-4">
+            <Link to="/login">
+              <Button variant="ghost">Login</Button>
+            </Link>
+            <Link to="/login">
+              <Button className="bg-green-600 hover:bg-green-700">Registrar</Button>
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -36,13 +38,19 @@ const LandingPage: React.FC = () => {
                 Sistema completo de análise de solo e recomendação de adubação com base em saturação por bases.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  onClick={() => navigate('/login')} 
-                  className="bg-green-600 hover:bg-green-700 text-white text-lg py-6 px-8 rounded-lg"
-                >
-                  Começar agora
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                <Link to="/login">
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white text-lg py-6 px-8 rounded-lg"
+                  >
+                    Começar agora
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link to="/relatorio" className="w-full sm:w-auto">
+                  <Button variant="outline" className="w-full border-green-600 text-green-700 hover:bg-green-50">
+                    Ver demonstração de relatório
+                  </Button>
+                </Link>
               </div>
             </div>
             <div className="md:w-1/2 flex justify-center">

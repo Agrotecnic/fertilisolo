@@ -20,6 +20,12 @@ const supabaseOptions = {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true
+  },
+  db: {
+    schema: 'public'
+  },
+  global: {
+    headers: { 'x-application-name': 'fertilisolo' }
   }
 };
 
@@ -27,6 +33,53 @@ const supabaseOptions = {
 export const supabase = hasValidCredentials 
   ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, supabaseOptions)
   : createClientMock();
+
+// Funções para acessar dados de referência sem autenticação
+export async function getCrops() {
+  if (!hasValidCredentials) {
+    console.error('Credenciais do Supabase inválidas.');
+    return { data: [], error: new Error('Credenciais inválidas') };
+  }
+  
+  try {
+    // Primeiro tenta usar a função RPC que criamos
+    const { data: rpcData, error: rpcError } = await supabase.rpc('get_crops');
+    
+    if (!rpcError && rpcData) {
+      return { data: rpcData, error: null };
+    }
+    
+    // Se falhar, tenta acessar diretamente a tabela (política pública)
+    console.log('Função RPC falhou, tentando acesso direto à tabela');
+    return await supabase.from('crops').select('*');
+  } catch (error) {
+    console.error('Erro ao buscar culturas:', error);
+    return { data: [], error };
+  }
+}
+
+export async function getFertilizerSources() {
+  if (!hasValidCredentials) {
+    console.error('Credenciais do Supabase inválidas.');
+    return { data: [], error: new Error('Credenciais inválidas') };
+  }
+  
+  try {
+    // Primeiro tenta usar a função RPC que criamos
+    const { data: rpcData, error: rpcError } = await supabase.rpc('get_fertilizer_sources');
+    
+    if (!rpcError && rpcData) {
+      return { data: rpcData, error: null };
+    }
+    
+    // Se falhar, tenta acessar diretamente a tabela (política pública)
+    console.log('Função RPC falhou, tentando acesso direto à tabela');
+    return await supabase.from('fertilizer_sources').select('*');
+  } catch (error) {
+    console.error('Erro ao buscar fertilizantes:', error);
+    return { data: [], error };
+  }
+}
 
 // Cliente mock para evitar erros quando as credenciais não estão disponíveis
 function createClientMock() {
@@ -42,7 +95,14 @@ function createClientMock() {
         return Promise.resolve({ error: null });
       },
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
-    }
+    },
+    from: () => ({
+      select: () => Promise.resolve({ data: null, error: new Error(errorMsg) }),
+      insert: () => Promise.resolve({ data: null, error: new Error(errorMsg) }),
+      update: () => Promise.resolve({ data: null, error: new Error(errorMsg) }),
+      delete: () => Promise.resolve({ data: null, error: new Error(errorMsg) }),
+    }),
+    rpc: () => Promise.resolve({ data: null, error: new Error(errorMsg) })
   } as any;
 }
 

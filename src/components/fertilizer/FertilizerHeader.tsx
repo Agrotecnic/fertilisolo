@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Sprout } from 'lucide-react';
 import { SoilData, CalculatedResults } from '@/pages/Index';
 import { generatePDFReport } from '@/utils/pdfGenerator';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 
 interface FertilizerHeaderProps {
   soilData: SoilData;
@@ -15,17 +14,26 @@ export const FertilizerHeader: React.FC<FertilizerHeaderProps> = ({
   soilData, 
   results 
 }) => {
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     try {
-      generatePDFReport(soilData, results);
+      toast({
+        title: "Gerando PDF...",
+        description: "O arquivo PDF está sendo gerado, aguarde um momento.",
+      });
+      
+      // Usando await para garantir que a promessa seja resolvida
+      await generatePDFReport(soilData, results);
+      
       toast({
         title: "Relatório exportado com sucesso!",
         description: "O arquivo PDF foi gerado e está sendo baixado.",
       });
     } catch (error) {
+      console.error("Erro detalhado ao gerar PDF:", error);
+      
       toast({
         title: "Erro ao exportar relatório",
-        description: "Não foi possível gerar o arquivo PDF.",
+        description: "Não foi possível gerar o arquivo PDF. Verifique o console para mais detalhes.",
         variant: "destructive",
       });
     }

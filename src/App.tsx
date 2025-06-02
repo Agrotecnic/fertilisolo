@@ -12,6 +12,10 @@ import { useAuth } from "./hooks/useAuth";
 import { AuthBox } from "./components/AuthBox";
 import { Loader2 } from "lucide-react";
 import { PwaInstallPrompt } from "./components/PwaInstallPrompt";
+import DataTester from "./components/DataTester";
+import SupabaseConnectionTest from "./components/SupabaseConnectionTest";
+import EnvConfigHelper from "./components/EnvConfigHelper";
+import ReportGenerator from "./components/ReportGenerator";
 
 const queryClient = new QueryClient();
 
@@ -108,6 +112,11 @@ const AppContent = () => {
             </PublicRoute>
           } 
         />
+        {/* Rotas de teste */}
+        <Route path="/teste-dados" element={<DataTester />} />
+        <Route path="/diagnostico" element={<SupabaseConnectionTest />} />
+        <Route path="/config" element={<EnvConfigHelper />} />
+        <Route path="/relatorio" element={<ReportGenerator />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

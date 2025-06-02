@@ -15,8 +15,8 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' &&
     componentTagger(),
     VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'robots.txt', 'icone-fertilisolo.svg', 'logo-fertilisolo.png'],
+      registerType: 'prompt',
+      includeAssets: ['robots.txt', 'icone-fertilisolo.svg', 'logo-fertilisolo.png'],
       manifest: {
         name: 'FertiliSolo',
         short_name: 'FertiliSolo',
@@ -24,14 +24,63 @@ export default defineConfig(({ mode }) => ({
         theme_color: '#4ade80',
         background_color: '#ffffff',
         display: 'standalone',
+        orientation: 'portrait',
         scope: '/',
         start_url: '/',
         icons: [
           {
+            src: '/pwa-72x72.png',
+            sizes: '72x72',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-96x96.png',
+            sizes: '96x96',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-128x128.png',
+            sizes: '128x128',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-144x144.png',
+            sizes: '144x144',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-152x152.png',
+            sizes: '152x152',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-384x384.png',
+            sizes: '384x384',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
             src: '/icone-fertilisolo.svg',
-            sizes: '512x512 384x384 256x256 192x192 128x128 96x96 72x72 48x48',
+            sizes: '72x72 96x96 128x128 144x144 152x152 192x192 384x384 512x512',
             type: 'image/svg+xml',
-            purpose: 'any maskable'
+            purpose: 'maskable'
           }
         ]
       },
@@ -95,6 +144,11 @@ export default defineConfig(({ mode }) => ({
             }
           }
         ]
+      },
+      // Tornar o PWA mais perceptível
+      devOptions: {
+        enabled: true,
+        type: 'module'
       }
     })
   ].filter(Boolean),

@@ -7,10 +7,10 @@ import { AnalysisResults } from '@/components/AnalysisResults';
 import { FertilizerRecommendations } from '@/components/FertilizerRecommendations';
 import { AnalysisHistory } from '@/components/AnalysisHistory';
 import { SoilInsights } from '@/components/SoilInsights';
-import { Calculator, Leaf, FileText, History, Brain, LogOut } from 'lucide-react';
+import { Calculator, Leaf, FileText, History, Brain, LogOut, PlusCircleIcon, SearchIcon, ClipboardListIcon, SettingsIcon, FileTextIcon, AreaChartIcon } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 
 export interface SoilData {
@@ -115,11 +115,20 @@ const Index = () => {
       <Header />
       
       <div className="container mx-auto px-2 md:px-4 py-4 md:py-8">
-        {/* Botão de Logout Destacado */}
-        <div className="flex justify-end mb-4">
+        {/* Botões de ação */}
+        <div className="flex justify-between mb-4">
+          <Link to="/relatorio" className="hidden md:block">
+            <Button 
+              variant="outline" 
+              className="border-green-600 text-green-700 hover:bg-green-50 shadow-md flex items-center gap-2 text-sm md:text-base py-1 px-2 md:py-2 md:px-4"
+            >
+              <FileText className="h-4 w-4 md:h-5 md:w-5" />
+              Ver Modelo de Relatório
+            </Button>
+          </Link>
           <Button 
             variant="destructive" 
-            className="bg-red-600 hover:bg-red-700 shadow-md flex items-center gap-1 md:gap-2 text-sm md:text-base py-1 px-2 md:py-2 md:px-4"
+            className="bg-red-600 hover:bg-red-700 shadow-md flex items-center gap-1 md:gap-2 text-sm md:text-base py-1 px-2 md:py-2 md:px-4 ml-auto"
             onClick={handleLogout}
           >
             <LogOut className="h-4 w-4 md:h-5 md:w-5" />
@@ -195,6 +204,17 @@ const Index = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-4 md:pt-6">
+                <div className="mb-4 md:hidden">
+                  <Link to="/relatorio" className="w-full">
+                    <Button 
+                      variant="outline" 
+                      className="border-green-600 text-green-700 hover:bg-green-50 w-full flex items-center justify-center gap-2"
+                    >
+                      <FileText className="h-4 w-4" />
+                      Ver Modelo de Relatório
+                    </Button>
+                  </Link>
+                </div>
                 <SoilAnalysisForm onAnalysisComplete={handleAnalysisComplete} />
               </CardContent>
             </Card>
