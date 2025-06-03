@@ -1,46 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from './env';
 
-// Cria o cliente apenas se as credenciais forem URLs válidas
-const isValidUrl = (url: string) => {
-  try {
-    new URL(url);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Verifica se as credenciais existem e são válidas
-const hasValidCredentials = isValidUrl(SUPABASE_URL) && SUPABASE_ANON_KEY.length > 0;
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Supabase URL ou Anon Key não encontrados. Verifique suas variáveis de ambiente.');
+}
 
-// Configurações adicionais para o cliente Supabase
-const supabaseOptions = {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  },
-  db: {
-    schema: 'public'
-  },
-  global: {
-    headers: { 'x-application-name': 'fertilisolo' }
-  }
-};
-
-// Cria o cliente se as credenciais forem válidas, ou cria um mock que lança erros quando usado
-export const supabase = hasValidCredentials 
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, supabaseOptions)
-  : createClientMock();
+export const supabase = createClient(
+  supabaseUrl || '',
+  supabaseAnonKey || ''
+);
 
 // Funções para acessar dados de referência sem autenticação
 export async function getCrops() {
-  if (!hasValidCredentials) {
-    console.error('Credenciais do Supabase inválidas.');
-    return { data: [], error: new Error('Credenciais inválidas') };
-  }
-  
   try {
     // Primeiro tenta usar a função RPC que criamos
     const { data: rpcData, error: rpcError } = await supabase.rpc('get_crops');
@@ -59,11 +32,6 @@ export async function getCrops() {
 }
 
 export async function getFertilizerSources() {
-  if (!hasValidCredentials) {
-    console.error('Credenciais do Supabase inválidas.');
-    return { data: [], error: new Error('Credenciais inválidas') };
-  }
-  
   try {
     // Primeiro tenta usar a função RPC que criamos
     const { data: rpcData, error: rpcError } = await supabase.rpc('get_fertilizer_sources');
@@ -81,33 +49,159 @@ export async function getFertilizerSources() {
   }
 }
 
-// Cliente mock para evitar erros quando as credenciais não estão disponíveis
-function createClientMock() {
-  const errorMsg = 'Credenciais do Supabase inválidas. Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.';
-  
-  return {
-    auth: {
-      getSession: () => Promise.resolve({ data: { session: null }, error: new Error(errorMsg) }),
-      signInWithPassword: () => Promise.resolve({ data: null, error: new Error(errorMsg) }),
-      signUp: () => Promise.resolve({ data: null, error: new Error(errorMsg) }),
-      signOut: () => {
-        console.log('Mock signOut chamado');
-        return Promise.resolve({ error: null });
-      },
-      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
-    },
-    from: () => ({
-      select: () => Promise.resolve({ data: null, error: new Error(errorMsg) }),
-      insert: () => Promise.resolve({ data: null, error: new Error(errorMsg) }),
-      update: () => Promise.resolve({ data: null, error: new Error(errorMsg) }),
-      delete: () => Promise.resolve({ data: null, error: new Error(errorMsg) }),
-    }),
-    rpc: () => Promise.resolve({ data: null, error: new Error(errorMsg) })
-  } as any;
-}
-
-export type UserType = 'admin' | 'agronomist' | 'technician' | 'farmer';
-
-export interface UserMetadata {
-  userType: UserType;
-} 
+// Tipos para esquema do banco de dados
+export type Database = {
+  public: {
+    Tables: {
+      farms: {
+        Row: {
+          id: string;
+          name: string;
+          location: string | null;
+          area_size: number | null;
+          area_unit: string | null;
+          user_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          location?: string | null;
+          area_size?: number | null;
+          area_unit?: string | null;
+          user_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          location?: string | null;
+          area_size?: number | null;
+          area_unit?: string | null;
+          user_id?: string;
+          created_at?: string;
+        };
+      };
+      plots: {
+        Row: {
+          id: string;
+          name: string;
+          farm_id: string;
+          area_size: number | null;
+          area_unit: string | null;
+          soil_type: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          farm_id: string;
+          area_size?: number | null;
+          area_unit?: string | null;
+          soil_type?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          farm_id?: string;
+          area_size?: number | null;
+          area_unit?: string | null;
+          soil_type?: string | null;
+          created_at?: string;
+        };
+      };
+      soil_analyses: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          farm_name: string | null;
+          location: string | null;
+          collection_date: string | null;
+          ph: number | null;
+          organic_matter: number | null;
+          phosphorus: number | null;
+          potassium: number | null;
+          calcium: number | null;
+          magnesium: number | null;
+          sulfur: number | null;
+          boron: number | null;
+          copper: number | null;
+          iron: number | null;
+          manganese: number | null;
+          zinc: number | null;
+          plot_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          farm_name?: string | null;
+          location?: string | null;
+          collection_date?: string | null;
+          ph?: number | null;
+          organic_matter?: number | null;
+          phosphorus?: number | null;
+          potassium?: number | null;
+          calcium?: number | null;
+          magnesium?: number | null;
+          sulfur?: number | null;
+          boron?: number | null;
+          copper?: number | null;
+          iron?: number | null;
+          manganese?: number | null;
+          zinc?: number | null;
+          plot_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          farm_name?: string | null;
+          location?: string | null;
+          collection_date?: string | null;
+          ph?: number | null;
+          organic_matter?: number | null;
+          phosphorus?: number | null;
+          potassium?: number | null;
+          calcium?: number | null;
+          magnesium?: number | null;
+          sulfur?: number | null;
+          boron?: number | null;
+          copper?: number | null;
+          iron?: number | null;
+          manganese?: number | null;
+          zinc?: number | null;
+          plot_id?: string | null;
+          created_at?: string;
+        };
+      };
+      fertilizer_recommendations: {
+        Row: {
+          id: string;
+          soil_analysis_id: string;
+          fertilizer_source_id: string;
+          recommendation_amount: number;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          soil_analysis_id: string;
+          fertilizer_source_id: string;
+          recommendation_amount: number;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          soil_analysis_id?: string;
+          fertilizer_source_id?: string;
+          recommendation_amount?: number;
+          notes?: string | null;
+          created_at?: string;
+        };
+      };
+    };
+  };
+}; 

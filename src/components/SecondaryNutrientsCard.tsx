@@ -3,12 +3,12 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle } from 'lucide-react';
-import { SoilData, CalculatedResults } from '@/pages/Index';
+import { SoilData, CalculationResult } from '@/types/soilAnalysis';
 import { formatNumberOptional } from '@/utils/numberFormat';
 
 interface SecondaryNutrientsCardProps {
   soilData: SoilData;
-  results: CalculatedResults;
+  results: CalculationResult;
 }
 
 export const SecondaryNutrientsCard: React.FC<SecondaryNutrientsCardProps> = ({ soilData, results }) => {

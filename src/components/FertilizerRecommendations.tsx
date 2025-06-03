@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { SoilData, CalculatedResults } from '@/pages/Index';
+import { SoilData, CalculationResult } from '@/types/soilAnalysis';
 import { FertilizerHeader } from './fertilizer/FertilizerHeader';
 import { MacronutrientCard } from './fertilizer/MacronutrientCard';
 import { MicronutrientCard } from './fertilizer/MicronutrientCard';
@@ -8,7 +7,7 @@ import { ApplicationInfo } from './fertilizer/ApplicationInfo';
 
 interface FertilizerRecommendationsProps {
   soilData: SoilData;
-  results: CalculatedResults;
+  results: CalculationResult;
 }
 
 export const FertilizerRecommendations: React.FC<FertilizerRecommendationsProps> = ({ 

@@ -1,5 +1,5 @@
 
-import { SoilData, CalculatedResults } from '@/pages/Index';
+import { SoilData, CalculationResult } from '@/types/soilAnalysis';
 import {
   calculatePhosphorusNeed,
   calculateSulfurNeed,
@@ -15,7 +15,7 @@ export { fertilizerSources } from './fertilizerSources';
 export { calculateFertilizerRecommendations } from './fertilizerCalculations';
 export type { FertilizerSource } from '@/types/soil';
 
-export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): CalculatedResults => {
+export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): CalculationResult => {
   const { T, Ca, Mg, K, P, S, B, Cu, Fe, Mn, Zn, Mo } = data;
 
   // Converter K de mg/dm³ para cmolc/dm³ (K mg/dm³ ÷ 390 = cmolc/dm³)

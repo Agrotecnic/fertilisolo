@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SoilData } from '@/pages/Index';
+import { SoilData } from '@/types/soilAnalysis';
 
 interface AnalysisInfoProps {
   soilData: SoilData;
@@ -24,8 +23,8 @@ export const AnalysisInfo: React.FC<AnalysisInfoProps> = ({ soilData }) => {
             <p className="text-lg font-semibold">{soilData.date}</p>
           </div>
           <div>
-            <span className="text-sm font-medium text-gray-600">CTC:</span>
-            <p className="text-lg font-semibold">{soilData.T} cmolc/dm³</p>
+            <span className="text-sm font-medium text-gray-600">Matéria Orgânica:</span>
+            <p className="text-lg font-semibold">{soilData.organicMatter}%</p>
           </div>
         </div>
       </CardContent>

@@ -1,6 +1,5 @@
-
-import React from 'react';
-import { SoilData, CalculatedResults } from '@/pages/Index';
+import React, { useEffect } from 'react';
+import { SoilData, CalculationResult } from '@/types/soilAnalysis';
 import { AnalysisInfo } from './AnalysisInfo';
 import { SaturationsCard } from './SaturationsCard';
 import { RelationshipCard } from './RelationshipCard';
@@ -11,10 +10,14 @@ import { AlertsSection } from './AlertsSection';
 
 interface AnalysisResultsProps {
   soilData: SoilData;
-  results: CalculatedResults;
+  results: CalculationResult;
 }
 
 export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ soilData, results }) => {
+  useEffect(() => {
+    console.log("DEBUG - AnalysisResults recebeu:", { soilData, results });
+  }, [soilData, results]);
+
   return (
     <div className="space-y-6">
       {/* Informações básicas - largura total */}

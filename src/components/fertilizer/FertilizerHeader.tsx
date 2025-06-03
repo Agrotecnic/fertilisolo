@@ -1,13 +1,13 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Sprout } from 'lucide-react';
-import { SoilData, CalculatedResults } from '@/pages/Index';
+import { SoilData, CalculationResult } from '@/types/soilAnalysis';
 import { generatePDFReport } from '@/utils/pdfGenerator';
 import { toast } from '@/components/ui/use-toast';
 
 interface FertilizerHeaderProps {
   soilData: SoilData;
-  results: CalculatedResults;
+  results: CalculationResult;
 }
 
 export const FertilizerHeader: React.FC<FertilizerHeaderProps> = ({ 

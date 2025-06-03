@@ -2,14 +2,14 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Target, CheckCircle } from 'lucide-react';
-import { SoilData, CalculatedResults } from '@/pages/Index';
+import { SoilData, CalculationResult } from '@/types/soilAnalysis';
 
 interface StrategicRecommendationsProps {
   soilData: SoilData;
-  results: CalculatedResults;
+  results: CalculationResult;
 }
 
-const generateStrategicInsights = (soilData: SoilData, results: CalculatedResults): string[] => {
+const generateStrategicInsights = (soilData: SoilData, results: CalculationResult): string[] => {
   const insights: string[] = [];
   const { saturations, caeMgRatio, isAdequate, needs } = results;
 

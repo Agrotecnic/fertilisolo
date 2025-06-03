@@ -1,10 +1,10 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalculatedResults } from '@/pages/Index';
+import { CalculationResult } from '@/types/soilAnalysis';
 import { formatNumber } from '@/utils/numberFormat';
 
 interface NeedsCardProps {
-  results: CalculatedResults;
+  results: CalculationResult;
 }
 
 export const NeedsCard: React.FC<NeedsCardProps> = ({ results }) => {

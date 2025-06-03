@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { SoilData, CalculatedResults } from '@/pages/Index';
+import { SoilData, CalculationResult } from '@/types/soilAnalysis';
 import { calculateSoilAnalysis } from '@/utils/soilCalculations';
 import { saveAnalysisToHistory } from '@/utils/analysisStorage';
 import { toast } from '@/hooks/use-toast';
@@ -11,7 +11,7 @@ import { SecondaryMacronutrientsSection } from '@/components/SecondaryMacronutri
 import { MicronutrientsSection } from '@/components/MicronutrientsSection';
 
 interface SoilAnalysisFormProps {
-  onAnalysisComplete: (data: SoilData, results: CalculatedResults) => void;
+  onAnalysisComplete: (data: SoilData, results: CalculationResult) => void;
 }
 
 export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisComplete }) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SoilData, CalculatedResults } from '@/pages/Index';
+import { SoilData, CalculationResult } from '@/types/soilAnalysis';
 import { SoilQualityScore } from './insights/SoilQualityScore';
 import { LimitingFactors } from './insights/LimitingFactors';
 import { CriticalPatterns } from './insights/CriticalPatterns';
@@ -8,10 +8,10 @@ import { ImplementationPlan } from './insights/ImplementationPlan';
 
 interface SoilInsightsProps {
   soilData: SoilData;
-  results: CalculatedResults;
+  results: CalculationResult;
 }
 
-const calculateSoilQualityScore = (results: CalculatedResults): number => {
+const calculateSoilQualityScore = (results: CalculationResult): number => {
   const { saturations, caeMgRatio, isAdequate } = results;
   
   let score = 0;

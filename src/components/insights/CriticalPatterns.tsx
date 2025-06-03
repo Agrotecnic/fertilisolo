@@ -2,14 +2,14 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap } from 'lucide-react';
-import { SoilData, CalculatedResults } from '@/pages/Index';
+import { SoilData, CalculationResult } from '@/types/soilAnalysis';
 
 interface CriticalPatternsProps {
   soilData: SoilData;
-  results: CalculatedResults;
+  results: CalculationResult;
 }
 
-const analyzeNutrientPatterns = (soilData: SoilData, results: CalculatedResults): string[] => {
+const analyzeNutrientPatterns = (soilData: SoilData, results: CalculationResult): string[] => {
   const patterns: string[] = [];
   const { saturations, caeMgRatio, isAdequate } = results;
 

@@ -2,10 +2,10 @@
 import React from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
-import { CalculatedResults } from '@/pages/Index';
+import { CalculationResult } from '@/types/soilAnalysis';
 
 interface AlertsSectionProps {
-  results: CalculatedResults;
+  results: CalculationResult;
 }
 
 export const AlertsSection: React.FC<AlertsSectionProps> = ({ results }) => {

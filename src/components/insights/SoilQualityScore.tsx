@@ -6,13 +6,13 @@ import { Badge } from '@/components/ui/badge';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Lightbulb, Zap } from 'lucide-react';
-import { CalculatedResults } from '@/pages/Index';
+import { CalculationResult } from '@/types/soilAnalysis';
 
 interface SoilQualityScoreProps {
-  results: CalculatedResults;
+  results: CalculationResult;
 }
 
-const calculateSoilQualityScore = (results: CalculatedResults): number => {
+const calculateSoilQualityScore = (results: CalculationResult): number => {
   const { saturations, caeMgRatio, isAdequate } = results;
   
   let score = 0;

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalculatedResults } from '@/pages/Index';
+import { CalculationResult } from '@/types/soilAnalysis';
 
 interface ImplementationPlanProps {
   qualityScore: number;

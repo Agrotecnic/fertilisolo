@@ -3,13 +3,13 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle } from 'lucide-react';
-import { CalculatedResults } from '@/pages/Index';
+import { CalculationResult } from '@/types/soilAnalysis';
 
 interface LimitingFactorsProps {
-  results: CalculatedResults;
+  results: CalculationResult;
 }
 
-const calculateLimitingFactors = (results: CalculatedResults): { factor: string; impact: string; severity: number }[] => {
+const calculateLimitingFactors = (results: CalculationResult): { factor: string; impact: string; severity: number }[] => {
   const factors: { factor: string; impact: string; severity: number }[] = [];
   const { isAdequate, saturations } = results;
 

@@ -1,4 +1,4 @@
-import { SoilData, CalculatedResults } from '@/pages/Index';
+import { SoilData, CalculationResult } from '@/types/soilAnalysis';
 import { calculateFertilizerRecommendations } from './soilCalculations';
 import { formatNumber, formatNumberOptional } from './numberFormat';
 import { jsPDF } from 'jspdf';
@@ -51,7 +51,7 @@ interface FertilizerRec {
 }
 
 // Renderizar modelo de relatório em elemento HTML para capturar com html2canvas
-const renderReportTemplate = (soilData: SoilData, results: CalculatedResults) => {
+const renderReportTemplate = (soilData: SoilData, results: CalculationResult) => {
   // Criar um container temporário
   const container = document.createElement('div');
   container.id = 'temp-report-container';
@@ -428,7 +428,7 @@ const renderReportTemplate = (soilData: SoilData, results: CalculatedResults) =>
   return container;
 };
 
-export const generatePDFReport = async (soilData: SoilData, results: CalculatedResults) => {
+export const generatePDFReport = async (soilData: SoilData, results: CalculationResult) => {
   try {
     console.log("Iniciando geração do PDF usando método de captura do modelo de relatório...");
     
