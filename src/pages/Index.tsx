@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { SoilAnalysisForm } from '@/components/SoilAnalysisForm';
 import { AnalysisResults } from '@/components/AnalysisResults';
 import { FertilizerRecommendations } from '@/components/FertilizerRecommendations';
-import { AnalysisHistory } from '@/components/AnalysisHistory';
 import { UserAnalysisHistory } from '@/components/UserAnalysisHistory';
 import { SoilInsights } from '@/components/SoilInsights';
 import { Calculator, Leaf, FileText, History, Brain, LogOut, PlusCircleIcon, SearchIcon, ClipboardListIcon, SettingsIcon, FileTextIcon, AreaChartIcon, Database } from 'lucide-react';
@@ -315,12 +314,8 @@ const Index = () => {
               Recomendações
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
-              <History className="h-4 w-4" />
-              Histórico
-            </TabsTrigger>
-            <TabsTrigger value="saved" className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
               <Database className="h-4 w-4" />
-              Análises Salvas
+              Histórico
             </TabsTrigger>
           </TabsList>
           
@@ -341,18 +336,14 @@ const Index = () => {
               </TabsTrigger>
             </TabsList>
             
-            <TabsList className="grid w-full grid-cols-3 bg-white shadow-sm text-xs">
+            <TabsList className="grid w-full grid-cols-2 bg-white shadow-sm text-xs">
               <TabsTrigger value="recommendations" disabled={!results} className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
                 <Leaf className="h-4 w-4" />
                 <span>Recomendações</span>
               </TabsTrigger>
               <TabsTrigger value="history" className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
-                <History className="h-4 w-4" />
-                <span>Histórico</span>
-              </TabsTrigger>
-              <TabsTrigger value="saved" className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
                 <Database className="h-4 w-4" />
-                <span>Salvas</span>
+                <span>Histórico</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -656,28 +647,11 @@ const Index = () => {
             <Card className="bg-white border-secondary-dark/10 shadow-sm">
               <CardHeader className="border-b border-secondary-dark/10">
                 <CardTitle className="text-lg md:text-xl text-primary-dark flex items-center gap-2" style={titleStyle}>
-                  <History className="h-4 w-4 md:h-5 md:w-5 text-secondary-dark" />
+                  <Database className="h-4 w-4 md:h-5 md:w-5 text-secondary-dark" />
                   Histórico de Análises
                 </CardTitle>
                 <CardDescription className="text-xs md:text-sm text-neutral-medium">
-                  Visualize e compare análises anteriores
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-4 md:pt-6">
-                <AnalysisHistory />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="saved">
-            <Card className="bg-white border-secondary-dark/10 shadow-sm">
-              <CardHeader className="border-b border-secondary-dark/10">
-                <CardTitle className="text-lg md:text-xl text-primary-dark flex items-center gap-2" style={titleStyle}>
-                  <Database className="h-4 w-4 md:h-5 md:w-5 text-secondary-dark" />
-                  Análises Salvas
-                </CardTitle>
-                <CardDescription className="text-xs md:text-sm text-neutral-medium">
-                  Visualize e gerencie suas análises salvas
+                  Visualize e gerencie suas análises salvas no banco de dados
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-4 md:pt-6">
