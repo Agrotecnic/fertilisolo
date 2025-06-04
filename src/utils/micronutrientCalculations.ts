@@ -1,4 +1,3 @@
-
 export const calculatePhosphorusNeed = (currentP: number): number => {
   const targetP = 15;
   
@@ -28,7 +27,7 @@ export const calculateSulfurNeed = (currentS: number): number => {
 };
 
 export const calculateBoronNeed = (currentB: number): number => {
-  const targetB = 0.2;
+  const targetB = 0.3;
   if (currentB >= targetB) return 0;
   return (targetB - currentB) * 2;
 };
@@ -40,19 +39,19 @@ export const calculateCopperNeed = (currentCu: number): number => {
 };
 
 export const calculateIronNeed = (currentFe: number): number => {
-  const targetFe = 5;
+  const targetFe = 12;
   if (currentFe >= targetFe) return 0;
   return (targetFe - currentFe) * 5;
 };
 
 export const calculateManganeseNeed = (currentMn: number): number => {
-  const targetMn = 1.2;
+  const targetMn = 5;
   if (currentMn >= targetMn) return 0;
   return (targetMn - currentMn) * 4;
 };
 
 export const calculateZincNeed = (currentZn: number): number => {
-  const targetZn = 0.5;
+  const targetZn = 1.5;
   if (currentZn >= targetZn) return 0;
   return (targetZn - currentZn) * 8;
 };
