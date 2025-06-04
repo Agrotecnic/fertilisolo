@@ -6,8 +6,9 @@ import { SoilAnalysisForm } from '@/components/SoilAnalysisForm';
 import { AnalysisResults } from '@/components/AnalysisResults';
 import { FertilizerRecommendations } from '@/components/FertilizerRecommendations';
 import { AnalysisHistory } from '@/components/AnalysisHistory';
+import { UserAnalysisHistory } from '@/components/UserAnalysisHistory';
 import { SoilInsights } from '@/components/SoilInsights';
-import { Calculator, Leaf, FileText, History, Brain, LogOut, PlusCircleIcon, SearchIcon, ClipboardListIcon, SettingsIcon, FileTextIcon, AreaChartIcon } from 'lucide-react';
+import { Calculator, Leaf, FileText, History, Brain, LogOut, PlusCircleIcon, SearchIcon, ClipboardListIcon, SettingsIcon, FileTextIcon, AreaChartIcon, Database } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
@@ -32,22 +33,25 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { FarmManagementButton } from '@/components/farm/FarmManagementButton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const schema = z.object({
-  location: z.string().min(1, 'Localização é obrigatória'),
-  date: z.string().min(1, 'Data é obrigatória'),
-  organicMatter: z.number().min(0, 'Não pode ser negativo'),
-  P: z.number().min(0, 'Não pode ser negativo'),
-  K: z.number().min(0, 'Não pode ser negativo'),
-  Ca: z.number().min(0, 'Não pode ser negativo'),
-  Mg: z.number().min(0, 'Não pode ser negativo'),
-  S: z.number().min(0, 'Não pode ser negativo'),
-  B: z.number().min(0, 'Não pode ser negativo'),
-  Cu: z.number().min(0, 'Não pode ser negativo'),
-  Fe: z.number().min(0, 'Não pode ser negativo'),
-  Mn: z.number().min(0, 'Não pode ser negativo'),
-  Zn: z.number().min(0, 'Não pode ser negativo'),
-  selectedPlotId: z.string().optional(),
+  location: z.string().min(1, "Localização é obrigatória"),
+  date: z.string().min(1, "Data é obrigatória"),
+  organicMatter: z.number().min(0, "Valor deve ser positivo").optional(),
+  T: z.number().min(0, "Valor deve ser positivo").optional(),
+  P: z.number().min(0, "Valor deve ser positivo").optional(),
+  argila: z.number().min(0, "Valor deve ser positivo").max(100, "Valor máximo é 100%").optional(),
+  K: z.number().min(0, "Valor deve ser positivo").optional(),
+  Ca: z.number().min(0, "Valor deve ser positivo").optional(),
+  Mg: z.number().min(0, "Valor deve ser positivo").optional(),
+  S: z.number().min(0, "Valor deve ser positivo").optional(),
+  B: z.number().min(0, "Valor deve ser positivo").optional(),
+  Cu: z.number().min(0, "Valor deve ser positivo").optional(),
+  Fe: z.number().min(0, "Valor deve ser positivo").optional(),
+  Mn: z.number().min(0, "Valor deve ser positivo").optional(),
+  Zn: z.number().min(0, "Valor deve ser positivo").optional(),
+  selectedPlotId: z.string().optional()
 });
 
 type FormData = z.infer<typeof schema>;
@@ -70,7 +74,9 @@ const Index = () => {
       location: '',
       date: new Date().toISOString().split('T')[0],
       organicMatter: 0,
+      T: 0,
       P: 0,
+      argila: 35,
       K: 0,
       Ca: 0,
       Mg: 0,
@@ -181,7 +187,9 @@ const Index = () => {
       location: data.location,
       date: data.date,
       organicMatter: data.organicMatter,
+      T: data.T,
       P: data.P,
+      argila: data.argila,
       K: data.K,
       Ca: data.Ca,
       Mg: data.Mg,
@@ -310,6 +318,10 @@ const Index = () => {
               <History className="h-4 w-4" />
               Histórico
             </TabsTrigger>
+            <TabsTrigger value="saved" className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+              <Database className="h-4 w-4" />
+              Análises Salvas
+            </TabsTrigger>
           </TabsList>
           
           {/* Versão para dispositivos móveis - layout em duas linhas */}
@@ -329,7 +341,7 @@ const Index = () => {
               </TabsTrigger>
             </TabsList>
             
-            <TabsList className="grid w-full grid-cols-2 bg-white shadow-sm text-xs">
+            <TabsList className="grid w-full grid-cols-3 bg-white shadow-sm text-xs">
               <TabsTrigger value="recommendations" disabled={!results} className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
                 <Leaf className="h-4 w-4" />
                 <span>Recomendações</span>
@@ -337,6 +349,10 @@ const Index = () => {
               <TabsTrigger value="history" className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
                 <History className="h-4 w-4" />
                 <span>Histórico</span>
+              </TabsTrigger>
+              <TabsTrigger value="saved" className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+                <Database className="h-4 w-4" />
+                <span>Salvas</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -441,6 +457,38 @@ const Index = () => {
                         {...register('P', { valueAsNumber: true })} 
                       />
                       {errors.P && <p className="text-sm text-red-500">{errors.P.message}</p>}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center">
+                        <Label htmlFor="argila">Argila (%)</Label>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="ml-1 text-blue-500 cursor-help text-xs">ⓘ</span>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-sm">
+                              <p>Porcentagem de argila na análise granulométrica. Necessário para interpretação precisa do fósforo.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <Input 
+                        id="argila" 
+                        type="number" 
+                        step="0.1"
+                        min="0"
+                        max="100"
+                        placeholder="Ex: 35"
+                        {...register('argila', { 
+                          required: "Argila é obrigatória para interpretação de fósforo",
+                          valueAsNumber: true,
+                          min: { value: 0, message: "Valor mínimo é 0%" },
+                          max: { value: 100, message: "Valor máximo é 100%" }
+                        })} 
+                      />
+                      {errors.argila && <p className="text-sm text-red-500">{errors.argila.message}</p>}
+                      <p className="text-xs text-gray-500">% de argila no solo</p>
                     </div>
                     
                     <div className="space-y-2">
@@ -617,6 +665,23 @@ const Index = () => {
               </CardHeader>
               <CardContent className="pt-4 md:pt-6">
                 <AnalysisHistory />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="saved">
+            <Card className="bg-white border-secondary-dark/10 shadow-sm">
+              <CardHeader className="border-b border-secondary-dark/10">
+                <CardTitle className="text-lg md:text-xl text-primary-dark flex items-center gap-2" style={titleStyle}>
+                  <Database className="h-4 w-4 md:h-5 md:w-5 text-secondary-dark" />
+                  Análises Salvas
+                </CardTitle>
+                <CardDescription className="text-xs md:text-sm text-neutral-medium">
+                  Visualize e gerencie suas análises salvas
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-4 md:pt-6">
+                <UserAnalysisHistory />
               </CardContent>
             </Card>
           </TabsContent>

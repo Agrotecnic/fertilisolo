@@ -40,6 +40,7 @@ export interface SoilAnalysisDB {
   iron?: number;       // Fe
   manganese?: number;  // Mn
   zinc?: number;       // Zn
+  clay_content?: number; // Percentual de argila
   plot_id?: string;
 }
 
@@ -73,7 +74,32 @@ export const convertSoilDataToDBFormat = (data: SoilData, userId?: string, plotI
     iron: data.Fe,
     manganese: data.Mn,
     zinc: data.Zn,
+    clay_content: data.argila,
     plot_id: plotId && plotId.trim() !== '' ? plotId : null // Apenas use plotId se não for vazio
+  };
+};
+
+/**
+ * Converte o formato do banco para o formato SoilData da aplicação
+ */
+export const convertDBToSoilDataFormat = (data: SoilAnalysisDB): SoilData => {
+  return {
+    location: data.location || '',
+    date: data.collection_date || new Date().toISOString().split('T')[0],
+    organicMatter: data.organic_matter || 0,
+    T: 10, // Valor padrão de CTC, deve ser calculado baseado nos dados
+    P: data.phosphorus || 0,
+    argila: data.clay_content || 35, // Valor padrão de 35% se não tiver o dado
+    K: data.potassium || 0,
+    Ca: data.calcium || 0,
+    Mg: data.magnesium || 0,
+    S: data.sulfur || 0,
+    B: data.boron || 0,
+    Cu: data.copper || 0,
+    Fe: data.iron || 0,
+    Mn: data.manganese || 0,
+    Zn: data.zinc || 0,
+    Mo: 0 // Valor padrão para Molibdênio que não está no banco
   };
 };
 
@@ -238,7 +264,10 @@ export const getUserSoilAnalyses = async () => {
 
     if (error) throw error;
     
-    return { data, error: null };
+    // Converter cada análise para o formato SoilData
+    const convertedData = data ? data.map(analysis => convertDBToSoilDataFormat(analysis)) : [];
+    
+    return { data: convertedData, error: null };
   } catch (error: any) {
     console.error('Erro ao buscar análises de solo:', error);
     return { data: [], error };
