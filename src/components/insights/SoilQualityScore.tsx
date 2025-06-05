@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Lightbulb, Zap } from 'lucide-react';
 import { CalculationResult } from '@/types/soilAnalysis';
 
@@ -27,7 +26,8 @@ const calculateSoilQualityScore = (results: CalculationResult): number => {
 
   // Relação Ca/Mg (muito importante)
   totalChecks += 2.5;
-  if (isAdequate.CaMgRatio) score += 2.5;
+  // Verificar se a relação Ca/Mg está em um intervalo adequado (2 a 5)
+  if (caeMgRatio >= 2 && caeMgRatio <= 5) score += 2.5;
 
   // Macronutrientes secundários
   const secondaryNutrients = ['S'] as const;
@@ -131,25 +131,23 @@ export const SoilQualityScore: React.FC<SoilQualityScoreProps> = ({ results }) =
           <div className="flex flex-col items-center">
             <div className="relative w-40 h-40">
               <ChartContainer config={chartConfig} className="w-full h-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={chartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={75}
-                      startAngle={90}
-                      endAngle={450}
-                      dataKey="value"
-                    >
-                      {chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                  </PieChart>
-                </ResponsiveContainer>
+                <PieChart width={160} height={160}>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={75}
+                    startAngle={90}
+                    endAngle={450}
+                    dataKey="value"
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                </PieChart>
               </ChartContainer>
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">

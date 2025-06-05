@@ -1,9 +1,12 @@
 // Tipos compartilhados para análise de solo
 export interface SoilData {
+  id?: string;
   location: string;
   date: string;
   organicMatter: number;
+  T: number; // CTC total (cmolc/dm³)
   P: number;
+  argila: number; // Percentual de argila (%)
   K: number;
   Ca: number;
   Mg: number;
@@ -13,6 +16,7 @@ export interface SoilData {
   Fe: number;
   Mn: number;
   Zn: number;
+  Mo?: number; // Molibdênio (opcional)
 }
 
 export interface NutrientRecommendations {
@@ -42,8 +46,6 @@ export interface FertilizerSuggestions {
 }
 
 export interface CalculationResult {
-  recommendations: NutrientRecommendations;
-  fertilizers: FertilizerSuggestions;
   saturations: {
     Ca: number;
     Mg: number;
@@ -68,7 +70,6 @@ export interface CalculationResult {
     Mg: boolean;
     K: boolean;
     P: boolean;
-    CaMgRatio: boolean;
     S: boolean;
     B: boolean;
     Cu: boolean;
@@ -77,4 +78,44 @@ export interface CalculationResult {
     Zn: boolean;
     Mo: boolean;
   };
+  recommendations: {
+    macronutrientes: {
+      P: string;
+      K: string;
+      Ca: string;
+      Mg: string;
+      S: string;
+    };
+    micronutrientes: {
+      B: string;
+      Cu: string;
+      Fe: string;
+      Mn: string;
+      Zn: string;
+      Mo: string;
+    };
+  };
+  fertilizers: {
+    macronutrientes: Array<{
+      nome: string;
+      quantidade: number;
+      unidade: string;
+    }>;
+    micronutrientes: Array<{
+      nome: string;
+      quantidade: number;
+      unidade: string;
+    }>;
+  };
+}
+
+// Interface para armazenar a interpretação de fósforo baseada em argila
+export interface PhosphorusAnalysis {
+  interpretacao: string;        // Nível de P (Muito Baixo, Baixo, etc.)
+  classe: number;               // Classe de argila (1-4)
+  doseRecomendada: number;      // Dose recomendada de P2O5 (kg/ha)
+  texturaSolo: string;          // Descrição da textura do solo
+  limiteCritico: number;        // Limite crítico de P para a classe
+  observacao: string;           // Observação específica para a classe
+  statusAdequacao: boolean;     // Se está acima do limite crítico
 } 

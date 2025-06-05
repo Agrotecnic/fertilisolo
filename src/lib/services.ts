@@ -84,6 +84,7 @@ export const convertSoilDataToDBFormat = (data: SoilData, userId?: string, plotI
  */
 export const convertDBToSoilDataFormat = (data: SoilAnalysisDB): SoilData => {
   return {
+    id: data.id,
     location: data.location || '',
     date: data.collection_date || new Date().toISOString().split('T')[0],
     organicMatter: data.organic_matter || 0,
@@ -264,8 +265,14 @@ export const getUserSoilAnalyses = async () => {
 
     if (error) throw error;
     
+    console.log("Análises brutas do Supabase:", data);
+    
     // Converter cada análise para o formato SoilData
-    const convertedData = data ? data.map(analysis => convertDBToSoilDataFormat(analysis)) : [];
+    const convertedData = data ? data.map(analysis => {
+      const converted = convertDBToSoilDataFormat(analysis);
+      console.log("Análise convertida:", converted);
+      return converted;
+    }) : [];
     
     return { data: convertedData, error: null };
   } catch (error: any) {
@@ -297,5 +304,32 @@ export const saveFertilizerRecommendation = async (recommendation: FertilizerRec
   } catch (error: any) {
     console.error('Erro ao salvar recomendação de fertilizante:', error);
     return { data: null, error };
+  }
+};
+
+/**
+ * Deleta uma análise de solo do Supabase pelo ID
+ */
+export const deleteSoilAnalysis = async (analysisId: string) => {
+  try {
+    // Verificar se o usuário está autenticado
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) {
+      throw new Error('Usuário não autenticado');
+    }
+
+    // Deletar a análise
+    const { error } = await supabase
+      .from('soil_analyses')
+      .delete()
+      .eq('id', analysisId)
+      .eq('user_id', session.user.id); // Garantir que a análise pertence ao usuário
+
+    if (error) throw error;
+    
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Erro ao deletar análise de solo:', error);
+    return { success: false, error };
   }
 }; 

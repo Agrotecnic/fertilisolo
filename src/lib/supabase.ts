@@ -20,7 +20,7 @@ export async function getCrops() {
     
     if (!rpcError && rpcData) {
       return { data: rpcData, error: null };
-    }
+  }
     
     // Se falhar, tenta acessar diretamente a tabela (política pública)
     console.log('Função RPC falhou, tentando acesso direto à tabela');

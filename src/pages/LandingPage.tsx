@@ -39,12 +39,12 @@ const LandingPage: React.FC = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/login">
-                  <Button 
-                    className="bg-green-600 hover:bg-green-700 text-white text-lg py-6 px-8 rounded-lg"
-                  >
-                    Começar agora
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
+                <Button 
+                  className="bg-green-600 hover:bg-green-700 text-white text-lg py-6 px-8 rounded-lg"
+                >
+                  Começar agora
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
                 </Link>
                 <Link to="/relatorio" className="w-full sm:w-auto">
                   <Button variant="outline" className="w-full border-green-600 text-green-700 hover:bg-green-50">

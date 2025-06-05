@@ -4,16 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { SoilData, CalculationResult } from '@/types/soilAnalysis';
-import { getUserSoilAnalyses } from '@/lib/services';
+import { getUserSoilAnalyses, deleteSoilAnalysis } from '@/lib/services';
 import { calculateSoilAnalysis } from '@/utils/soilCalculations';
 import { Trash2, Eye, MapPin, Calendar, AlertTriangle, Download } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import * as pdfGenerator from '@/utils/pdfGenerator';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 export const UserAnalysisHistory: React.FC = () => {
   const [history, setHistory] = useState<SoilData[]>([]);
   const [selectedAnalysis, setSelectedAnalysis] = useState<SoilData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     loadHistory();
@@ -50,7 +52,7 @@ export const UserAnalysisHistory: React.FC = () => {
         analysis.location
       );
       
-      if (pdfContent && pdfContent.pdf) {
+      if (pdfContent) {
         pdfContent.pdf.save(pdfContent.filename);
         
         toast({
@@ -65,6 +67,50 @@ export const UserAnalysisHistory: React.FC = () => {
         title: 'Erro ao gerar PDF',
         description: 'Não foi possível gerar o relatório.'
       });
+    }
+  };
+
+  const handleDelete = async (analysis: SoilData) => {
+    console.log("Tentando excluir análise:", analysis);
+    
+    if (!analysis.id) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao excluir',
+        description: 'ID da análise não encontrado.'
+      });
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const { success, error } = await deleteSoilAnalysis(analysis.id);
+      
+      if (error) throw error;
+      
+      if (success) {
+        // Se a análise excluída for a selecionada, limpe a seleção
+        if (selectedAnalysis && selectedAnalysis.id === analysis.id) {
+          setSelectedAnalysis(null);
+        }
+        
+        // Recarregar a lista de análises
+        await loadHistory();
+        
+        toast({
+          title: "Análise excluída",
+          description: "A análise foi excluída com sucesso."
+        });
+      }
+    } catch (error: any) {
+      console.error('Erro ao excluir análise:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao excluir análise',
+        description: error.message || 'Não foi possível excluir a análise.'
+      });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -139,15 +185,48 @@ export const UserAnalysisHistory: React.FC = () => {
                 </div>
 
                 <div className="flex justify-between mt-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-xs h-8"
-                    onClick={() => handleViewDetails(analysis)}
-                  >
-                    <Eye className="h-3 w-3 mr-1" />
-                    Ver detalhes
-                  </Button>
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-xs h-8"
+                      onClick={() => handleViewDetails(analysis)}
+                    >
+                      <Eye className="h-3 w-3 mr-1" />
+                      Ver detalhes
+                    </Button>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-xs h-8 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                          disabled={deleting}
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Excluir
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Excluir análise</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Tem certeza que deseja excluir esta análise? Esta ação não pode ser desfeita.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction 
+                            className="bg-red-600 hover:bg-red-700"
+                            onClick={() => handleDelete(analysis)}
+                          >
+                            Excluir
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                   
                   <Button 
                     variant="outline" 
@@ -249,7 +328,7 @@ export const UserAnalysisHistory: React.FC = () => {
                   })()}
                 </div>
 
-                <div className="mt-4">
+                <div className="mt-4 space-y-3">
                   <Button 
                     className="w-full bg-green-600 hover:bg-green-700 text-white"
                     onClick={() => handleExportPDF(selectedAnalysis)}
@@ -257,6 +336,36 @@ export const UserAnalysisHistory: React.FC = () => {
                     <Download className="h-4 w-4 mr-2" />
                     Exportar como PDF
                   </Button>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="w-full border-red-300 text-red-600 hover:bg-red-50"
+                        disabled={deleting}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Excluir análise
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Excluir análise</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja excluir esta análise? Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction 
+                          className="bg-red-600 hover:bg-red-700"
+                          onClick={() => handleDelete(selectedAnalysis)}
+                        >
+                          Excluir
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             </CardContent>

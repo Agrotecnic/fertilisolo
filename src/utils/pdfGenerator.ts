@@ -839,207 +839,182 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
 };
 
 export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: string) => {
-  const pdf = new jsPDF();
-  
-  // Configurações do PDF
-  pdf.setProperties({
-    title: 'Relatório de Análise de Solo',
-    author: 'Fertilisolo',
-    subject: 'Análise e Recomendação de Fertilizantes',
-    keywords: 'solo, fertilizantes, análise'
-  });
-  
-  // Título do documento
-  pdf.setFontSize(20);
-  pdf.setTextColor(56, 142, 60); // cor verde para o título
-  pdf.text('Relatório de Análise de Solo', 15, 15);
-  
-  // Informações gerais
-  pdf.setFontSize(12);
-  pdf.setTextColor(0, 0, 0);
-  pdf.text(`Local: ${soilData.location || "Não especificado"}`, 15, 30);
-  pdf.text(`Fazenda: ${farmName || "Não especificada"}`, 15, 37);
-  pdf.text(`Talhão: ${plotName || "Não especificado"}`, 15, 44);
-  pdf.text(`Data da Análise: ${soilData.date || new Date().toLocaleDateString()}`, 15, 51);
-  
-  // Análise da textura do solo e interpretação de fósforo
-  const classeArgila = determinarClasseArgila(soilData.argila);
-  const texturaDescricao = getTexturaClasseArgila(classeArgila);
-  const interpretacaoP = interpretarFosforo(soilData.P, soilData.argila);
-  const analiseP = calcularRecomendacaoP(soilData.P, soilData.argila);
-  
-  // Linha divisória
-  pdf.setDrawColor(56, 142, 60);
-  pdf.line(15, 58, 195, 58);
-  
-  // Resultados da Análise
-  pdf.setFontSize(16);
-  pdf.setTextColor(56, 142, 60);
-  pdf.text('Resultados da Análise de Solo', 15, 68);
-  
-  // Usar uma tabela HTML para formatar os dados
-  pdf.setFontSize(10);
-  pdf.setTextColor(0, 0, 0);
-  
-  // Converter o K para cmolc/dm³
-  const kCmolc = soilData.K / 390;
-  
-  // Seção de informação sobre classe textural
-  pdf.setFontSize(14);
-  pdf.setTextColor(56, 142, 60);
-  pdf.text('Classificação Textural do Solo', 15, 78);
-  
-  pdf.setFontSize(10);
-  pdf.setTextColor(0, 0, 0);
-  pdf.text(`Teor de Argila: ${soilData.argila}%`, 15, 85);
-  pdf.text(`Classe Textural: ${texturaDescricao}`, 15, 92);
-  pdf.text(`Interpretação do Fósforo: ${interpretacaoP}`, 15, 99);
-  pdf.text(`Limite Crítico de P para esta classe: ${analiseP.limiteCritico} mg/dm³`, 15, 106);
-  
-  // Linha divisória
-  pdf.setDrawColor(200, 200, 200);
-  pdf.line(15, 113, 195, 113);
-  
-  // Resultados da análise química
-  pdf.setFontSize(14);
-  pdf.setTextColor(56, 142, 60);
-  pdf.text('Resultados da Análise Química', 15, 123);
-  
-  // Dados da análise em formato HTML para renderizar no PDF
-  const htmlContent = `
-    <div class="mt-4">
-      <div class="bg-green-50 p-3 rounded-md border-green-200">
-        <h4 class="font-medium text-green-800 border-b border-green-300 pb-1 mb-2">Macronutrientes Primários</h4>
-        <div class="space-y-2">
-          <div class="flex justify-between">
-            <span class="text-gray-600">CTC (T):</span>
-            <span class="font-medium">${soilData.T || 0} cmolc/dm³</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Fósforo (P):</span>
-            <span class="font-medium">${soilData.P || 0} mg/dm³</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Potássio (K):</span>
-            <span class="font-medium">${kCmolc.toFixed(2)} cmolc/dm³ (${soilData.K || 0} mg/dm³)</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Cálcio (Ca):</span>
-            <span class="font-medium">${soilData.Ca || 0} cmolc/dm³</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Magnésio (Mg):</span>
-            <span class="font-medium">${soilData.Mg || 0} cmolc/dm³</span>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  
-  // Configurar a tabela de análise de nutrientes
-  const tableColumn = [
-    "Nutriente", 
-    "Valor", 
-    "Unidade", 
-    "Interpretação", 
-    "Faixa Ideal"
-  ];
-  
-  // Dados dos macronutrientes
-  const tableRows = [
-    ["CTC (T)", (soilData.T || 0).toFixed(2), "cmolc/dm³", 
-      soilData.T < 5 ? "Baixa" : soilData.T < 10 ? "Média" : "Alta", 
-      "5,0 - 12,0"],
-    ["Fósforo (P)", (soilData.P || 0).toFixed(2), "mg/dm³", 
-      interpretacaoP, 
-      `${analiseP.limiteCritico} - ${analiseP.limiteCritico * 2}`],
-    ["Potássio (K)", kCmolc.toFixed(2), "cmolc/dm³", 
-      kCmolc < 0.15 ? "Baixo" : kCmolc < 0.3 ? "Médio" : "Alto", 
-      "0,15 - 0,30"],
-    ["Cálcio (Ca)", (soilData.Ca || 0).toFixed(2), "cmolc/dm³", 
-      soilData.Ca < 2 ? "Baixo" : soilData.Ca < 4 ? "Médio" : "Alto", 
-      "2,0 - 4,0"],
-    ["Magnésio (Mg)", (soilData.Mg || 0).toFixed(2), "cmolc/dm³", 
-      soilData.Mg < 0.5 ? "Baixo" : soilData.Mg < 1 ? "Médio" : "Alto", 
-      "0,5 - 1,0"],
-    ["Enxofre (S)", (soilData.S || 0).toFixed(2), "mg/dm³", 
-      soilData.S < 5 ? "Baixo" : soilData.S < 10 ? "Médio" : "Alto", 
-      "5,0 - 15,0"],
-  ];
-  
-  // Posição vertical após o conteúdo HTML
-  const yPos = 130;
-  
-  // Adicionar a tabela de análise de nutrientes
-  (pdf as any).autoTable({
-    head: [tableColumn],
-    body: tableRows,
-    startY: yPos,
-    theme: 'grid',
-    headStyles: { fillColor: [56, 142, 60], textColor: [255, 255, 255] },
-    alternateRowStyles: { fillColor: [240, 248, 240] },
-    margin: { top: 10 },
-  });
-  
-  // Adicionar recomendação de fósforo com base na classe textural
-  pdf.setFontSize(14);
-  pdf.setTextColor(56, 142, 60);
-  pdf.text('Recomendação para Fósforo', 15, ((pdf as any).lastAutoTable?.finalY || 220) + 10);
-  
-  pdf.setFontSize(10);
-  pdf.setTextColor(0, 0, 0);
-  pdf.text(`Dose Recomendada: ${analiseP.doseRecomendada} kg/ha de P₂O₅`, 15, ((pdf as any).lastAutoTable?.finalY || 220) + 20);
-  pdf.text(`Observação: ${analiseP.observacao}`, 15, ((pdf as any).lastAutoTable?.finalY || 220) + 27);
-  
-  // Micronutrientes
-  const micronutrientesRows = [
-    ["Boro (B)", (soilData.B || 0).toFixed(2), "mg/dm³", 
-      soilData.B < 0.3 ? "Baixo" : soilData.B < 0.6 ? "Médio" : "Alto", 
-      "0,3 - 0,6"],
-    ["Cobre (Cu)", (soilData.Cu || 0).toFixed(2), "mg/dm³", 
-      soilData.Cu < 0.4 ? "Baixo" : soilData.Cu < 0.8 ? "Médio" : "Alto", 
-      "0,4 - 0,8"],
-    ["Ferro (Fe)", (soilData.Fe || 0).toFixed(2), "mg/dm³", 
-      soilData.Fe < 8 ? "Baixo" : soilData.Fe < 30 ? "Médio" : "Alto", 
-      "8,0 - 30,0"],
-    ["Manganês (Mn)", (soilData.Mn || 0).toFixed(2), "mg/dm³", 
-      soilData.Mn < 3 ? "Baixo" : soilData.Mn < 5 ? "Médio" : "Alto", 
-      "3,0 - 5,0"],
-    ["Zinco (Zn)", (soilData.Zn || 0).toFixed(2), "mg/dm³", 
-      soilData.Zn < 1 ? "Baixo" : soilData.Zn < 1.5 ? "Médio" : "Alto", 
-      "1,0 - 1,5"]
-  ];
-  
-  // Título para micronutrientes
-  pdf.setFontSize(14);
-  pdf.setTextColor(56, 142, 60);
-  pdf.text('Micronutrientes', 15, ((pdf as any).lastAutoTable?.finalY || 220) + 37);
-  
-  // Tabela de micronutrientes
-  (pdf as any).autoTable({
-    head: [tableColumn],
-    body: micronutrientesRows,
-    startY: ((pdf as any).lastAutoTable?.finalY || 220) + 45,
-    theme: 'grid',
-    headStyles: { fillColor: [56, 142, 60], textColor: [255, 255, 255] },
-    alternateRowStyles: { fillColor: [240, 248, 240] },
-    margin: { top: 10 },
-  });
-  
-  // Informações de rodapé
-  const pageCount = pdf.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
-    pdf.setPage(i);
-    pdf.setFontSize(8);
-    pdf.setTextColor(100, 100, 100);
-    pdf.text(`Fertilisolo - Relatório gerado em ${new Date().toLocaleDateString()}`, 15, 285);
-    pdf.text(`Página ${i} de ${pageCount}`, 175, 285);
+  try {
+    const pdf = new jsPDF();
+    
+    // Configurações do PDF
+    pdf.setProperties({
+      title: 'Relatório de Análise de Solo',
+      author: 'Fertilisolo',
+      subject: 'Análise e Recomendação de Fertilizantes',
+      keywords: 'solo, fertilizantes, análise'
+    });
+    
+    // Título do documento
+    pdf.setFontSize(20);
+    pdf.setTextColor(56, 142, 60); // cor verde para o título
+    pdf.text('Relatório de Análise de Solo', 15, 15);
+    
+    // Informações gerais
+    pdf.setFontSize(12);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`Local: ${soilData.location || "Não especificado"}`, 15, 30);
+    pdf.text(`Fazenda: ${farmName || "Não especificada"}`, 15, 37);
+    pdf.text(`Talhão: ${plotName || "Não especificado"}`, 15, 44);
+    pdf.text(`Data da Análise: ${soilData.date || new Date().toLocaleDateString()}`, 15, 51);
+    
+    // Análise da textura do solo e interpretação de fósforo
+    const classeArgila = determinarClasseArgila(soilData.argila || 0);
+    const texturaDescricao = getTexturaClasseArgila(classeArgila);
+    const interpretacaoP = interpretarFosforo(soilData.P || 0, soilData.argila || 0);
+    const analiseP = calcularRecomendacaoP(soilData.P || 0, soilData.argila || 0);
+    
+    // Linha divisória
+    pdf.setDrawColor(56, 142, 60);
+    pdf.line(15, 58, 195, 58);
+    
+    // Resultados da Análise
+    pdf.setFontSize(16);
+    pdf.setTextColor(56, 142, 60);
+    pdf.text('Resultados da Análise de Solo', 15, 68);
+    
+    // Usar uma tabela HTML para formatar os dados
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 0, 0);
+    
+    // Converter o K para cmolc/dm³
+    const kCmolc = (soilData.K || 0) / 390;
+    
+    // Seção de informação sobre classe textural
+    pdf.setFontSize(14);
+    pdf.setTextColor(56, 142, 60);
+    pdf.text('Classificação Textural do Solo', 15, 78);
+    
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`Teor de Argila: ${soilData.argila || 0}%`, 15, 85);
+    pdf.text(`Classe Textural: ${texturaDescricao}`, 15, 92);
+    pdf.text(`Interpretação do Fósforo: ${interpretacaoP}`, 15, 99);
+    pdf.text(`Limite Crítico de P para esta classe: ${analiseP.limiteCritico} mg/dm³`, 15, 106);
+    
+    // Linha divisória
+    pdf.setDrawColor(200, 200, 200);
+    pdf.line(15, 113, 195, 113);
+    
+    // Resultados da análise química
+    pdf.setFontSize(14);
+    pdf.setTextColor(56, 142, 60);
+    pdf.text('Resultados da Análise Química', 15, 123);
+    
+    // Configurar a tabela de análise de nutrientes
+    const tableColumn = [
+      "Nutriente", 
+      "Valor", 
+      "Unidade", 
+      "Interpretação", 
+      "Faixa Ideal"
+    ];
+    
+    // Dados dos macronutrientes
+    const tableRows = [
+      ["CTC (T)", (soilData.T || 0).toFixed(2), "cmolc/dm³", 
+        soilData.T < 5 ? "Baixa" : soilData.T < 10 ? "Média" : "Alta", 
+        "5,0 - 12,0"],
+      ["Fósforo (P)", (soilData.P || 0).toFixed(2), "mg/dm³", 
+        interpretacaoP, 
+        `${analiseP.limiteCritico} - ${analiseP.limiteCritico * 2}`],
+      ["Potássio (K)", kCmolc.toFixed(2), "cmolc/dm³", 
+        kCmolc < 0.15 ? "Baixo" : kCmolc < 0.3 ? "Médio" : "Alto", 
+        "0,15 - 0,30"],
+      ["Cálcio (Ca)", (soilData.Ca || 0).toFixed(2), "cmolc/dm³", 
+        soilData.Ca < 2 ? "Baixo" : soilData.Ca < 4 ? "Médio" : "Alto", 
+        "2,0 - 4,0"],
+      ["Magnésio (Mg)", (soilData.Mg || 0).toFixed(2), "cmolc/dm³", 
+        soilData.Mg < 0.5 ? "Baixo" : soilData.Mg < 1 ? "Médio" : "Alto", 
+        "0,5 - 1,0"],
+      ["Enxofre (S)", (soilData.S || 0).toFixed(2), "mg/dm³", 
+        soilData.S < 5 ? "Baixo" : soilData.S < 10 ? "Médio" : "Alto", 
+        "5,0 - 15,0"],
+    ];
+    
+    // Posição vertical após o conteúdo HTML
+    const yPos = 130;
+    
+    // Adicionar a tabela de análise de nutrientes
+    (pdf as any).autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: yPos,
+      theme: 'grid',
+      headStyles: { fillColor: [56, 142, 60], textColor: [255, 255, 255] },
+      alternateRowStyles: { fillColor: [240, 248, 240] },
+      margin: { top: 10 },
+    });
+    
+    // Adicionar recomendação de fósforo com base na classe textural
+    pdf.setFontSize(14);
+    pdf.setTextColor(56, 142, 60);
+    pdf.text('Recomendação para Fósforo', 15, ((pdf as any).lastAutoTable?.finalY || 220) + 10);
+    
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`Dose Recomendada: ${analiseP.doseRecomendada} kg/ha de P₂O₅`, 15, ((pdf as any).lastAutoTable?.finalY || 220) + 20);
+    pdf.text(`Observação: ${analiseP.observacao}`, 15, ((pdf as any).lastAutoTable?.finalY || 220) + 27);
+    
+    // Micronutrientes
+    const micronutrientesRows = [
+      ["Boro (B)", (soilData.B || 0).toFixed(2), "mg/dm³", 
+        soilData.B < 0.3 ? "Baixo" : soilData.B < 0.6 ? "Médio" : "Alto", 
+        "0,3 - 0,6"],
+      ["Cobre (Cu)", (soilData.Cu || 0).toFixed(2), "mg/dm³", 
+        soilData.Cu < 0.4 ? "Baixo" : soilData.Cu < 0.8 ? "Médio" : "Alto", 
+        "0,4 - 0,8"],
+      ["Ferro (Fe)", (soilData.Fe || 0).toFixed(2), "mg/dm³", 
+        soilData.Fe < 8 ? "Baixo" : soilData.Fe < 30 ? "Médio" : "Alto", 
+        "8,0 - 30,0"],
+      ["Manganês (Mn)", (soilData.Mn || 0).toFixed(2), "mg/dm³", 
+        soilData.Mn < 3 ? "Baixo" : soilData.Mn < 5 ? "Médio" : "Alto", 
+        "3,0 - 5,0"],
+      ["Zinco (Zn)", (soilData.Zn || 0).toFixed(2), "mg/dm³", 
+        soilData.Zn < 1 ? "Baixo" : soilData.Zn < 1.5 ? "Médio" : "Alto", 
+        "1,0 - 1,5"]
+    ];
+    
+    // Título para micronutrientes
+    pdf.setFontSize(14);
+    pdf.setTextColor(56, 142, 60);
+    pdf.text('Micronutrientes', 15, ((pdf as any).lastAutoTable?.finalY || 220) + 37);
+    
+    // Tabela de micronutrientes
+    (pdf as any).autoTable({
+      head: [tableColumn],
+      body: micronutrientesRows,
+      startY: ((pdf as any).lastAutoTable?.finalY || 220) + 45,
+      theme: 'grid',
+      headStyles: { fillColor: [56, 142, 60], textColor: [255, 255, 255] },
+      alternateRowStyles: { fillColor: [240, 248, 240] },
+      margin: { top: 10 },
+    });
+    
+    // Informações de rodapé
+    const pageCount = pdf.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Fertilisolo - Relatório gerado em ${new Date().toLocaleDateString()}`, 15, 285);
+      pdf.text(`Página ${i} de ${pageCount}`, 175, 285);
+    }
+    
+    // Nome do arquivo para download
+    const filename = `Recomendacao_${soilData.location || "Local"}.pdf`;
+    
+    // Retornar o PDF para download
+    return { pdf, filename };
+  } catch (error) {
+    console.error("Erro ao gerar PDF:", error);
+    throw error;
   }
-  
-  // Nome do arquivo para download
-  const filename = `Recomendacao_${soilData.location || "Local"}.pdf`;
-  
-  // Retornar o PDF para download
-  return { pdf, filename };
 };
 
 export default generatePDF;

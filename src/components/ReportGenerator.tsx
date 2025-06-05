@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { getCrops, getFertilizerSources } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -6,6 +6,17 @@ import { Printer, Download, Send } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
+import { Progress } from '@/components/ui/progress';
+import * as pdfGenerator from '@/utils/pdfGenerator';
+import { 
+  interpretarFosforo, 
+  calcularRecomendacaoP, 
+  determinarClasseArgila, 
+  getTexturaClasseArgila,
+  calculateResultsWithArgilaInterpretation
+} from '@/utils/soilCalculations';
+import { SoilData, CalculationResult, PhosphorusAnalysis } from '@/types/soilAnalysis';
+import { Badge } from '@/components/ui/badge';
 
 // Estendendo o jsPDF com autotable
 declare module 'jspdf' {
@@ -31,6 +42,10 @@ interface SoilAnalysis {
   iron?: number;
   manganese?: number;
   zinc?: number;
+  T?: number;
+  argila?: number;
+  P?: number;
+  K?: number;
 }
 
 interface FertilizerRecommendation {
@@ -70,7 +85,11 @@ const sampleData: ReportData = {
     copper: 1.8,
     iron: 45.2,
     manganese: 28.6,
-    zinc: 2.1
+    zinc: 2.1,
+    T: 0.5,
+    argila: 20,
+    P: 10,
+    K: 0.2
   },
   crop: {
     name: "Soja",
@@ -91,6 +110,9 @@ const sampleData: ReportData = {
 export default function ReportGenerator() {
   const [reportData, setReportData] = useState<ReportData>(sampleData);
   const [loading, setLoading] = useState(false);
+  const [calculationResults, setCalculationResults] = useState<CalculationResult | null>(null);
+  const [phosphorusAnalysis, setPhosphorusAnalysis] = useState<PhosphorusAnalysis | null>(null);
+  const [showReport, setShowReport] = useState(false);
 
   const handlePrint = () => {
     window.print();
@@ -211,7 +233,7 @@ export default function ReportGenerator() {
       
       // Adicionar observações sobre micronutrientes
       pdf.setFontSize(12);
-      pdf.text('Observações importantes sobre micronutrientes:', 15, pdf.autoTable.previous.finalY + 15);
+      pdf.text('Observações importantes sobre micronutrientes:', 15, ((pdf as any).lastAutoTable?.finalY || 150) + 15);
       
       const observations = [
         "• Os micronutrientes são essenciais para o desenvolvimento completo das plantas",
@@ -221,7 +243,7 @@ export default function ReportGenerator() {
         "• Análises foliares podem complementar as informações do solo para ajuste preciso"
       ];
       
-      let yPos = pdf.autoTable.previous.finalY + 20;
+      let yPos = ((pdf as any).lastAutoTable?.finalY || 150) + 20;
       observations.forEach(obs => {
         pdf.text(obs, 15, yPos);
         yPos += 7;
@@ -234,6 +256,80 @@ export default function ReportGenerator() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGenerateReport = () => {
+    if (reportData) {
+      // Converter SoilAnalysis para SoilData para compatibilidade
+      const soilData: SoilData = {
+        location: reportData.soilAnalysis.location || "",
+        date: new Date().toISOString().split('T')[0],
+        organicMatter: reportData.soilAnalysis.organic_matter || 0,
+        T: reportData.soilAnalysis.T || 0,
+        P: reportData.soilAnalysis.P || 0,
+        argila: reportData.soilAnalysis.argila || 35, // valor padrão se não fornecido
+        K: reportData.soilAnalysis.K || 0,
+        Ca: reportData.soilAnalysis.calcium || 0,
+        Mg: reportData.soilAnalysis.magnesium || 0,
+        S: reportData.soilAnalysis.sulfur || 0,
+        B: reportData.soilAnalysis.boron || 0,
+        Cu: reportData.soilAnalysis.copper || 0,
+        Fe: reportData.soilAnalysis.iron || 0,
+        Mn: reportData.soilAnalysis.manganese || 0,
+        Zn: reportData.soilAnalysis.zinc || 0
+      };
+      
+      // Calcular resultados com a interpretação de fósforo baseada em argila
+      const results = calculateResultsWithArgilaInterpretation(soilData);
+      
+      // Obter análise específica de fósforo baseada na argila
+      const fosforoAnalise = calcularRecomendacaoP(
+        soilData.P, 
+        soilData.argila
+      );
+      
+      setCalculationResults(results);
+      setPhosphorusAnalysis(fosforoAnalise);
+      setShowReport(true);
+    }
+  };
+
+  const handleExportPDF = () => {
+    setLoading(true);
+    
+    if (reportData) {
+      // Converter SoilAnalysis para SoilData para compatibilidade
+      const soilData: SoilData = {
+        location: reportData.soilAnalysis.location || "",
+        date: new Date().toISOString().split('T')[0],
+        organicMatter: reportData.soilAnalysis.organic_matter || 0,
+        T: reportData.soilAnalysis.T || 0,
+        P: reportData.soilAnalysis.P || 0,
+        argila: reportData.soilAnalysis.argila || 35, // valor padrão se não fornecido
+        K: reportData.soilAnalysis.K || 0,
+        Ca: reportData.soilAnalysis.calcium || 0,
+        Mg: reportData.soilAnalysis.magnesium || 0,
+        S: reportData.soilAnalysis.sulfur || 0,
+        B: reportData.soilAnalysis.boron || 0,
+        Cu: reportData.soilAnalysis.copper || 0,
+        Fe: reportData.soilAnalysis.iron || 0,
+        Mn: reportData.soilAnalysis.manganese || 0,
+        Zn: reportData.soilAnalysis.zinc || 0
+      };
+      
+      try {
+        const { pdf, filename } = pdfGenerator.generatePDF(
+          soilData, 
+          reportData.soilAnalysis.farm_name, 
+          reportData.soilAnalysis.location
+        );
+        pdf.save(filename);
+      } catch (error) {
+        console.error("Erro ao gerar PDF:", error);
+      }
+    }
+    
+    setLoading(false);
   };
 
   // Função para determinar o nível de um nutriente
@@ -262,312 +358,90 @@ export default function ReportGenerator() {
   }
 
   return (
-    <div className="p-4 max-w-4xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Relatório de Recomendação de Fertilizantes</h1>
-        <div className="flex space-x-2">
-          <Button onClick={handlePrint} variant="outline" className="flex items-center gap-2">
-            <Printer size={16} />
-            Imprimir
+    <div className="p-4">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Relatório de Análise de Solo</h2>
+        <div className="space-x-2">
+          <Button onClick={handleGenerateReport} variant="outline" className="bg-green-50 text-green-600 border-green-200 hover:bg-green-100">
+            Analisar Solo
           </Button>
-          <Button onClick={handleDownloadPDF} disabled={loading} className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
-            <Download size={16} />
-            {loading ? 'Gerando PDF...' : 'Download PDF'}
+          <Button onClick={handleExportPDF} disabled={loading} className="bg-green-600 text-white hover:bg-green-700">
+            {loading ? "Gerando..." : "Exportar PDF"}
           </Button>
         </div>
       </div>
 
-      {/* Container do relatório que será capturado para PDF */}
-      <div id="report-container" className="bg-white p-6 rounded-lg shadow-md space-y-6 print:shadow-none print:p-0">
-        {/* Cabeçalho */}
-        <div className="flex justify-between items-center border-b border-green-200 pb-4">
-          <div>
-            <h2 className="text-xl font-bold text-green-700">Fertilisolo</h2>
-            <p className="text-sm text-gray-500">Relatório gerado em: {new Date().toLocaleDateString('pt-BR')}</p>
-          </div>
-          <div className="text-right">
-            <h3 className="font-medium">{reportData.soilAnalysis.farm_name}</h3>
-            <p className="text-sm text-gray-600">{reportData.soilAnalysis.location}</p>
-            <p className="text-sm text-gray-600">Data da coleta: {reportData.soilAnalysis.collection_date && new Date(reportData.soilAnalysis.collection_date).toLocaleDateString('pt-BR')}</p>
-          </div>
-        </div>
-
-        {/* Informações da cultura */}
-        <div className="bg-green-50 p-4 rounded-md">
-          <h3 className="text-lg font-semibold text-green-700 mb-2">Cultura: {reportData.crop.name}</h3>
-          {reportData.crop.scientific_name && (
-            <p className="text-sm text-gray-600 italic">Nome científico: {reportData.crop.scientific_name}</p>
-          )}
-        </div>
-
-        {/* Análise do solo em grid */}
-        <div>
-          <h3 className="text-lg font-semibold text-green-700 mb-3">Análise do Solo</h3>
+      {/* Exibir relatório após clicar em Analisar Solo */}
+      {showReport && phosphorusAnalysis && (
+        <div className="bg-white shadow-md rounded-lg p-6 my-4">
+          <h3 className="text-xl font-semibold text-green-800 mb-4">Análise de Solo - {reportData.soilAnalysis.location}</h3>
           
-          <div className="grid grid-cols-3 gap-4">
-            {/* Macronutrientes */}
-            <Card className="p-3 bg-green-50 border-green-100">
-              <h4 className="font-medium text-green-800 border-b border-green-200 pb-1 mb-2">pH e Matéria Orgânica</h4>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">pH:</span>
-                  <span className="font-medium">{reportData.soilAnalysis.ph}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Matéria Orgânica:</span>
-                  <span className="font-medium">{reportData.soilAnalysis.organic_matter} %</span>
-                </div>
-              </div>
-            </Card>
-            
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <Card className="p-3 bg-green-50 border-green-100">
               <h4 className="font-medium text-green-800 border-b border-green-200 pb-1 mb-2">Macronutrientes Primários</h4>
               <div className="space-y-2">
                 <div className="flex justify-between">
+                  <span className="text-gray-600">CTC (T):</span>
+                  <span className="font-medium">{reportData.soilAnalysis.T} cmolc/dm³</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-gray-600">Fósforo (P):</span>
-                  <span className="font-medium">{reportData.soilAnalysis.phosphorus} mg/dm³</span>
+                  <span className="font-medium">{reportData.soilAnalysis.P} mg/dm³</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Argila:</span>
+                  <span className="font-medium">{reportData.soilAnalysis.argila}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Classe textural:</span>
+                  <span className="font-medium">{phosphorusAnalysis && getTexturaClasseArgila(phosphorusAnalysis.classe)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Interpretação de P:</span>
+                  <Badge className={`${
+                    phosphorusAnalysis?.interpretacao === "Muito Baixo" || phosphorusAnalysis?.interpretacao === "Baixo" 
+                      ? "bg-red-100 text-red-800 hover:bg-red-100" 
+                      : phosphorusAnalysis?.interpretacao === "Médio" 
+                        ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-100" 
+                        : "bg-green-100 text-green-800 hover:bg-green-100"
+                  }`}>
+                    {phosphorusAnalysis?.interpretacao || "Não avaliado"}
+                  </Badge>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Potássio (K):</span>
-                  <span className="font-medium">{reportData.soilAnalysis.potassium} cmolc/dm³</span>
+                  <div>
+                    <span className="font-medium">{(reportData.soilAnalysis.K / 390).toFixed(2)} cmolc/dm³</span>
+                    <span className="text-xs text-gray-500 ml-1">({reportData.soilAnalysis.K} mg/dm³)</span>
+                  </div>
                 </div>
               </div>
             </Card>
-            
-            <Card className="p-3 bg-green-50 border-green-100">
-              <h4 className="font-medium text-green-800 border-b border-green-200 pb-1 mb-2">Macronutrientes Secundários</h4>
+
+            {/* Adicionar card com observações sobre o fósforo */}
+            <Card className="p-3 bg-blue-50 border-blue-100">
+              <h4 className="font-medium text-blue-800 border-b border-blue-200 pb-1 mb-2">Recomendação para Fósforo</h4>
               <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Cálcio (Ca):</span>
-                  <span className="font-medium">{reportData.soilAnalysis.calcium} cmolc/dm³</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Magnésio (Mg):</span>
-                  <span className="font-medium">{reportData.soilAnalysis.magnesium} cmolc/dm³</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Enxofre (S):</span>
-                  <span className="font-medium">{reportData.soilAnalysis.sulfur} mg/dm³</span>
-                </div>
-              </div>
-            </Card>
-            
-            {/* Micronutrientes - destaque especial */}
-            <Card className="p-3 bg-green-100 border-green-200 col-span-3">
-              <h4 className="font-medium text-green-800 border-b border-green-300 pb-1 mb-2">Micronutrientes</h4>
-              <div className="grid grid-cols-5 gap-4">
-                <div className="space-y-1">
-                  <div className="text-gray-700 font-medium">Boro (B)</div>
-                  <div className="text-lg font-semibold">{reportData.soilAnalysis.boron} mg/dm³</div>
-                  <div className={`text-xs px-2 py-0.5 rounded-full inline-block ${getNutrientLevel(reportData.soilAnalysis.boron, 0.2, 0.6) === 'Baixo' ? 'bg-red-100 text-red-800' : getNutrientLevel(reportData.soilAnalysis.boron, 0.2, 0.6) === 'Alto' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                    {getNutrientLevel(reportData.soilAnalysis.boron, 0.2, 0.6)}
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-gray-700 font-medium">Cobre (Cu)</div>
-                  <div className="text-lg font-semibold">{reportData.soilAnalysis.copper} mg/dm³</div>
-                  <div className={`text-xs px-2 py-0.5 rounded-full inline-block ${getNutrientLevel(reportData.soilAnalysis.copper, 0.8, 1.8) === 'Baixo' ? 'bg-red-100 text-red-800' : getNutrientLevel(reportData.soilAnalysis.copper, 0.8, 1.8) === 'Alto' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                    {getNutrientLevel(reportData.soilAnalysis.copper, 0.8, 1.8)}
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-gray-700 font-medium">Ferro (Fe)</div>
-                  <div className="text-lg font-semibold">{reportData.soilAnalysis.iron} mg/dm³</div>
-                  <div className={`text-xs px-2 py-0.5 rounded-full inline-block ${getNutrientLevel(reportData.soilAnalysis.iron, 15, 40) === 'Baixo' ? 'bg-red-100 text-red-800' : getNutrientLevel(reportData.soilAnalysis.iron, 15, 40) === 'Alto' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                    {getNutrientLevel(reportData.soilAnalysis.iron, 15, 40)}
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-gray-700 font-medium">Manganês (Mn)</div>
-                  <div className="text-lg font-semibold">{reportData.soilAnalysis.manganese} mg/dm³</div>
-                  <div className={`text-xs px-2 py-0.5 rounded-full inline-block ${getNutrientLevel(reportData.soilAnalysis.manganese, 15, 30) === 'Baixo' ? 'bg-red-100 text-red-800' : getNutrientLevel(reportData.soilAnalysis.manganese, 15, 30) === 'Alto' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                    {getNutrientLevel(reportData.soilAnalysis.manganese, 15, 30)}
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-gray-700 font-medium">Zinco (Zn)</div>
-                  <div className="text-lg font-semibold">{reportData.soilAnalysis.zinc} mg/dm³</div>
-                  <div className={`text-xs px-2 py-0.5 rounded-full inline-block ${getNutrientLevel(reportData.soilAnalysis.zinc, 1.0, 2.2) === 'Baixo' ? 'bg-red-100 text-red-800' : getNutrientLevel(reportData.soilAnalysis.zinc, 1.0, 2.2) === 'Alto' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                    {getNutrientLevel(reportData.soilAnalysis.zinc, 1.0, 2.2)}
-                  </div>
+                <p className="text-sm text-gray-700">
+                  <span className="font-medium">Dose recomendada:</span> {phosphorusAnalysis.doseRecomendada} kg/ha de P₂O₅
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-medium">Nível crítico para esta classe de solo:</span> {phosphorusAnalysis.limiteCritico} mg/dm³
+                </p>
+                <div className="mt-1 pt-1 border-t border-blue-200">
+                  <p className="text-sm italic text-gray-700">{phosphorusAnalysis.observacao}</p>
                 </div>
               </div>
             </Card>
           </div>
-        </div>
-
-        {/* Recomendações de fertilizantes */}
-        <div>
-          <h3 className="text-lg font-semibold text-green-700 mb-3">Recomendações de Fertilizantes</h3>
           
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-green-200">
-              <thead className="bg-green-50">
-                <tr>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Fertilizante</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Quantidade</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Método</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Estágio</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-green-100">
-                {reportData.recommendations.map((rec, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-green-50 bg-opacity-30' : 'bg-white'}>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{rec.name}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{rec.amount} {rec.unit}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{rec.application_method || '-'}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{rec.stage || '-'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="text-right mt-4">
+            <Button onClick={handleExportPDF} disabled={loading} className="bg-green-600 text-white hover:bg-green-700">
+              {loading ? "Gerando..." : "Exportar PDF com Análise Completa"}
+            </Button>
           </div>
         </div>
-
-        {/* Gráfico visual de necessidades */}
-        <div>
-          <h3 className="text-lg font-semibold text-green-700 mb-3">Análise Visual de Necessidades</h3>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-green-50 p-3 rounded-md">
-              <h4 className="font-medium text-green-800 mb-2">Macronutrientes</h4>
-              <div className="space-y-3">
-                {/* Barra de Fósforo */}
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-xs font-medium text-gray-700">Fósforo (P)</span>
-                    <span className="text-xs font-medium text-gray-700">
-                      {getNutrientLevel(reportData.soilAnalysis.phosphorus, 10, 20)}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full" 
-                      style={{ 
-                        width: `${Math.min(100, (reportData.soilAnalysis.phosphorus || 0) / 30 * 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-                {/* Barra de Potássio */}
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-xs font-medium text-gray-700">Potássio (K)</span>
-                    <span className="text-xs font-medium text-gray-700">
-                      {getNutrientLevel(reportData.soilAnalysis.potassium, 0.1, 0.3)}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full" 
-                      style={{ 
-                        width: `${Math.min(100, (reportData.soilAnalysis.potassium || 0) / 0.5 * 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-                {/* Barra de Cálcio */}
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-xs font-medium text-gray-700">Cálcio (Ca)</span>
-                    <span className="text-xs font-medium text-gray-700">
-                      {getNutrientLevel(reportData.soilAnalysis.calcium, 2.0, 4.0)}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full" 
-                      style={{ 
-                        width: `${Math.min(100, (reportData.soilAnalysis.calcium || 0) / 6 * 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-green-50 p-3 rounded-md">
-              <h4 className="font-medium text-green-800 mb-2">Micronutrientes</h4>
-              <div className="space-y-3">
-                {/* Barra de Boro */}
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-xs font-medium text-gray-700">Boro (B)</span>
-                    <span className="text-xs font-medium text-gray-700">
-                      {getNutrientLevel(reportData.soilAnalysis.boron, 0.2, 0.6)}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full" 
-                      style={{ 
-                        width: `${Math.min(100, (reportData.soilAnalysis.boron || 0) / 1 * 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-                {/* Barra de Zinco */}
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-xs font-medium text-gray-700">Zinco (Zn)</span>
-                    <span className="text-xs font-medium text-gray-700">
-                      {getNutrientLevel(reportData.soilAnalysis.zinc, 1.0, 2.2)}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full" 
-                      style={{ 
-                        width: `${Math.min(100, (reportData.soilAnalysis.zinc || 0) / 3 * 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-                {/* Barra de Manganês */}
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-xs font-medium text-gray-700">Manganês (Mn)</span>
-                    <span className="text-xs font-medium text-gray-700">
-                      {getNutrientLevel(reportData.soilAnalysis.manganese, 15, 30)}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full" 
-                      style={{ 
-                        width: `${Math.min(100, (reportData.soilAnalysis.manganese || 0) / 50 * 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Notas e recomendações especiais */}
-        <div className="bg-green-50 p-4 rounded-md">
-          <h3 className="text-md font-semibold text-green-700 mb-2">Notas e Recomendações Especiais</h3>
-          <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-            <li>Aplicar os micronutrientes em deficiência via foliar nos estágios iniciais de desenvolvimento.</li>
-            <li>Considerar o parcelamento da adubação potássica em solos arenosos.</li>
-            <li>Monitorar os níveis de pH após a calagem para verificar a efetividade.</li>
-            <li>Para essa cultura, atenção especial aos níveis de {reportData.soilAnalysis.zinc && reportData.soilAnalysis.zinc < 1.0 ? 'zinco' : reportData.soilAnalysis.boron && reportData.soilAnalysis.boron < 0.2 ? 'boro' : 'micronutrientes em geral'}.</li>
-          </ul>
-        </div>
-        
-        {/* Rodapé */}
-        <div className="border-t border-green-100 pt-4 text-sm text-gray-500 flex justify-between">
-          <div>
-            <p>Fertilisolo - Análise e recomendação de fertilizantes</p>
-            <p>Relatório gerado por sistema especialista</p>
-          </div>
-          <div className="text-right">
-            <p>Página 1/3</p>
-            <p>Contato: suporte@fertilisolo.com.br</p>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 } 

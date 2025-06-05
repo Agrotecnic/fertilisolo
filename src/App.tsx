@@ -80,11 +80,6 @@ const AppContent = () => {
 
   return (
     <>
-      {user && userType && (
-        <div className="fixed top-2 right-2 md:top-6 md:right-6 z-50">
-          <AuthBox user={user} userType={userType} onLogout={handleLogout} />
-        </div>
-      )}
       <Routes>
         {/* Rota principal: landing page para usuários não logados */}
         <Route 

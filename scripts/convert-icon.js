@@ -24,7 +24,7 @@ async function convertSvgToPng() {
     const svgPath = path.join(__dirname, '..', 'public', 'icone-fertilisolo.svg');
     
     // Caminho para o arquivo PNG
-    const pngPath = path.join(iconsDir, 'icon-512x512.png');
+    const pngPath = path.join(iconsDir, 'logo-fertilisolo.png');
     
     // Ler o SVG
     const svgBuffer = fs.readFileSync(svgPath);
