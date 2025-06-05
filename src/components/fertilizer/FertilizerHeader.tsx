@@ -48,7 +48,10 @@ export const FertilizerHeader: React.FC<FertilizerHeaderProps> = ({
             Recomendações de Fertilizantes
           </h3>
           <p className="text-gray-700">
-            Quantidades recomendadas por fonte comercial, baseadas no método de Saturação por Bases
+            Opções alternativas para correção de nutrientes - escolha <strong>uma fonte</strong> para cada tipo de nutriente
+          </p>
+          <p className="text-gray-600 text-sm mt-1">
+            Cálculos baseados no método de Saturação por Bases e resultados da análise de solo
           </p>
         </div>
         <Button onClick={handleExportPDF} className="bg-green-600 hover:bg-green-700 shadow-md">

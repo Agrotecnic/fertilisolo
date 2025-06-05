@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sprout } from 'lucide-react';
+import { Sprout, Info } from 'lucide-react';
 import { calculateFertilizerRecommendations } from '@/utils/soilCalculations';
 import { formatNumber, formatNumberOptional } from '@/utils/numberFormat';
 
@@ -55,6 +54,16 @@ export const MacronutrientCard: React.FC<MacronutrientCardProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
+        <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+          <div className="flex items-start gap-2">
+            <Info className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-blue-700">
+              As opções abaixo são <strong>alternativas</strong> para suprir a necessidade de {title}. 
+              <span className="block mt-1">Escolha <strong>uma opção</strong> com base na disponibilidade, custo e benefícios adicionais.</span>
+            </p>
+          </div>
+        </div>
+        
         <div className="space-y-4">
           {recommendations.map((rec, index) => (
             <div key={index} className={`p-4 bg-${color}-50 rounded-lg border border-${color}-100 hover:bg-${color}-100 transition-colors`}>

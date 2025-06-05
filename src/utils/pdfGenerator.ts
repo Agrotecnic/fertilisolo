@@ -183,84 +183,95 @@ const renderReportTemplate = (soilData: SoilData, results: CalculationResult) =>
     </div>
   `;
   
-  // Recomendações de fertilizantes
+  // Seção de recomendações de fertilizantes
   const recommendations = document.createElement('div');
   recommendations.innerHTML = `
-    <h3 class="text-lg font-semibold text-green-700 mb-3">Recomendações de Fertilizantes</h3>
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-green-200">
+    <div class="mt-5 mb-3">
+      <h3 class="text-lg font-semibold text-green-700 mb-4">Recomendações de Fertilizantes</h3>
+      
+      <div class="bg-blue-50 p-4 rounded-md border border-blue-200 mb-4">
+        <div class="flex items-start">
+          <div class="rounded-full bg-blue-100 p-1 mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-medium text-blue-800 mb-1">Opções de Correção</p>
+            <p class="text-sm text-blue-700">
+              As fontes de nutrientes listadas abaixo são <strong>opções alternativas</strong> para cada deficiência.
+              Escolha <strong>apenas uma fonte</strong> para cada nutriente com base na disponibilidade, custo e benefícios adicionais.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
         <thead class="bg-green-50">
           <tr>
-            <th class="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Fertilizante</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Quantidade</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Método</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Estágio</th>
+            <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Fonte de Fertilizante</th>
+            <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Quantidade</th>
+            <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Método</th>
+            <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Época</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-green-100">
-          ${results.needs.Ca > 0 ? `
-          <tr class="bg-green-50 bg-opacity-30">
+        <tbody class="bg-white divide-y divide-gray-200">
+          ${soilData.Ca < 3 ? `
+          <tr class="bg-blue-50 bg-opacity-30">
             <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Calcário Dolomítico</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${results.needs.Ca * 1000} kg/ha</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">2.5 t/ha</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">A lanço</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Pré-plantio</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">60-90 dias antes do plantio</td>
           </tr>` : ''}
-          ${results.needs.Mg > 0 ? `
-          <tr class="bg-white">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Calcário Calcítico</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${results.needs.Mg * 500} kg/ha</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">A lanço</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Pré-plantio</td>
-          </tr>` : ''}
-          ${results.needs.K > 0 ? `
-          <tr class="bg-green-50 bg-opacity-30">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Cloreto de Potássio</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${results.needs.K * 2} kg/ha</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Sulco</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Plantio</td>
-          </tr>` : ''}
-          ${results.needs.P > 0 ? `
+          ${soilData.P < 12 ? `
           <tr class="bg-white">
             <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Superfosfato Simples</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${results.needs.P * 5} kg/ha</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">400 kg/ha</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Sulco</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Plantio</td>
           </tr>` : ''}
+          ${soilData.K < 80 ? `
+          <tr class="bg-blue-50 bg-opacity-30">
+            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Cloreto de Potássio</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">150 kg/ha</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Incorporado</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Plantio/Cobertura</td>
+          </tr>` : ''}
+          ${soilData.Mg < 1 ? `
+          <tr class="bg-white">
+            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Sulfato de Magnésio</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">200 kg/ha</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">A lanço</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Pré-plantio</td>
+          </tr>` : ''}
           ${soilData.B < 0.3 ? `
-          <tr class="bg-green-50 bg-opacity-30">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Ácido Bórico</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">2 kg/ha</td>
+          <tr class="bg-blue-50 bg-opacity-30">
+            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Bórax</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">20 kg/ha</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Foliar</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Desenvolvimento inicial</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Desenvolvimento vegetativo</td>
           </tr>` : ''}
           ${soilData.Zn < 1.5 ? `
           <tr class="bg-white">
             <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Sulfato de Zinco</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">4 kg/ha</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Foliar</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Desenvolvimento inicial</td>
-          </tr>` : ''}
-          ${soilData.Cu < 0.8 ? `
-          <tr class="bg-green-50 bg-opacity-30">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Sulfato de Cobre</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">2 kg/ha</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">20 kg/ha</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Foliar</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Desenvolvimento inicial</td>
           </tr>` : ''}
           ${soilData.Mn < 5 ? `
-          <tr class="bg-white">
+          <tr class="bg-blue-50 bg-opacity-30">
             <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Sulfato de Manganês</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">3 kg/ha</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Foliar</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Desenvolvimento inicial</td>
           </tr>` : ''}
-          <tr class="bg-green-50 bg-opacity-30">
+          <tr class="bg-white">
             <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Ureia</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">80 kg/ha</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Cobertura</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">V4</td>
           </tr>
-          <tr class="bg-white">
+          <tr class="bg-blue-50 bg-opacity-30">
             <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Molibdato de Sódio</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">0.1 kg/ha</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Tratamento de sementes</td>
@@ -531,7 +542,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
     // Fontes de Fósforo
     if (results.needs.P > 0) {
       tableRows.push([
-        "Superfosfato Simples (18% P2O5)",
+        "Superfosfato Simples",
         (results.needs.P * 5).toString(),
         "kg/ha",
         "Sulco",
@@ -539,7 +550,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
       ]);
       
       tableRows.push([
-        "Superfosfato Triplo (46% P2O5)",
+        "Superfosfato Triplo",
         (results.needs.P * 2).toString(),
         "kg/ha",
         "Sulco",
@@ -547,7 +558,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
       ]);
       
       tableRows.push([
-        "MAP (52% P2O5)",
+        "MAP",
         (results.needs.P * 1.8).toString(),
         "kg/ha",
         "Sulco",
@@ -558,7 +569,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
     // Fontes de Potássio
     if (results.needs.K > 0) {
       tableRows.push([
-        "Cloreto de Potássio (60% K2O)",
+        "Cloreto de Potássio",
         (results.needs.K * 2).toString(),
         "kg/ha",
         "Sulco",
@@ -566,7 +577,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
       ]);
       
       tableRows.push([
-        "Sulfato de Potássio (50% K2O)",
+        "Sulfato de Potássio",
         (results.needs.K * 2.4).toString(),
         "kg/ha",
         "Sulco",
@@ -594,7 +605,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
     // SEÇÃO MICRONUTRIENTES
     if (soilData.B < 0.3) {
       tableRows.push([
-        "Ácido Bórico (17% B)",
+        "Ácido Bórico",
         "2",
         "kg/ha",
         "Foliar",
@@ -602,7 +613,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
       ]);
       
       tableRows.push([
-        "Borax (11% B)",
+        "Borax",
         "3",
         "kg/ha",
         "Foliar",
@@ -612,7 +623,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
     
     if (soilData.Zn < 1.5) {
       tableRows.push([
-        "Sulfato de Zinco (22% Zn)",
+        "Sulfato de Zinco",
         "4",
         "kg/ha",
         "Foliar",
@@ -620,7 +631,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
       ]);
       
       tableRows.push([
-        "Óxido de Zinco (80% Zn)",
+        "Óxido de Zinco",
         "1",
         "kg/ha",
         "Foliar",
@@ -630,7 +641,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
     
     if (soilData.Cu < 0.8) {
       tableRows.push([
-        "Sulfato de Cobre (25% Cu)",
+        "Sulfato de Cobre",
         "2",
         "kg/ha",
         "Foliar",
@@ -638,7 +649,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
       ]);
       
       tableRows.push([
-        "Óxido de Cobre (75% Cu)",
+        "Óxido de Cobre",
         "0.7",
         "kg/ha",
         "Foliar",
@@ -648,7 +659,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
     
     if (soilData.Mn < 5) {
       tableRows.push([
-        "Sulfato de Manganês (26% Mn)",
+        "Sulfato de Manganês",
         "3",
         "kg/ha",
         "Foliar",
@@ -656,7 +667,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
       ]);
       
       tableRows.push([
-        "Óxido de Manganês (60% Mn)",
+        "Óxido de Manganês",
         "1.3",
         "kg/ha",
         "Foliar",
@@ -666,7 +677,7 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
     
     // Adicionar fertilizante para Molibdênio
     tableRows.push([
-      "Molibdato de Sódio (39% Mo)",
+      "Molibdato de Sódio",
       "0.1",
       "kg/ha",
       "Tratamento de sementes",

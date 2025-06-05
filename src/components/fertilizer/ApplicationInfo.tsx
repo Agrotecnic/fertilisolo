@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -73,6 +72,10 @@ export const ApplicationInfo: React.FC = () => {
             <div>
               <h4 className="font-semibold text-yellow-800 mb-2">Observações Importantes</h4>
               <p className="text-sm text-yellow-700 leading-relaxed">
+                As fontes de nutrientes apresentadas são <strong>opções alternativas</strong> - você deve escolher 
+                <strong> apenas uma fonte</strong> para cada nutriente com base na disponibilidade e relação custo-benefício.
+              </p>
+              <p className="text-sm text-yellow-700 leading-relaxed mt-2">
                 Estas recomendações são baseadas no método de Saturação por Bases e nos valores informados 
                 na análise de solo. Recomenda-se consultar um engenheiro agrônomo para validação das 
                 recomendações e adequação às condições específicas da propriedade e da cultura a ser implantada.

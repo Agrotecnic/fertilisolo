@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sprout } from 'lucide-react';
+import { Sprout, Info } from 'lucide-react';
 import { fertilizerSources } from '@/utils/soilCalculations';
 import { formatNumber, formatNumberOptional } from '@/utils/numberFormat';
 
@@ -53,6 +52,17 @@ export const MicronutrientCard: React.FC<MicronutrientCardProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
+        {sources.length > 1 && (
+          <div className="mb-3 p-2 bg-blue-50 rounded-md border border-blue-100">
+            <div className="flex items-start gap-1.5">
+              <Info className="h-3 w-3 text-blue-500 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-blue-700">
+                Escolha <strong>apenas uma</strong> das opções abaixo para correção.
+              </p>
+            </div>
+          </div>
+        )}
+        
         <div className="space-y-3">
           {sources.map((source, index) => {
             const recommendation = needValue / (source.concentration / 100);
