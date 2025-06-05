@@ -61,14 +61,14 @@ const renderReportTemplate = (soilData: SoilData, results: CalculationResult) =>
   // Criar um container temporário
   const container = document.createElement('div');
   container.id = 'temp-report-container';
-  container.className = 'bg-white p-6 rounded-lg shadow-md space-y-6';
+  container.className = 'bg-white p-6 rounded-lg shadow-md space-y-4';
   container.style.width = '800px';
   container.style.position = 'absolute';
   container.style.left = '-9999px';
   
   // Cabeçalho
   const header = document.createElement('div');
-  header.className = 'flex justify-between items-center border-b border-green-200 pb-4';
+  header.className = 'flex justify-between items-center border-b border-green-200 pb-3';
   header.innerHTML = `
     <div>
       <h2 class="text-xl font-bold text-green-700">Fertilisolo</h2>
@@ -81,216 +81,78 @@ const renderReportTemplate = (soilData: SoilData, results: CalculationResult) =>
     </div>
   `;
   
-  // Informações da cultura
-  const cropInfo = document.createElement('div');
-  cropInfo.innerHTML = `
-    <h3 class="text-lg font-semibold text-green-700 mb-3">Informações da Cultura</h3>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="bg-green-50 p-3 rounded-md">
-        <h4 class="font-medium text-green-800 border-b border-green-200 pb-1 mb-2">Detalhes</h4>
-        <div class="space-y-2">
-          <div class="flex justify-between">
-            <span class="text-gray-600">Cultura:</span>
-            <span class="font-medium">${"Não especificada"}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Matéria Orgânica:</span>
-            <span class="font-medium">${soilData.organicMatter || 0}%</span>
-          </div>
+  // Informações da cultura e aviso sobre opções (layout melhorado em duas colunas)
+  const topSection = document.createElement('div');
+  topSection.className = 'grid grid-cols-1 md:grid-cols-3 gap-3 mt-3';
+  
+  // Coluna 1: Detalhes básicos
+  topSection.innerHTML = `
+    <div class="bg-green-50 p-3 rounded-md">
+      <h4 class="font-medium text-green-800 border-b border-green-200 pb-1 mb-2">Detalhes</h4>
+      <div class="space-y-2">
+        <div class="flex justify-between">
+          <span class="text-gray-600">Cultura:</span>
+          <span class="font-medium">${"Não especificada"}</span>
         </div>
-      </div>
-      
-      <div class="bg-green-50 p-3 rounded-md">
-        <h4 class="font-medium text-green-800 border-b border-green-200 pb-1 mb-2">Macronutrientes Primários</h4>
-        <div class="space-y-2">
-          <div class="flex justify-between">
-            <span class="text-gray-600">CTC (T):</span>
-            <span class="font-medium">${soilData.T || 0} cmolc/dm³</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Fósforo (P):</span>
-            <span class="font-medium">${soilData.P || 0} mg/dm³</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Potássio (K):</span>
-            <span class="font-medium">${(soilData.K ? (soilData.K / 390).toFixed(3) : 0)} cmolc/dm³</span>
-            <span class="text-xs text-gray-500">(${soilData.K || 0} mg/dm³)</span>
-          </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Matéria Orgânica:</span>
+          <span class="font-medium">${soilData.organicMatter || 0}%</span>
         </div>
-      </div>
-      
-      <div class="bg-green-50 p-3 rounded-md">
-        <h4 class="font-medium text-green-800 border-b border-green-200 pb-1 mb-2">Macronutrientes Secundários</h4>
-        <div class="space-y-2">
-          <div class="flex justify-between">
-            <span class="text-gray-600">Cálcio (Ca):</span>
-            <span class="font-medium">${soilData.Ca || 0} cmolc/dm³</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Magnésio (Mg):</span>
-            <span class="font-medium">${soilData.Mg || 0} cmolc/dm³</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Enxofre (S):</span>
-            <span class="font-medium">${soilData.S || 0} mg/dm³</span>
-          </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Argila:</span>
+          <span class="font-medium">${soilData.argila || 0}%</span>
         </div>
       </div>
     </div>
-
-    <!-- Micronutrientes - destaque especial -->
-    <div class="mt-4">
-      <div class="bg-green-100 p-3 rounded-md border-green-200">
-        <h4 class="font-medium text-green-800 border-b border-green-300 pb-1 mb-2">Micronutrientes</h4>
-        <div class="grid grid-cols-5 gap-4">
-          <div class="space-y-1">
-            <div class="text-gray-700 font-medium">Boro (B)</div>
-            <div class="text-lg font-semibold">${soilData.B || 0} mg/dm³</div>
-            <div class="text-xs px-2 py-0.5 rounded-full inline-block ${getNutrientLevel(soilData.B, 0.3, 0.6) === 'Baixo' ? 'bg-red-100 text-red-800' : getNutrientLevel(soilData.B, 0.3, 0.6) === 'Alto' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
-              ${getNutrientLevel(soilData.B, 0.3, 0.6)}
-            </div>
-          </div>
-          <div class="space-y-1">
-            <div class="text-gray-700 font-medium">Cobre (Cu)</div>
-            <div class="text-lg font-semibold">${soilData.Cu || 0} mg/dm³</div>
-            <div class="text-xs px-2 py-0.5 rounded-full inline-block ${getNutrientLevel(soilData.Cu, 0.8, 1.2) === 'Baixo' ? 'bg-red-100 text-red-800' : getNutrientLevel(soilData.Cu, 0.8, 1.2) === 'Alto' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
-              ${getNutrientLevel(soilData.Cu, 0.8, 1.2)}
-            </div>
-          </div>
-          <div class="space-y-1">
-            <div class="text-gray-700 font-medium">Ferro (Fe)</div>
-            <div class="text-lg font-semibold">${soilData.Fe || 0} mg/dm³</div>
-            <div class="text-xs px-2 py-0.5 rounded-full inline-block ${getNutrientLevel(soilData.Fe, 12, 40) === 'Baixo' ? 'bg-red-100 text-red-800' : getNutrientLevel(soilData.Fe, 12, 40) === 'Alto' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
-              ${getNutrientLevel(soilData.Fe, 12, 40)}
-            </div>
-          </div>
-          <div class="space-y-1">
-            <div class="text-gray-700 font-medium">Manganês (Mn)</div>
-            <div class="text-lg font-semibold">${soilData.Mn || 0} mg/dm³</div>
-            <div class="text-xs px-2 py-0.5 rounded-full inline-block ${getNutrientLevel(soilData.Mn, 5, 30) === 'Baixo' ? 'bg-red-100 text-red-800' : getNutrientLevel(soilData.Mn, 5, 30) === 'Alto' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
-              ${getNutrientLevel(soilData.Mn, 5, 30)}
-            </div>
-          </div>
-          <div class="space-y-1">
-            <div class="text-gray-700 font-medium">Zinco (Zn)</div>
-            <div class="text-lg font-semibold">${soilData.Zn || 0} mg/dm³</div>
-            <div class="text-xs px-2 py-0.5 rounded-full inline-block ${getNutrientLevel(soilData.Zn, 1.5, 2.2) === 'Baixo' ? 'bg-red-100 text-red-800' : getNutrientLevel(soilData.Zn, 1.5, 2.2) === 'Alto' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
-              ${getNutrientLevel(soilData.Zn, 1.5, 2.2)}
-            </div>
-          </div>
+    
+    <!-- Macronutrientes primários -->
+    <div class="bg-green-50 p-3 rounded-md">
+      <h4 class="font-medium text-green-800 border-b border-green-200 pb-1 mb-2">Macronutrientes</h4>
+      <div class="space-y-2">
+        <div class="flex justify-between">
+          <span class="text-gray-600">CTC (T):</span>
+          <span class="font-medium">${soilData.T || 0} cmolc/dm³</span>
         </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Fósforo (P):</span>
+          <span class="font-medium">${soilData.P || 0} mg/dm³</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Potássio (K):</span>
+          <span class="font-medium">${(soilData.K ? (soilData.K / 390).toFixed(3) : 0)} cmolc/dm³</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Cálcio (Ca):</span>
+          <span class="font-medium">${soilData.Ca || 0} cmolc/dm³</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Magnésio (Mg):</span>
+          <span class="font-medium">${soilData.Mg || 0} cmolc/dm³</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Aviso sobre as opções - mais compacto -->
+    <div class="bg-blue-50 p-3 rounded-md border border-blue-200">
+      <h4 class="font-medium text-blue-800 border-b border-blue-100 pb-1 mb-2">Informação Importante</h4>
+      <div class="text-sm text-blue-700">
+        <p class="mb-1"><strong>Opções de Correção:</strong> As fontes de nutrientes listadas são <strong>alternativas</strong>.</p>
+        <p>Escolha <strong>apenas uma fonte</strong> para cada tipo de nutriente com base na disponibilidade, custo e benefícios adicionais.</p>
       </div>
     </div>
   `;
   
-  // Seção de recomendações de fertilizantes
-  const recommendations = document.createElement('div');
-  recommendations.innerHTML = `
-    <div class="mt-5 mb-3">
-      <h3 class="text-lg font-semibold text-green-700 mb-4">Recomendações de Fertilizantes</h3>
-      
-      <div class="bg-blue-50 p-4 rounded-md border border-blue-200 mb-4">
-        <div class="flex items-start">
-          <div class="rounded-full bg-blue-100 p-1 mr-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div>
-            <p class="font-medium text-blue-800 mb-1">Opções de Correção</p>
-            <p class="text-sm text-blue-700">
-              As fontes de nutrientes listadas abaixo são <strong>opções alternativas</strong> para cada deficiência.
-              Escolha <strong>apenas uma fonte</strong> para cada nutriente com base na disponibilidade, custo e benefícios adicionais.
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      <table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
-        <thead class="bg-green-50">
-          <tr>
-            <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Fonte de Fertilizante</th>
-            <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Quantidade</th>
-            <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Método</th>
-            <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Época</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          ${soilData.Ca < 3 ? `
-          <tr class="bg-blue-50 bg-opacity-30">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Calcário Dolomítico</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">2.5 t/ha</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">A lanço</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">60-90 dias antes do plantio</td>
-          </tr>` : ''}
-          ${soilData.P < 12 ? `
-          <tr class="bg-white">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Superfosfato Simples</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">400 kg/ha</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Sulco</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Plantio</td>
-          </tr>` : ''}
-          ${soilData.K < 80 ? `
-          <tr class="bg-blue-50 bg-opacity-30">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Cloreto de Potássio</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">150 kg/ha</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Incorporado</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Plantio/Cobertura</td>
-          </tr>` : ''}
-          ${soilData.Mg < 1 ? `
-          <tr class="bg-white">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Sulfato de Magnésio</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">200 kg/ha</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">A lanço</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Pré-plantio</td>
-          </tr>` : ''}
-          ${soilData.B < 0.3 ? `
-          <tr class="bg-blue-50 bg-opacity-30">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Bórax</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">20 kg/ha</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Foliar</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Desenvolvimento vegetativo</td>
-          </tr>` : ''}
-          ${soilData.Zn < 1.5 ? `
-          <tr class="bg-white">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Sulfato de Zinco</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">20 kg/ha</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Foliar</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Desenvolvimento inicial</td>
-          </tr>` : ''}
-          ${soilData.Mn < 5 ? `
-          <tr class="bg-blue-50 bg-opacity-30">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Sulfato de Manganês</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">3 kg/ha</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Foliar</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Desenvolvimento inicial</td>
-          </tr>` : ''}
-          <tr class="bg-white">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Ureia</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">80 kg/ha</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Cobertura</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">V4</td>
-          </tr>
-          <tr class="bg-blue-50 bg-opacity-30">
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">Molibdato de Sódio</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">0.1 kg/ha</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Tratamento de sementes</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">Plantio</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  `;
-
-  // Gráfico visual de necessidades
+  // Seção de análise visual de necessidades - redesenhada para ser mais compacta
   const visualAnalysis = document.createElement('div');
+  visualAnalysis.className = 'bg-white p-3 rounded-md border border-gray-200 mt-3';
   visualAnalysis.innerHTML = `
     <h3 class="text-lg font-semibold text-green-700 mb-3">Análise Visual de Necessidades</h3>
     
-    <div class="grid grid-cols-2 gap-4">
-      <div class="bg-green-50 p-3 rounded-md">
+    <div class="grid grid-cols-2 gap-3">
+      <!-- Coluna Macronutrientes -->
+      <div>
         <h4 class="font-medium text-green-800 mb-2">Macronutrientes</h4>
-        <div class="space-y-3">
+        <div class="space-y-2">
           <!-- Barra de Fósforo -->
           <div>
             <div class="flex justify-between mb-1">
@@ -345,9 +207,10 @@ const renderReportTemplate = (soilData: SoilData, results: CalculationResult) =>
         </div>
       </div>
       
-      <div class="bg-green-50 p-3 rounded-md">
+      <!-- Coluna Micronutrientes -->
+      <div>
         <h4 class="font-medium text-green-800 mb-2">Micronutrientes</h4>
-        <div class="space-y-3">
+        <div class="space-y-2">
           <!-- Barra de Boro -->
           <div>
             <div class="flex justify-between mb-1">
@@ -404,24 +267,80 @@ const renderReportTemplate = (soilData: SoilData, results: CalculationResult) =>
     </div>
   `;
   
-  // Notas e recomendações especiais
+  // Seção de recomendações de fertilizantes - mais compacta
+  const recommendations = document.createElement('div');
+  recommendations.className = 'mt-3';
+  recommendations.innerHTML = `
+    <h3 class="text-lg font-semibold text-green-700 mb-2">Recomendações de Fertilizantes</h3>
+    
+    <table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
+      <thead class="bg-green-50">
+        <tr>
+          <th scope="col" class="px-3 py-2 text-left text-sm font-medium text-gray-700">Fonte de Fertilizante</th>
+          <th scope="col" class="px-3 py-2 text-left text-sm font-medium text-gray-700">Quantidade</th>
+          <th scope="col" class="px-3 py-2 text-left text-sm font-medium text-gray-700">Método</th>
+          <th scope="col" class="px-3 py-2 text-left text-sm font-medium text-gray-700">Época</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200 text-sm">
+        ${soilData.Ca < 3 ? `
+        <tr class="bg-blue-50 bg-opacity-30">
+          <td class="px-3 py-2 whitespace-nowrap font-medium text-gray-900">Calcário Dolomítico</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-700">2.5 t/ha</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-700">A lanço</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-700">60-90 dias antes do plantio</td>
+        </tr>` : ''}
+        ${soilData.P < 12 ? `
+        <tr class="bg-white">
+          <td class="px-3 py-2 whitespace-nowrap font-medium text-gray-900">Superfosfato Simples</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-700">400 kg/ha</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-700">Sulco</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-700">Plantio</td>
+        </tr>` : ''}
+        ${soilData.K < 80 ? `
+        <tr class="bg-blue-50 bg-opacity-30">
+          <td class="px-3 py-2 whitespace-nowrap font-medium text-gray-900">Cloreto de Potássio</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-700">150 kg/ha</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-700">Incorporado</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-700">Plantio/Cobertura</td>
+        </tr>` : ''}
+        ${soilData.Mg < 1 ? `
+        <tr class="bg-white">
+          <td class="px-3 py-2 whitespace-nowrap font-medium text-gray-900">Sulfato de Magnésio</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-700">200 kg/ha</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-700">A lanço</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-700">Pré-plantio</td>
+        </tr>` : ''}
+      </tbody>
+    </table>
+  `;
+  
+  // Notas e recomendações especiais - mais compacta
   const notes = document.createElement('div');
-  notes.className = 'bg-green-50 p-4 rounded-md';
+  notes.className = 'bg-green-50 p-3 rounded-md mt-3';
   notes.innerHTML = `
     <h3 class="text-md font-semibold text-green-700 mb-2">Notas e Recomendações Especiais</h3>
-    <ul class="list-disc pl-5 space-y-1 text-sm text-gray-700">
-      <li>Aplicar os micronutrientes em deficiência via foliar nos estágios iniciais de desenvolvimento.</li>
-      <li>Considerar o parcelamento da adubação potássica em solos arenosos.</li>
-      <li>Monitorar os níveis de pH após a calagem para verificar a efetividade.</li>
-      <li>Para essa cultura, atenção especial aos níveis de ${soilData.Zn && soilData.Zn < 1.5 ? 'zinco' : soilData.B && soilData.B < 0.3 ? 'boro' : 'micronutrientes em geral'}.</li>
-      <li>As recomendações são baseadas no método de Saturação por Bases.</li>
-      <li>Consulte um engenheiro agrônomo para validação das recomendações.</li>
-    </ul>
+    <div class="grid grid-cols-2 gap-2">
+      <div>
+        <ul class="list-disc pl-5 space-y-1 text-xs text-gray-700">
+          <li>Aplicar os micronutrientes em deficiência via foliar nos estágios iniciais</li>
+          <li>Considerar o parcelamento da adubação potássica em solos arenosos</li>
+          <li>Monitorar os níveis de pH após a calagem para verificar a efetividade</li>
+        </ul>
+      </div>
+      <div>
+        <ul class="list-disc pl-5 space-y-1 text-xs text-gray-700">
+          <li>Para essa cultura, atenção especial aos níveis de ${soilData.Zn && soilData.Zn < 1.5 ? 'zinco' : soilData.B && soilData.B < 0.3 ? 'boro' : 'micronutrientes'}</li>
+          <li>As recomendações são baseadas no método de Saturação por Bases</li>
+          <li>Consulte um engenheiro agrônomo para validação das recomendações</li>
+        </ul>
+      </div>
+    </div>
   `;
   
   // Rodapé
   const footer = document.createElement('div');
-  footer.className = 'border-t border-green-100 pt-4 text-sm text-gray-500 flex justify-between';
+  footer.className = 'border-t border-green-100 pt-2 mt-3 text-xs text-gray-500 flex justify-between';
   footer.innerHTML = `
     <div>
       <p>Fertilisolo - Análise e recomendação de fertilizantes</p>
@@ -435,9 +354,9 @@ const renderReportTemplate = (soilData: SoilData, results: CalculationResult) =>
   
   // Montar o template
   container.appendChild(header);
-  container.appendChild(cropInfo);
-  container.appendChild(recommendations);
+  container.appendChild(topSection);
   container.appendChild(visualAnalysis);
+  container.appendChild(recommendations);
   container.appendChild(notes);
   container.appendChild(footer);
   
