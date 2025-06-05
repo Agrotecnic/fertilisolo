@@ -449,6 +449,8 @@ const renderReportTemplate = (soilData: SoilData, results: CalculationResult) =>
 export const generatePDFReport = async (soilData: SoilData, results: CalculationResult) => {
   try {
     console.log("Iniciando geração do PDF usando método de captura do modelo de relatório...");
+    console.log("Dados do solo:", soilData);
+    console.log("Resultados calculados:", results);
     
     // Gerar elemento HTML para capturar como imagem
     const reportElement = renderReportTemplate(soilData, results);
@@ -833,18 +835,20 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
       pdf.text(`Relatório gerado em: ${new Date().toLocaleDateString('pt-BR')}`, pdf.internal.pageSize.getWidth() - 60, 287);
     }
     
-    // Salvar o PDF com tratamento assíncrono adequado
-    const filename = `Recomendacao_${soilData.location || "Local"}.pdf`;
+    // Nome do arquivo para download
+    const filename = `Recomendacao_${soilData.location || "Local"}_${new Date().toISOString().slice(0,10)}.pdf`;
+    console.log('Tentando salvar PDF com nome:', filename);
     
-    // Verificar se estamos em ambiente de browser
+    // Verificar se estamos em ambiente de browser e salvar o PDF
     if (typeof window !== 'undefined') {
-      console.log('Salvando PDF no navegador...');
-      return pdf.save(filename);
+      pdf.save(filename);
+      console.log('PDF salvo com sucesso!');
+      return Promise.resolve(); // Resolver a promessa após salvar
     } else {
       throw new Error('Ambiente de execução não suportado para salvar PDF');
     }
   } catch (error) {
-    console.error('Erro ao gerar PDF:', error);
+    console.error('Erro detalhado ao gerar PDF:', error);
     throw error; // Re-lançar o erro para ser tratado pelo chamador
   }
 };

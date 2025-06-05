@@ -46,20 +46,19 @@ export const UserAnalysisHistory: React.FC = () => {
 
   const handleExportPDF = async (analysis: SoilData) => {
     try {
-      const pdfContent = pdfGenerator.generatePDF(
+      // Calcular resultados da análise para incluir no PDF
+      const results = calculateSoilAnalysis(analysis);
+      
+      // Usar a função generatePDFReport em vez de generatePDF para incluir os resultados calculados
+      await pdfGenerator.generatePDFReport(
         analysis, 
-        analysis.location, 
-        analysis.location
+        results
       );
       
-      if (pdfContent) {
-        pdfContent.pdf.save(pdfContent.filename);
-        
-        toast({
-          title: "PDF Gerado",
-          description: "O relatório foi gerado com sucesso.",
-        });
-      }
+      toast({
+        title: "PDF Gerado",
+        description: "O relatório foi gerado com sucesso.",
+      });
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
       toast({
