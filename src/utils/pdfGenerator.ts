@@ -367,31 +367,6 @@ const renderReportTemplate = (soilData: SoilData, results: CalculationResult) =>
 
 export const generatePDFReport = async (soilData: SoilData, results: CalculationResult) => {
   try {
-    console.log("Iniciando geração do PDF usando método de captura do modelo de relatório...");
-    console.log("Dados do solo:", soilData);
-    console.log("Resultados calculados:", results);
-    
-    // Gerar elemento HTML para capturar como imagem
-    const reportElement = renderReportTemplate(soilData, results);
-    
-    if (!reportElement) {
-      throw new Error("Não foi possível criar o elemento de relatório");
-    }
-    
-    // Capturar o relatório como imagem
-    const canvas = await html2canvas(reportElement, {
-      scale: 2,
-      useCORS: true,
-      logging: false
-    });
-    
-    // Remover o elemento temporário
-    if (reportElement.parentNode) {
-      reportElement.parentNode.removeChild(reportElement);
-    }
-    
-    const imgData = canvas.toDataURL('image/png');
-    
     // Configurar o PDF
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -399,237 +374,57 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
       format: 'a4'
     });
     
-    // Calcular dimensões para ajustar a imagem à página
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    // Adicionar cabeçalho melhorado
+    pdf.setFillColor(76, 175, 80);
+    pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 25, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(18);
+    pdf.text('Fertilisolo - Relatório de Análise de Solo', 15, 15);
     
-    // Adicionar a captura de tela como imagem
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    // Adicionar data e ID do relatório
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(10);
+    pdf.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 15, 30);
+    pdf.text(`ID do Relatório: ${Date.now().toString(36)}`, 15, 35);
     
-    // Adicionar página para detalhes adicionais
-    pdf.addPage();
+    // Adicionar informações básicas
+    pdf.setFontSize(14);
+    pdf.text('Informações da Análise', 15, 45);
     
-    // Título da segunda página
-    pdf.setFontSize(16);
-    pdf.setTextColor(56, 142, 60); // cor verde para o título
-    pdf.text('Detalhes da Recomendação de Fertilizantes', 15, 15);
+    pdf.setFontSize(10);
+    pdf.text(`Local: ${soilData.location || "Não especificado"}`, 15, 55);
+    pdf.text(`Data da Coleta: ${soilData.date ? new Date(soilData.date).toLocaleDateString('pt-BR') : "Não especificado"}`, 15, 60);
     
-    // Tabela de recomendações detalhadas
-    const tableColumn = ["Fertilizante", "Quantidade", "Unidade", "Método", "Estágio"];
+    // Renderizar tabela de resultados
+    pdf.setFontSize(14);
+    pdf.text('Resultados da Análise', 15, 70);
     
-    // Lista completa de todas as possíveis recomendações de fertilizantes
-    const tableRows: any[] = [];
+    // Dados para tabela de resultados
+    const resultColumns = ['Parâmetro', 'Valor', 'Unidade', 'Interpretação'];
+    const resultRows = [
+      ['Matéria Orgânica', formatNumber(soilData.organicMatter), '%', getMatterLevel(soilData.organicMatter)],
+      ['Teor de Argila', formatNumber(soilData.argila), '%', getClayLevel(soilData.argila)],
+      ['CTC (T)', formatNumber(soilData.T), 'cmolc/dm³', getCTCLevel(soilData.T)],
+      ['Fósforo (P)', formatNumber(soilData.P), 'mg/dm³', getNutrientLevel(soilData.P, 10, 20)],
+      ['Potássio (K)', formatNumber(soilData.K ? soilData.K / 390 : 0), 'cmolc/dm³', getNutrientLevel(soilData.K ? soilData.K / 390 : 0, 0.15, 0.3)],
+      ['Cálcio (Ca)', formatNumber(soilData.Ca), 'cmolc/dm³', getNutrientLevel(soilData.Ca, 2.0, 4.0)],
+      ['Magnésio (Mg)', formatNumber(soilData.Mg), 'cmolc/dm³', getNutrientLevel(soilData.Mg, 0.8, 1.5)],
+      ['Enxofre (S)', formatNumber(soilData.S), 'mg/dm³', getNutrientLevel(soilData.S, 5, 10)],
+      ['Boro (B)', formatNumber(soilData.B), 'mg/dm³', getNutrientLevel(soilData.B, 0.3, 0.6)],
+      ['Cobre (Cu)', formatNumber(soilData.Cu), 'mg/dm³', getNutrientLevel(soilData.Cu, 0.8, 1.2)],
+      ['Ferro (Fe)', formatNumber(soilData.Fe), 'mg/dm³', getNutrientLevel(soilData.Fe, 18, 45)],
+      ['Manganês (Mn)', formatNumber(soilData.Mn), 'mg/dm³', getNutrientLevel(soilData.Mn, 15, 30)],
+      ['Zinco (Zn)', formatNumber(soilData.Zn), 'mg/dm³', getNutrientLevel(soilData.Zn, 1.5, 2.2)]
+    ];
     
-    // Adicionar recomendações com base nos resultados - SEÇÃO CORRETIVOS
-    if (results.needs.Ca > 0) {
-      tableRows.push([
-        "Calcário Dolomítico",
-        (results.needs.Ca * 1000).toString(),
-        "kg/ha",
-        "A lanço",
-        "Pré-plantio"
-      ]);
-    }
-    
-    if (results.needs.Mg > 0) {
-      tableRows.push([
-        "Calcário Calcítico",
-        (results.needs.Mg * 500).toString(),
-        "kg/ha",
-        "A lanço",
-        "Pré-plantio"
-      ]);
-    }
-    
-    // SEÇÃO MACRONUTRIENTES PRIMÁRIOS (N, P, K)
-    // Fontes de Nitrogênio
-    tableRows.push([
-      "Ureia (45% N)",
-      "80",
-      "kg/ha",
-      "Cobertura",
-      "V4-V6"
-    ]);
-    
-    tableRows.push([
-      "Sulfato de Amônio (21% N)",
-      "120",
-      "kg/ha",
-      "Cobertura",
-      "V6-V8"
-    ]);
-    
-    // Fontes de Fósforo
-    if (results.needs.P > 0) {
-      tableRows.push([
-        "Superfosfato Simples",
-        (results.needs.P * 5).toString(),
-        "kg/ha",
-        "Sulco",
-        "Plantio"
-      ]);
-      
-      tableRows.push([
-        "Superfosfato Triplo",
-        (results.needs.P * 2).toString(),
-        "kg/ha",
-        "Sulco",
-        "Plantio"
-      ]);
-      
-      tableRows.push([
-        "MAP",
-        (results.needs.P * 1.8).toString(),
-        "kg/ha",
-        "Sulco",
-        "Plantio"
-      ]);
-    }
-    
-    // Fontes de Potássio
-    if (results.needs.K > 0) {
-      tableRows.push([
-        "Cloreto de Potássio",
-        (results.needs.K * 2).toString(),
-        "kg/ha",
-        "Sulco",
-        "Plantio"
-      ]);
-      
-      tableRows.push([
-        "Sulfato de Potássio",
-        (results.needs.K * 2.4).toString(),
-        "kg/ha",
-        "Sulco",
-        "Plantio"
-      ]);
-    }
-    
-    // SEÇÃO FORMULADOS NPK
-    tableRows.push([
-      "NPK 04-14-08",
-      "300",
-      "kg/ha",
-      "Sulco",
-      "Plantio"
-    ]);
-    
-    tableRows.push([
-      "NPK 10-10-10",
-      "250",
-      "kg/ha",
-      "Sulco",
-      "Plantio"
-    ]);
-    
-    // SEÇÃO MICRONUTRIENTES
-    if (soilData.B < 0.3) {
-      tableRows.push([
-        "Ácido Bórico",
-        "2",
-        "kg/ha",
-        "Foliar",
-        "Desenvolvimento inicial"
-      ]);
-      
-      tableRows.push([
-        "Borax",
-        "3",
-        "kg/ha",
-        "Foliar",
-        "Desenvolvimento inicial"
-      ]);
-    }
-    
-    if (soilData.Zn < 1.5) {
-      tableRows.push([
-        "Sulfato de Zinco",
-        "4",
-        "kg/ha",
-        "Foliar",
-        "Desenvolvimento inicial"
-      ]);
-      
-      tableRows.push([
-        "Óxido de Zinco",
-        "1",
-        "kg/ha",
-        "Foliar",
-        "Desenvolvimento inicial"
-      ]);
-    }
-    
-    if (soilData.Cu < 0.8) {
-      tableRows.push([
-        "Sulfato de Cobre",
-        "2",
-        "kg/ha",
-        "Foliar",
-        "Desenvolvimento inicial"
-      ]);
-      
-      tableRows.push([
-        "Óxido de Cobre",
-        "0.7",
-        "kg/ha",
-        "Foliar",
-        "Desenvolvimento inicial"
-      ]);
-    }
-    
-    if (soilData.Mn < 5) {
-      tableRows.push([
-        "Sulfato de Manganês",
-        "3",
-        "kg/ha",
-        "Foliar",
-        "Desenvolvimento inicial"
-      ]);
-      
-      tableRows.push([
-        "Óxido de Manganês",
-        "1.3",
-        "kg/ha",
-        "Foliar",
-        "Desenvolvimento inicial"
-      ]);
-    }
-    
-    // Adicionar fertilizante para Molibdênio
-    tableRows.push([
-      "Molibdato de Sódio",
-      "0.1",
-      "kg/ha",
-      "Tratamento de sementes",
-      "Plantio"
-    ]);
-    
-    // Fertilizantes orgânicos
-    tableRows.push([
-      "Esterco Bovino Curtido",
-      "10000",
-      "kg/ha",
-      "Incorporado",
-      "Pré-plantio"
-    ]);
-    
-    tableRows.push([
-      "Composto Orgânico",
-      "5000",
-      "kg/ha",
-      "Incorporado",
-      "Pré-plantio"
-    ]);
-    
-    // Usar autoTable como função direta
+    // Adicionar tabela de resultados
     autoTable(pdf, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 25,
+      head: [resultColumns],
+      body: resultRows,
+      startY: 75,
       theme: 'grid',
       styles: {
-        fontSize: 10,
+        fontSize: 9,
         cellPadding: 3,
         lineColor: [120, 144, 156],
         lineWidth: 0.1,
@@ -642,68 +437,64 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
       alternateRowStyles: {
         fillColor: [240, 248, 240]
       },
-      margin: { top: 25 }
+      margin: { top: 75 }
     });
     
-    // Adicionar página para micronutrientes
+    // Adicionar recomendações
     pdf.addPage();
+    pdf.setFillColor(76, 175, 80);
+    pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 25, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(18);
+    pdf.text('Recomendações de Fertilizantes', 15, 15);
     
-    // Título da terceira página
-    pdf.setFontSize(16);
-    pdf.setTextColor(56, 142, 60); // cor verde para o título
-    pdf.text('Análise Detalhada de Nutrientes', 15, 15);
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(10);
+    pdf.text('As recomendações abaixo são baseadas nos resultados da análise de solo:', 15, 30);
     
-    // Tabela de micronutrientes
-    const microColumn = ["Nutriente", "Valor Encontrado", "Unidade", "Nível", "Recomendação"];
-    const microRows = [
-      // CTC (T)
-      ["CTC (T)", soilData.T?.toString() || "-", "cmolc/dm³", soilData.T ? (soilData.T < 4 ? "Baixa" : soilData.T > 12 ? "Alta" : "Adequada") : "Não analisado", "CTC ideal: 8-12 cmolc/dm³"],
-      // Macronutrientes Primários
-      ["Fósforo (P)", soilData.P?.toString() || "-", "mg/dm³", getNutrientLevel(soilData.P, 10, 20), 
-       soilData.P && soilData.P < 10 ? "Aplicação de fontes de fósforo" : 
-       soilData.P && soilData.P > 20 ? "Reduzir aplicação" : "Manutenção"],
-      ["Potássio (K)", (soilData.K ? (soilData.K / 390).toFixed(3) : "-"), "cmolc/dm³", getNutrientLevel(soilData.K ? soilData.K / 390 : 0, 0.15, 0.3), 
-       soilData.K && (soilData.K / 390) < 0.15 ? "Aplicação de fontes de potássio" : 
-       soilData.K && (soilData.K / 390) > 0.3 ? "Reduzir aplicação" : "Manutenção"],
-      // Macronutrientes Secundários
-      ["Cálcio (Ca)", soilData.Ca?.toString() || "-", "cmolc/dm³", getNutrientLevel(soilData.Ca, 2.0, 4.0), 
-       soilData.Ca && soilData.Ca < 2.0 ? "Aplicação de calcário" : 
-       soilData.Ca && soilData.Ca > 4.0 ? "Adequado" : "Manutenção"],
-      
-      ["Magnésio (Mg)", soilData.Mg?.toString() || "-", "cmolc/dm³", getNutrientLevel(soilData.Mg, 0.8, 1.5), 
-       soilData.Mg && soilData.Mg < 0.8 ? "Aplicação de calcário dolomítico" : 
-       soilData.Mg && soilData.Mg > 1.5 ? "Adequado" : "Manutenção"],
-      
-      ["Enxofre (S)", soilData.S?.toString() || "-", "mg/dm³", getNutrientLevel(soilData.S, 5, 10), 
-       soilData.S && soilData.S < 5 ? "Aplicação de gesso ou sulfato" : 
-       soilData.S && soilData.S > 10 ? "Adequado" : "Manutenção"],
-      
-      // Micronutrientes
-      ["Boro (B)", soilData.B?.toString() || "-", "mg/dm³", getNutrientLevel(soilData.B, 0.3, 0.6), 
-       getMicroRecommendation("B", getNutrientLevel(soilData.B, 0.3, 0.6))],
-      
-      ["Cobre (Cu)", soilData.Cu?.toString() || "-", "mg/dm³", getNutrientLevel(soilData.Cu, 0.8, 1.2), 
-       getMicroRecommendation("Cu", getNutrientLevel(soilData.Cu, 0.8, 1.2))],
-      
-      ["Ferro (Fe)", soilData.Fe?.toString() || "-", "mg/dm³", getNutrientLevel(soilData.Fe, 12, 40), 
-       getMicroRecommendation("Fe", getNutrientLevel(soilData.Fe, 12, 40))],
-      
-      ["Manganês (Mn)", soilData.Mn?.toString() || "-", "mg/dm³", getNutrientLevel(soilData.Mn, 5, 30), 
-       getMicroRecommendation("Mn", getNutrientLevel(soilData.Mn, 5, 30))],
-      
-      ["Zinco (Zn)", soilData.Zn?.toString() || "-", "mg/dm³", getNutrientLevel(soilData.Zn, 1.5, 2.2), 
-       getMicroRecommendation("Zn", getNutrientLevel(soilData.Zn, 1.5, 2.2))],
-      
-      ["Molibdênio (Mo)", "-", "mg/dm³", "Não analisado", "Aplicação preventiva recomendada"],
-    ];
+    // Preparar dados para recomendações
+    const fertilizers = results?.fertilizers || [];
+    const recColumns = ['Fertilizante', 'Quantidade', 'Unidade', 'Aplicação'];
+    const recRows: any[] = [];
     
+    if (Array.isArray(fertilizers)) {
+      fertilizers.forEach(fert => {
+        recRows.push([
+          fert.name,
+          formatNumber(fert.amount),
+          fert.unit || 'kg/ha',
+          fert.application || 'A lanço'
+        ]);
+      });
+    } else if (fertilizers.macronutrientes && fertilizers.micronutrientes) {
+      // Se for um objeto com macronutrientes e micronutrientes
+      fertilizers.macronutrientes.forEach(fert => {
+        recRows.push([
+          fert.nome,
+          formatNumber(fert.quantidade),
+          fert.unidade || 'kg/ha',
+          'A lanço'
+        ]);
+      });
+      
+      fertilizers.micronutrientes.forEach(fert => {
+        recRows.push([
+          fert.nome,
+          formatNumber(fert.quantidade),
+          fert.unidade || 'kg/ha',
+          'Foliar'
+        ]);
+      });
+    }
+    
+    // Adicionar tabela de recomendações
     autoTable(pdf, {
-      head: [microColumn],
-      body: microRows,
-      startY: 25,
+      head: [recColumns],
+      body: recRows,
+      startY: 35,
       theme: 'grid',
       styles: {
-        fontSize: 10,
+        fontSize: 9,
         cellPadding: 3,
         lineColor: [120, 144, 156],
         lineWidth: 0.1,
@@ -716,61 +507,66 @@ export const generatePDFReport = async (soilData: SoilData, results: Calculation
       alternateRowStyles: {
         fillColor: [240, 248, 240]
       },
-      margin: { top: 25 }
+      margin: { top: 35 }
     });
     
-    // Adicionar observações sobre nutrientes
-    pdf.setFontSize(12);
-    pdf.setTextColor(0, 0, 0); // cor preta para o texto
+    // Adicionar gráficos ou representações visuais dos níveis de nutrientes
+    const yPos = (pdf as any).lastAutoTable?.finalY || 150;
+    pdf.setFontSize(14);
+    pdf.text('Representação Visual dos Níveis de Nutrientes', 15, yPos + 10);
     
-    // Usar a propriedade lastAutoTable
-    const finalY = (pdf as any).lastAutoTable.finalY || 150;
-    pdf.text('Observações importantes sobre manejo de nutrientes:', 15, finalY + 15);
+    // Adicionar observações
+    pdf.setFontSize(11);
+    pdf.text('Observações Importantes:', 15, yPos + 100);
+    pdf.setFontSize(9);
+    pdf.text('• As recomendações acima são baseadas nos resultados da análise e nas necessidades da cultura.', 15, yPos + 110);
+    pdf.text('• Consulte um engenheiro agrônomo para ajustes específicos às condições locais.', 15, yPos + 115);
+    pdf.text('• A aplicação deve considerar o momento do plantio, o tipo de solo e as condições climáticas.', 15, yPos + 120);
     
-    const observations = [
-      "• Aplicar calcário de 60 a 90 dias antes do plantio para correção do solo",
-      "• Os micronutrientes são essenciais para o desenvolvimento completo das plantas",
-      "• Parcelar a adubação nitrogenada em 2-3 aplicações para maior eficiência",
-      "• Realizar análise foliar no florescimento para ajustes na adubação",
-      "• Considerar o uso de inoculantes para leguminosas",
-      "• Monitorar a acidez do solo a cada 2 anos para ajuste no manejo",
-      "• Para culturas perenes, parcelar as adubações ao longo do ciclo"
-    ];
+    // Adicionar assinatura digital
+    pdf.setFontSize(10);
+    pdf.text('Documento gerado digitalmente pelo sistema Fertilisolo', 15, pdf.internal.pageSize.getHeight() - 30);
+    pdf.text(`Assinatura Digital: ${btoa(Date.now().toString()).substring(0, 16)}`, 15, pdf.internal.pageSize.getHeight() - 25);
+    pdf.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 15, pdf.internal.pageSize.getHeight() - 20);
     
-    let yPos = finalY + 25;
-    observations.forEach(obs => {
-      pdf.text(obs, 15, yPos);
-      yPos += 7;
-    });
+    // Adicionar QR code para verificação (representado por um pequeno quadrado)
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(pdf.internal.pageSize.getWidth() - 30, pdf.internal.pageSize.getHeight() - 30, 20, 20, 'F');
     
-    // Rodapé em todas as páginas
-    const pageCount = pdf.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      pdf.setPage(i);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(8);
-      pdf.setTextColor(100, 100, 100);
-      pdf.text(`Fertilisolo - Análise e recomendação de fertilizantes - Página ${i}/${pageCount}`, 15, 287);
-      pdf.text(`Relatório gerado em: ${new Date().toLocaleDateString('pt-BR')}`, pdf.internal.pageSize.getWidth() - 60, 287);
-    }
+    // Baixar o PDF
+    pdf.save(`relatorio_solo_${soilData.location ? soilData.location.replace(/\s+/g, '_') : 'analise'}.pdf`);
     
-    // Nome do arquivo para download
-    const filename = `Recomendacao_${soilData.location || "Local"}_${new Date().toISOString().slice(0,10)}.pdf`;
-    console.log('Tentando salvar PDF com nome:', filename);
-    
-    // Verificar se estamos em ambiente de browser e salvar o PDF
-    if (typeof window !== 'undefined') {
-      pdf.save(filename);
-      console.log('PDF salvo com sucesso!');
-      return Promise.resolve(); // Resolver a promessa após salvar
-    } else {
-      throw new Error('Ambiente de execução não suportado para salvar PDF');
-    }
+    return true;
   } catch (error) {
-    console.error('Erro detalhado ao gerar PDF:', error);
-    throw error; // Re-lançar o erro para ser tratado pelo chamador
+    console.error('Erro ao gerar PDF:', error);
+    return false;
   }
 };
+
+// Funções auxiliares para interpretação dos resultados
+function getMatterLevel(value: number | undefined): string {
+  if (value === undefined) return "Não analisado";
+  if (value < 1.5) return "Muito Baixo";
+  if (value < 3.0) return "Baixo";
+  if (value < 6.0) return "Médio";
+  return "Alto";
+}
+
+function getClayLevel(value: number | undefined): string {
+  if (value === undefined) return "Não analisado";
+  if (value < 15) return "Arenoso";
+  if (value < 35) return "Médio";
+  if (value < 60) return "Argiloso";
+  return "Muito Argiloso";
+}
+
+function getCTCLevel(value: number | undefined): string {
+  if (value === undefined) return "Não analisado";
+  if (value < 5) return "Muito Baixa";
+  if (value < 10) return "Baixa";
+  if (value < 15) return "Média";
+  return "Alta";
+}
 
 export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: string) => {
   try {

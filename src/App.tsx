@@ -16,6 +16,7 @@ import DataTester from "./components/DataTester";
 import SupabaseConnectionTest from "./components/SupabaseConnectionTest";
 import EnvConfigHelper from "./components/EnvConfigHelper";
 import ReportGenerator from "./components/ReportGenerator";
+import { NetworkStatusChecker } from "./components/NetworkStatusChecker";
 
 const queryClient = new QueryClient();
 
@@ -118,6 +119,9 @@ const AppContent = () => {
       
       {/* Componente para instalação do PWA */}
       <PwaInstallPrompt />
+
+      {/* Componente para verificar status da conexão */}
+      <NetworkStatusChecker />
     </>
   );
 };
