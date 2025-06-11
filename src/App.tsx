@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
+import ResetPassword from "./pages/ResetPassword";
 import { useAuth } from "./hooks/useAuth";
 import { AuthBox } from "./components/AuthBox";
 import { Loader2 } from "lucide-react";
@@ -107,6 +108,11 @@ const AppContent = () => {
               <Auth />
             </PublicRoute>
           } 
+        />
+        {/* Rota de redefinição de senha */}
+        <Route 
+          path="/reset-password" 
+          element={<ResetPassword />} 
         />
         {/* Rotas de teste */}
         <Route path="/teste-dados" element={<DataTester />} />

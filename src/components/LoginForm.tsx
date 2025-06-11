@@ -11,6 +11,7 @@ import { AlertCircle, Loader2, AlertTriangle, UserPlus } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { SUPABASE_URL } from '@/lib/env';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ForgotPasswordForm } from './ForgotPasswordForm';
 
 const formSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -27,6 +28,7 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onCreateAccountClick }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSupabaseConfigured, setIsSupabaseConfigured] = useState(true);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { toast } = useToast();
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -79,6 +81,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onCreateAc
       setIsLoading(false);
     }
   };
+
+  if (showForgotPassword) {
+    return (
+      <ForgotPasswordForm onBackToLogin={() => setShowForgotPassword(false)} />
+    );
+  }
 
   return (
     <Card className="w-full max-w-md mx-auto bg-white/90 shadow-lg">
@@ -134,6 +142,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onCreateAc
                 {errors.password.message}
               </p>
             )}
+            <div className="text-right">
+              <button 
+                type="button" 
+                onClick={() => setShowForgotPassword(true)}
+                className="text-xs text-green-700 hover:text-green-800 hover:underline"
+              >
+                Esqueceu sua senha?
+              </button>
+            </div>
           </div>
           <Button 
             type="submit" 
