@@ -365,10 +365,10 @@ const renderReportTemplate = (soilData: SoilData, results: CalculationResult) =>
   return container;
 };
 
-export const generatePDFReport = async (soilData: SoilData, results: CalculationResult) => {
+export const generatePDFReport = async (soilData: SoilData, results: CalculationResult, cultureName?: string) => {
   try {
     // Usar a função generatePDF que já tem todas as páginas incluindo a primeira
-    const { pdf, filename } = generatePDF(soilData);
+    const { pdf, filename } = generatePDF(soilData, undefined, undefined, cultureName);
     pdf.save(filename);
     
     return true;
@@ -403,7 +403,7 @@ function getCTCLevel(value: number | undefined): string {
   return "Alta";
 }
 
-export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: string) => {
+export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: string, cultureName?: string) => {
   try {
     const pdf = new jsPDF();
     
@@ -456,17 +456,22 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     pdf.setLineWidth(0.5);
     pdf.rect(marginX, colY, col1Width, colHeight, 'S');
     
-    pdf.setFontSize(12); // Reduzido para caber melhor
-    pdf.setFont('helvetica', 'bold');
+    // Título da coluna 1
     pdf.setTextColor(51, 51, 51);
+    pdf.setFontSize(11);
+    pdf.setFont('helvetica', 'bold');
     pdf.text('Detalhes', marginX + 3, colY + 10);
     
-    pdf.setFontSize(9); // Reduzido
+    // Conteúdo da coluna 1
+    pdf.setFontSize(9);
     pdf.setFont('helvetica', 'normal');
-    pdf.text(`Cultura: Não especificada`, marginX + 3, colY + 20);
-    pdf.text(`Matéria Orgânica: ${formatNumber(soilData.organicMatter)}%`, marginX + 3, colY + 28);
-    pdf.text(`Argila: ${formatNumber(soilData.argila)}%`, marginX + 3, colY + 36);
-
+    pdf.text('Cultura:', marginX + 3, colY + 18);
+    pdf.text(cultureName || "Não especificada", marginX + 3, colY + 25);
+    pdf.text('Matéria Orgânica:', marginX + 3, colY + 32);
+    pdf.text(`${(soilData.organicMatter || 0).toFixed(1)}%`, marginX + 3, colY + 39);
+    pdf.text('Argila:', marginX + 3, colY + 46);
+    pdf.text(`${(soilData.argila || 0).toFixed(0)}%`, marginX + 3, colY + 53);
+    
     // Coluna 2 - Macronutrientes (Verde claro #E8F5E8)
     const col2X = marginX + col1Width + gap;
     pdf.setFillColor(232, 245, 232);

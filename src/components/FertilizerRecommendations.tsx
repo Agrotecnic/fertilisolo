@@ -8,15 +8,17 @@ import { ApplicationInfo } from './fertilizer/ApplicationInfo';
 interface FertilizerRecommendationsProps {
   soilData: SoilData;
   results: CalculationResult;
+  cultureName?: string;
 }
 
 export const FertilizerRecommendations: React.FC<FertilizerRecommendationsProps> = ({ 
   soilData, 
-  results 
+  results,
+  cultureName
 }) => {
   return (
     <div className="space-y-8">
-      <FertilizerHeader soilData={soilData} results={results} />
+      <FertilizerHeader soilData={soilData} results={results} cultureName={cultureName} />
 
       {/* Macronutrientes Primários - Grid 2x2 */}
       <div>

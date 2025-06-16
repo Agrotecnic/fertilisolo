@@ -394,47 +394,71 @@ const Index = () => {
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <Label htmlFor="plot">Talhão (opcional)</Label>
-                      <FarmManagementButton onDataUpdated={loadFarmsAndPlots} />
+                  {/* Linha com Talhão, Cultura e Produtividade lado a lado */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="plot">Talhão (opcional)</Label>
+                        <FarmManagementButton onDataUpdated={loadFarmsAndPlots} />
+                      </div>
+                      <Select 
+                        onValueChange={(value) => {
+                          if (value && value !== 'none') {
+                            onSelectPlot(value);
+                          } else {
+                            setValue('selectedPlotId', '');
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um talhão (opcional)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Nenhum talhão selecionado</SelectItem>
+                          {plots.map((plot) => (
+                            <SelectItem key={plot.id} value={plot.id || ''}>
+                              {plot.name} 
+                              {farms.find(farm => farm.id === plot.farm_id)?.name && 
+                                ` (${farms.find(farm => farm.id === plot.farm_id)?.name})`
+                              }
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <Select 
-                      onValueChange={(value) => {
-                        if (value && value !== 'none') {
-                          onSelectPlot(value);
-                        } else {
-                          setValue('selectedPlotId', '');
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um talhão (opcional)" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nenhum talhão selecionado</SelectItem>
-                        {plots.map((plot) => (
-                          <SelectItem key={plot.id} value={plot.id || ''}>
-                            {plot.name} 
-                            {farms.find(farm => farm.id === plot.farm_id)?.name && 
-                              ` (${farms.find(farm => farm.id === plot.farm_id)?.name})`
-                            }
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="organicMatter">Matéria Orgânica (%)</Label>
-                    <Input 
-                      id="organicMatter" 
-                      type="number" 
-                      step="0.01"
-                      min="0"
-                      {...register('organicMatter', { valueAsNumber: true })} 
-                    />
-                    {errors.organicMatter && <p className="text-sm text-red-500">{errors.organicMatter.message}</p>}
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="crop">Cultura</Label>
+                      <Select 
+                        value={selectedCrop}
+                        onValueChange={setSelectedCrop}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione a cultura" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="soja">Soja</SelectItem>
+                          <SelectItem value="milho">Milho</SelectItem>
+                          <SelectItem value="algodao">Algodão</SelectItem>
+                          <SelectItem value="cafe">Café</SelectItem>
+                          <SelectItem value="cana">Cana-de-açúcar</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="targetYield">Produtividade Esperada (ton/ha)</Label>
+                      <Input 
+                        id="targetYield" 
+                        type="number" 
+                        step="0.1"
+                        min="0"
+                        value={targetYield}
+                        onChange={(e) => setTargetYield(Number(e.target.value))}
+                        placeholder="Ex: 4.0"
+                      />
+                      <p className="text-xs text-gray-500">Produtividade esperada em toneladas por hectare</p>
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -589,6 +613,18 @@ const Index = () => {
                       />
                       {errors.Zn && <p className="text-sm text-red-500">{errors.Zn.message}</p>}
                     </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="organicMatter">Matéria Orgânica (%)</Label>
+                      <Input 
+                        id="organicMatter" 
+                        type="number" 
+                        step="0.01"
+                        min="0"
+                        {...register('organicMatter', { valueAsNumber: true })} 
+                      />
+                      {errors.organicMatter && <p className="text-sm text-red-500">{errors.organicMatter.message}</p>}
+                    </div>
                   </div>
                   
                   <Button type="submit" className="w-full mt-4" disabled={isLoading}>
@@ -634,7 +670,7 @@ const Index = () => {
             {soilData && results ? (
               <div className="space-y-4 md:space-y-6">
                 <h2 className="text-xl md:text-2xl font-bold text-primary-dark" style={titleStyle}>Recomendações de Adubação</h2>
-                <FertilizerRecommendations soilData={soilData} results={results} />
+                <FertilizerRecommendations soilData={soilData} results={results} cultureName={selectedCrop} />
               </div>
             ) : (
               <div className="p-4 text-center">

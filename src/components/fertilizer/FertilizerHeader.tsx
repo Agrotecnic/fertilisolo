@@ -8,11 +8,13 @@ import { toast } from '@/components/ui/use-toast';
 interface FertilizerHeaderProps {
   soilData: SoilData;
   results: CalculationResult;
+  cultureName?: string;
 }
 
 export const FertilizerHeader: React.FC<FertilizerHeaderProps> = ({ 
   soilData, 
-  results 
+  results,
+  cultureName
 }) => {
   const handleExportPDF = async () => {
     try {
@@ -22,7 +24,7 @@ export const FertilizerHeader: React.FC<FertilizerHeaderProps> = ({
       });
       
       // Usando await para garantir que a promessa seja resolvida
-      await generatePDFReport(soilData, results);
+      await generatePDFReport(soilData, results, cultureName);
       
       toast({
         title: "Relatório exportado com sucesso!",
@@ -53,6 +55,11 @@ export const FertilizerHeader: React.FC<FertilizerHeaderProps> = ({
           <p className="text-gray-600 text-sm mt-1">
             Cálculos baseados no método de Saturação por Bases e resultados da análise de solo
           </p>
+          {cultureName && (
+            <p className="text-green-700 text-sm mt-1 font-medium">
+              Cultura: {cultureName}
+            </p>
+          )}
         </div>
         <Button onClick={handleExportPDF} className="bg-green-600 hover:bg-green-700 shadow-md">
           <FileText className="h-4 w-4 mr-2" />
