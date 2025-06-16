@@ -423,6 +423,12 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     const pageWidth = 210; // A4 width in mm
     const contentWidth = pageWidth - (marginX * 2);
     
+    // Marca d'água "FERTILISOLO" no canto superior direito
+    pdf.setTextColor(200, 200, 200); // Cinza claro
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('FERTILISOLO', pageWidth - marginX - 35, marginY + 8);
+
     // Header Superior conforme modelo Fertilisolo
     pdf.setTextColor(51, 51, 51); // #333333
     pdf.setFontSize(18); // 18pt negrito
@@ -438,8 +444,13 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     // Canto superior direito - ajustado para não estrapolar
     pdf.setTextColor(51, 51, 51);
     pdf.setFontSize(10);
-    pdf.text(`${farmName || soilData.location || "Não especificado"}`, 120, marginY + 10);
-    pdf.text(`Data da coleta: ${soilData.date ? new Date(soilData.date).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR')}`, 120, marginY + 18);
+    const locationText = `${farmName || soilData.location || "Não especificado"}`;
+    const dateText = `Data da coleta: ${soilData.date ? new Date(soilData.date).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR')}`;
+    
+    // Centralizar texto no espaço disponível (até onde começa o logo)
+    const rightSectionX = 120;
+    pdf.text(locationText, rightSectionX, marginY + 10);
+    pdf.text(dateText, rightSectionX, marginY + 18);
 
     // Seção 1: Layout de 3 Colunas (Y = 40) - larguras ajustadas
     const colY = 40;
@@ -462,15 +473,31 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     pdf.setFont('helvetica', 'bold');
     pdf.text('Detalhes', marginX + 3, colY + 10);
     
-    // Conteúdo da coluna 1
+    // Conteúdo da coluna 1 - ajustado para não ultrapassar limites
     pdf.setFontSize(9);
     pdf.setFont('helvetica', 'normal');
-    pdf.text('Cultura:', marginX + 3, colY + 18);
-    pdf.text(cultureName || "Não especificada", marginX + 3, colY + 25);
-    pdf.text('Matéria Orgânica:', marginX + 3, colY + 32);
-    pdf.text(`${(soilData.organicMatter || 0).toFixed(1)}%`, marginX + 3, colY + 39);
-    pdf.text('Argila:', marginX + 3, colY + 46);
-    pdf.text(`${(soilData.argila || 0).toFixed(0)}%`, marginX + 3, colY + 53);
+    
+    // Cultura com quebra de linha se necessário
+    pdf.text('Cultura:', marginX + 2, colY + 16);
+    const culturaText = cultureName || "Não especificada";
+    if (culturaText.length > 15) {
+      // Quebra texto longo em duas linhas
+      const palavras = culturaText.split(' ');
+      const linha1 = palavras.slice(0, Math.ceil(palavras.length / 2)).join(' ');
+      const linha2 = palavras.slice(Math.ceil(palavras.length / 2)).join(' ');
+      pdf.text(linha1, marginX + 2, colY + 23);
+      pdf.text(linha2, marginX + 2, colY + 29);
+    } else {
+      pdf.text(culturaText, marginX + 2, colY + 23);
+    }
+    
+    // Matéria Orgânica
+    pdf.text('Mat. Orgânica:', marginX + 2, colY + 36);
+    pdf.text(`${(soilData.organicMatter || 0).toFixed(1)}%`, marginX + 2, colY + 42);
+    
+    // Argila
+    pdf.text('Argila:', marginX + 2, colY + 48);
+    pdf.text(`${(soilData.argila || 0).toFixed(0)}%`, marginX + 2, colY + 54);
     
     // Coluna 2 - Macronutrientes (Verde claro #E8F5E8)
     const col2X = marginX + col1Width + gap;
@@ -484,11 +511,14 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     
     pdf.setFontSize(8); // Reduzido para caber
     pdf.setFont('helvetica', 'normal');
-    pdf.text(`CTC (T): ${formatNumber(soilData.T)} cmolc/dm³`, col2X + 3, colY + 18);
-    pdf.text(`Fósforo (P): ${formatNumber(soilData.P)} mg/dm³`, col2X + 3, colY + 25);
-    pdf.text(`Potássio (K): ${formatNumber((soilData.K || 0) / 390)} cmolc/dm³`, col2X + 3, colY + 32);
-    pdf.text(`Cálcio (Ca): ${formatNumber(soilData.Ca)} cmolc/dm³`, col2X + 3, colY + 39);
-    pdf.text(`Magnésio (Mg): ${formatNumber(soilData.Mg)} cmolc/dm³`, col2X + 3, colY + 46);
+    // Texto mais compacto para caber na coluna
+    pdf.text(`CTC: ${formatNumber(soilData.T)}`, col2X + 2, colY + 18);
+    pdf.text(`cmolc/dm³`, col2X + 2, colY + 23);
+    pdf.text(`P: ${formatNumber(soilData.P)} mg/dm³`, col2X + 2, colY + 30);
+    pdf.text(`K: ${formatNumber((soilData.K || 0) / 390)}`, col2X + 2, colY + 37);
+    pdf.text(`cmolc/dm³`, col2X + 2, colY + 42);
+    pdf.text(`Ca: ${formatNumber(soilData.Ca)}`, col2X + 2, colY + 49);
+    pdf.text(`Mg: ${formatNumber(soilData.Mg)}`, col2X + 2, colY + 55);
 
     // Coluna 3 - Informação Importante (Azul claro #E3F2FD)
     const col3X = col2X + col2Width + gap;
@@ -503,12 +533,13 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     
     pdf.setFontSize(8); // Reduzido para caber
     pdf.setFont('helvetica', 'normal');
-    pdf.text('Opções de Correção: As fontes', col3X + 3, colY + 18);
-    pdf.text('de nutrientes listadas são', col3X + 3, colY + 24);
-    pdf.text('alternativas.', col3X + 3, colY + 30);
-    pdf.text('Escolha apenas uma fonte', col3X + 3, colY + 36);
-    pdf.text('para cada tipo de nutriente', col3X + 3, colY + 42);
-    pdf.text('com base na disponibilidade.', col3X + 3, colY + 48);
+    // Texto mais conciso para caber na coluna
+    pdf.text('Opções de Correção:', col3X + 2, colY + 18);
+    pdf.text('As fontes listadas são', col3X + 2, colY + 24);
+    pdf.text('alternativas.', col3X + 2, colY + 30);
+    pdf.text('Escolha APENAS UMA', col3X + 2, colY + 36);
+    pdf.text('fonte para cada tipo', col3X + 2, colY + 42);
+    pdf.text('de nutriente.', col3X + 2, colY + 48);
 
     // Seção 2: Análise Visual de Necessidades (Y = 100) - espaçamento corrigido
     let visualY = 100;
