@@ -423,16 +423,34 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     const pageWidth = 210; // A4 width in mm
     const contentWidth = pageWidth - (marginX * 2);
     
-    // Função para adicionar marca Fertilisolo em todas as páginas
+    // Função para adicionar logotipo Fertilisolo em todas as páginas
     const addLogo = () => {
-      const logoX = pageWidth - marginX - 30;
-      const logoY = marginY + 6;
-      
-      // Marca d'água FERTILISOLO no canto superior direito
-      pdf.setTextColor(160, 160, 160); // Cinza claro para não interferir no conteúdo
-      pdf.setFontSize(9);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('FERTILISOLO', logoX, logoY);
+      try {
+        const logoWidth = 18;
+        const logoHeight = 18;
+        const logoX = pageWidth - marginX - logoWidth - 5;
+        const logoY = marginY + 2;
+        
+        // Usar imagem base64 incorporada do logotipo
+        const logoBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='; // Placeholder
+        
+        // Tentar adicionar imagem do logotipo
+        try {
+          // Por enquanto, usar marca d'água como fallback mais elegante
+          pdf.setTextColor(120, 120, 120); // Cinza médio
+          pdf.setFontSize(8);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text('🌱 FERTILISOLO', logoX - 10, logoY + 10);
+        } catch (imgError) {
+          // Fallback simples
+          pdf.setTextColor(140, 140, 140);
+          pdf.setFontSize(8);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text('FERTILISOLO', logoX, logoY + 8);
+        }
+      } catch (error) {
+        console.log('Erro ao adicionar logotipo:', error);
+      }
     };
     
     // Adicionar logotipo na primeira página
@@ -482,31 +500,19 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     pdf.setFont('helvetica', 'bold');
     pdf.text('Detalhes', marginX + 3, colY + 10);
     
-    // Conteúdo da coluna 1 - espaçamento reduzido para caber no quadro
+    // Conteúdo da coluna 1 - dados na mesma linha após os dois pontos
     pdf.setFontSize(8); // Reduzido
     pdf.setFont('helvetica', 'normal');
     
-    // Cultura com quebra de linha se necessário
-    pdf.text('Cultura:', marginX + 2, colY + 15);
+    // Cultura - na mesma linha
     const culturaText = cultureName || "Não especificada";
-    if (culturaText.length > 15) {
-      // Quebra texto longo em duas linhas
-      const palavras = culturaText.split(' ');
-      const linha1 = palavras.slice(0, Math.ceil(palavras.length / 2)).join(' ');
-      const linha2 = palavras.slice(Math.ceil(palavras.length / 2)).join(' ');
-      pdf.text(linha1, marginX + 2, colY + 20);
-      pdf.text(linha2, marginX + 2, colY + 25);
-    } else {
-      pdf.text(culturaText, marginX + 2, colY + 20);
-    }
+    pdf.text(`Cultura: ${culturaText}`, marginX + 2, colY + 18);
     
-    // Matéria Orgânica
-    pdf.text('Mat. Orgânica:', marginX + 2, colY + 32);
-    pdf.text(`${(soilData.organicMatter || 0).toFixed(1)}%`, marginX + 2, colY + 37);
+    // Matéria Orgânica - na mesma linha
+    pdf.text(`Mat. Orgânica: ${(soilData.organicMatter || 0).toFixed(1)}%`, marginX + 2, colY + 28);
     
-    // Argila
-    pdf.text('Argila:', marginX + 2, colY + 44);
-    pdf.text(`${(soilData.argila || 0).toFixed(0)}%`, marginX + 2, colY + 49);
+    // Argila - na mesma linha
+    pdf.text(`Argila: ${(soilData.argila || 0).toFixed(0)}%`, marginX + 2, colY + 38);
     
     // Coluna 2 - Macronutrientes (Verde claro #E8F5E8)
     const col2X = marginX + col1Width + gap;
@@ -518,16 +524,14 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     pdf.setFont('helvetica', 'bold');
     pdf.text('Macronutrientes', col2X + 3, colY + 10);
     
-    pdf.setFontSize(7); // Ainda mais reduzido para caber
+    pdf.setFontSize(7); // Reduzido para caber
     pdf.setFont('helvetica', 'normal');
-    // Texto mais compacto com espaçamento reduzido
-    pdf.text(`CTC: ${formatNumber(soilData.T)}`, col2X + 2, colY + 16);
-    pdf.text(`cmolc/dm³`, col2X + 2, colY + 20);
+    // Dados na mesma linha após os dois pontos
+    pdf.text(`CTC: ${formatNumber(soilData.T)} cmolc/dm³`, col2X + 2, colY + 18);
     pdf.text(`P: ${formatNumber(soilData.P)} mg/dm³`, col2X + 2, colY + 26);
-    pdf.text(`K: ${formatNumber((soilData.K || 0) / 390)}`, col2X + 2, colY + 32);
-    pdf.text(`cmolc/dm³`, col2X + 2, colY + 36);
-    pdf.text(`Ca: ${formatNumber(soilData.Ca)}`, col2X + 2, colY + 42);
-    pdf.text(`Mg: ${formatNumber(soilData.Mg)}`, col2X + 2, colY + 48);
+    pdf.text(`K: ${formatNumber((soilData.K || 0) / 390)} cmolc/dm³`, col2X + 2, colY + 34);
+    pdf.text(`Ca: ${formatNumber(soilData.Ca)} cmolc/dm³`, col2X + 2, colY + 42);
+    pdf.text(`Mg: ${formatNumber(soilData.Mg)} cmolc/dm³`, col2X + 2, colY + 50);
 
     // Coluna 3 - Informação Importante (Azul claro #E3F2FD)
     const col3X = col2X + col2Width + gap;
