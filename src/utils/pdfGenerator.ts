@@ -57,7 +57,7 @@ interface FertilizerRec {
 }
 
 // Renderizar modelo de relatório em elemento HTML para capturar com html2canvas
-const renderReportTemplate = (soilData: SoilData, results: CalculationResult) => {
+const renderReportTemplate = (soilData: SoilData, results: CalculationResult, cultureName?: string) => {
   // Criar um container temporário
   const container = document.createElement('div');
   container.id = 'temp-report-container';
@@ -92,7 +92,7 @@ const renderReportTemplate = (soilData: SoilData, results: CalculationResult) =>
       <div class="space-y-2">
         <div class="flex justify-between">
           <span class="text-gray-600">Cultura:</span>
-          <span class="font-medium">${"Não especificada"}</span>
+          <span class="font-medium">${cultureName || "Não especificada"}</span>
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">Matéria Orgânica:</span>
@@ -423,38 +423,7 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     const pageWidth = 210; // A4 width in mm
     const contentWidth = pageWidth - (marginX * 2);
     
-    // Função para adicionar logotipo Fertilisolo em todas as páginas
-    const addLogo = () => {
-      try {
-        const logoWidth = 18;
-        const logoHeight = 18;
-        const logoX = pageWidth - marginX - logoWidth - 5;
-        const logoY = marginY + 2;
-        
-        // Usar imagem base64 incorporada do logotipo
-        const logoBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='; // Placeholder
-        
-        // Tentar adicionar imagem do logotipo
-        try {
-          // Por enquanto, usar marca d'água como fallback mais elegante
-          pdf.setTextColor(120, 120, 120); // Cinza médio
-          pdf.setFontSize(8);
-          pdf.setFont('helvetica', 'bold');
-          pdf.text('🌱 FERTILISOLO', logoX - 10, logoY + 10);
-        } catch (imgError) {
-          // Fallback simples
-          pdf.setTextColor(140, 140, 140);
-          pdf.setFontSize(8);
-          pdf.setFont('helvetica', 'bold');
-          pdf.text('FERTILISOLO', logoX, logoY + 8);
-        }
-      } catch (error) {
-        console.log('Erro ao adicionar logotipo:', error);
-      }
-    };
-    
-    // Adicionar logotipo na primeira página
-    addLogo();
+    // Sem logotipo conforme solicitado
 
     // Header Superior conforme modelo Fertilisolo
     pdf.setTextColor(51, 51, 51); // #333333
@@ -720,8 +689,7 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     
     pdf.addPage();
     
-    // Adicionar logotipo na página 2
-    addLogo();
+    // Sem logotipo conforme solicitado
     
     // Header da Página 2
     pdf.setFillColor(76, 175, 80);
@@ -791,8 +759,7 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     
     pdf.addPage();
     
-    // Adicionar logotipo na página 3
-    addLogo();
+    // Sem logotipo conforme solicitado
     
     // Header da Página 3
     pdf.setFillColor(76, 175, 80);
