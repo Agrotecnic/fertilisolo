@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { SoilData, CalculationResult } from '@/types/soilAnalysis';
 import { calculateSoilAnalysis } from '@/utils/soilCalculations';
 import { saveAnalysisToHistory } from '@/utils/analysisStorage';
+import { convertSoilDataToStandard, getUnitLabel, convertFromStandardUnit, convertToStandardUnit } from '@/utils/unitConversions';
 import { toast } from '@/hooks/use-toast';
 import { BasicInfoSection } from '@/components/BasicInfoSection';
 import { PrimaryMacronutrientsSection } from '@/components/PrimaryMacronutrientsSection';
 import { SecondaryMacronutrientsSection } from '@/components/SecondaryMacronutrientsSection';
 import { MicronutrientsSection } from '@/components/MicronutrientsSection';
-import { getDefaultUnits, convertSoilDataToStandard } from '@/utils/unitConversions';
-import { SelectedUnits } from '@/types/units';
+import { UnitSelector } from '@/components/UnitSelector';
+// Removendo importações complexas por enquanto
 
 interface SoilAnalysisFormProps {
   onAnalysisComplete: (data: SoilData, results: CalculationResult) => void;
@@ -41,8 +44,22 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Adicionar estado para unidades selecionadas
-  const [selectedUnits, setSelectedUnits] = useState<SelectedUnits>(getDefaultUnits());
+  // Estado para unidades selecionadas
+  const [selectedUnits, setSelectedUnits] = useState({
+    T: 'cmolc_dm3',
+    Ca: 'cmolc_dm3',
+    Mg: 'cmolc_dm3',
+    K: 'mg_dm3',
+    P: 'mg_dm3',
+    S: 'mg_dm3',
+    organicMatter: 'percent',
+    B: 'mg_dm3',
+    Cu: 'mg_dm3',
+    Fe: 'mg_dm3',
+    Mn: 'mg_dm3',
+    Zn: 'mg_dm3',
+    Mo: 'mg_dm3'
+  });
 
   const handleInputChange = (field: keyof typeof formData, value: string | number) => {
     const numericFields = ['organicMatter', 'T', 'Ca', 'Mg', 'K', 'P', 'S', 'B', 'Cu', 'Fe', 'Mn', 'Zn', 'Mo'];
@@ -125,6 +142,33 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
   };
 
   const handleUnitChange = (nutrient: string, unit: string) => {
+    const oldUnit = selectedUnits[nutrient];
+    const newUnit = unit;
+    
+    // Se a unidade mudou e há um valor, converter o valor
+    if (oldUnit !== newUnit && formData[nutrient] !== undefined) {
+      const currentValue = formData[nutrient];
+      
+      // Primeiro converter da unidade antiga para a padrão
+      const standardValue = convertToStandardUnit(currentValue, nutrient, oldUnit);
+      
+      // Depois converter da padrão para a nova unidade
+      const newValue = convertFromStandardUnit(standardValue, nutrient, newUnit);
+      
+      // Atualizar o valor no formData
+      setFormData(prev => ({
+        ...prev,
+        [nutrient]: newValue
+      }));
+      
+      // Atualizar o valor temporário também
+      setTempInputValues(prev => ({
+        ...prev,
+        [nutrient]: newValue.toString()
+      }));
+    }
+    
+    // Atualizar a unidade selecionada
     setSelectedUnits(prev => ({
       ...prev,
       [nutrient]: unit
@@ -137,12 +181,12 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
     if (!validateForm()) return;
 
     try {
-      // Converter dados para unidades padrão antes dos cálculos
-      const standardFormData = convertSoilDataToStandard(formData, selectedUnits);
+      // Converter dados para unidades padrão antes do cálculo
+      const convertedData = convertSoilDataToStandard(formData, selectedUnits);
+      const results = calculateSoilAnalysis(convertedData);
       
-      const results = calculateSoilAnalysis(standardFormData);
       const analysisData: SoilData = {
-        ...standardFormData, // Salvar em unidades padrão
+        ...convertedData,
         id: Date.now().toString(),
         date: new Date().toISOString().split('T')[0],
       };
@@ -174,15 +218,58 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
     return formData[field];
   };
 
+  // Obter o valor convertido para a unidade selecionada
+  const getConvertedValue = (field: keyof typeof formData) => {
+    const numericFields = ['organicMatter', 'T', 'Ca', 'Mg', 'K', 'P', 'S', 'B', 'Cu', 'Fe', 'Mn', 'Zn', 'Mo'];
+    if (!numericFields.includes(field)) return formData[field];
+    
+    const value = formData[field];
+    const selectedUnit = selectedUnits[field];
+    
+    if (!selectedUnit || value === 0) return value;
+    
+    // Converter da unidade padrão para a unidade selecionada
+    return convertFromStandardUnit(value, field, selectedUnit);
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-1">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {errors.general && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mb-4">
           <AlertDescription>{errors.general}</AlertDescription>
         </Alert>
       )}
 
       {/* Informações Básicas */}
+      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+        <h3 className="text-sm font-semibold text-gray-800 mb-3">Informações Básicas</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="location" className="text-sm font-medium text-gray-700">Localização</Label>
+            <Input 
+              id="location" 
+              value={formData.location || ''}
+              onChange={(e) => handleInputChange('location', e.target.value)}
+              placeholder="Ex: Fazenda São João"
+              className="h-10"
+            />
+            {errors.location && <p className="text-sm text-red-500">{errors.location}</p>}
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="date" className="text-sm font-medium text-gray-700">Data da Coleta</Label>
+            <Input 
+              id="date" 
+              type="date" 
+              value={formData.date || new Date().toISOString().split('T')[0]}
+              onChange={(e) => handleInputChange('date', e.target.value)}
+              className="h-10"
+            />
+            {errors.date && <p className="text-sm text-red-500">{errors.date}</p>}
+          </div>
+        </div>
+      </div>
+
       <BasicInfoSection
         location={formData.location || ''}
         crop={formData.crop || ''}
@@ -192,14 +279,14 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
       />
 
       {/* Macronutrientes Primários */}
-      <div>
-        <h3 className="text-xs font-semibold text-green-800 mb-1">Macronutrientes Primários</h3>
+      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+        <h3 className="text-sm font-semibold text-gray-800 mb-3">Macronutrientes Primários</h3>
         <PrimaryMacronutrientsSection
-          T={getDisplayValue('T')}
-          Ca={getDisplayValue('Ca')}
-          Mg={getDisplayValue('Mg')}
-          K={getDisplayValue('K')}
-          P={getDisplayValue('P')}
+          T={getConvertedValue('T')}
+          Ca={getConvertedValue('Ca')}
+          Mg={getConvertedValue('Mg')}
+          K={getConvertedValue('K')}
+          P={getConvertedValue('P')}
           onTChange={(value) => handleInputChange('T', value)}
           onCaChange={(value) => handleInputChange('Ca', value)}
           onMgChange={(value) => handleInputChange('Mg', value)}
@@ -211,47 +298,241 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
         />
       </div>
 
-      {/* Macronutrientes Secundários */}
-      <div>
-        <h3 className="text-xs font-semibold text-green-800 mb-1">Macronutrientes Secundários</h3>
-        <SecondaryMacronutrientsSection
-          S={getDisplayValue('S')}
-          organicMatter={getDisplayValue('organicMatter')}
-          onSChange={(value) => handleInputChange('S', value)}
-          onOrganicMatterChange={(value) => handleInputChange('organicMatter', value)}
-          errors={errors}
-          selectedUnits={selectedUnits}
-          onUnitChange={handleUnitChange}
-        />
+      {/* Macronutrientes Secundários e Argila */}
+      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+        <h3 className="text-sm font-semibold text-gray-800 mb-3">Macronutrientes Secundários e Argila</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Enxofre (S) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="S" className="text-sm font-medium text-gray-700">Enxofre (S)</Label>
+              <UnitSelector
+                nutrient="S"
+                selectedUnit={selectedUnits.S || 'mg_dm3'}
+                onUnitChange={(unit) => handleUnitChange('S', unit)}
+                className="w-20"
+              />
+            </div>
+            <Input 
+              id="S" 
+              type="number" 
+              step="0.01"
+              min="0"
+              placeholder="0,00"
+              value={getConvertedValue('S')}
+              onChange={(e) => handleInputChange('S', parseFloat(e.target.value) || 0)}
+              className="h-10"
+            />
+            {errors.S && <p className="text-sm text-red-500">{errors.S}</p>}
+            <p className="text-xs text-gray-500">{getUnitLabel('S', selectedUnits.S || 'mg_dm3')}</p>
+          </div>
+
+          {/* Argila */}
+          <div className="space-y-2">
+            <Label htmlFor="argila" className="text-sm font-medium text-gray-700">Argila (%)</Label>
+            <Input 
+              id="argila" 
+              type="number" 
+              step="0.1"
+              min="0"
+              max="100"
+              placeholder="Ex: 35"
+              value={formData.argila || 35}
+              onChange={(e) => handleInputChange('argila', parseFloat(e.target.value) || 0)}
+              className="h-10"
+            />
+            {errors.argila && <p className="text-sm text-red-500">{errors.argila}</p>}
+            <p className="text-xs text-gray-500">% de argila no solo</p>
+          </div>
+
+          {/* Matéria Orgânica */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="organicMatter" className="text-sm font-medium text-gray-700">Matéria Orgânica</Label>
+              <UnitSelector
+                nutrient="organicMatter"
+                selectedUnit={selectedUnits.organicMatter || 'percent'}
+                onUnitChange={(unit) => handleUnitChange('organicMatter', unit)}
+                className="w-20"
+              />
+            </div>
+            <Input 
+              id="organicMatter" 
+              type="number" 
+              step="0.01"
+              min="0"
+              placeholder="0,00"
+              value={getConvertedValue('organicMatter')}
+              onChange={(e) => handleInputChange('organicMatter', parseFloat(e.target.value) || 0)}
+              className="h-10"
+            />
+            {errors.organicMatter && <p className="text-sm text-red-500">{errors.organicMatter}</p>}
+            <p className="text-xs text-gray-500">{getUnitLabel('organicMatter', selectedUnits.organicMatter || 'percent')}</p>
+          </div>
+        </div>
       </div>
 
       {/* Micronutrientes */}
-      <div>
-        <h3 className="text-xs font-semibold text-green-800 mb-1">Micronutrientes</h3>
-        <MicronutrientsSection
-          B={getDisplayValue('B')}
-          Cu={getDisplayValue('Cu')}
-          Fe={getDisplayValue('Fe')}
-          Mn={getDisplayValue('Mn')}
-          Zn={getDisplayValue('Zn')}
-          Mo={getDisplayValue('Mo')}
-          onBChange={(value) => handleInputChange('B', value)}
-          onCuChange={(value) => handleInputChange('Cu', value)}
-          onFeChange={(value) => handleInputChange('Fe', value)}
-          onMnChange={(value) => handleInputChange('Mn', value)}
-          onZnChange={(value) => handleInputChange('Zn', value)}
-          onMoChange={(value) => handleInputChange('Mo', value)}
-          errors={errors}
-          selectedUnits={selectedUnits}
-          onUnitChange={handleUnitChange}
-        />
+      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+        <h3 className="text-sm font-semibold text-gray-800 mb-3">Micronutrientes</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {/* Boro (B) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="B" className="text-sm font-medium text-gray-700">Boro (B)</Label>
+              <UnitSelector
+                nutrient="B"
+                selectedUnit={selectedUnits.B || 'mg_dm3'}
+                onUnitChange={(unit) => handleUnitChange('B', unit)}
+                className="w-20"
+              />
+            </div>
+            <Input 
+              id="B" 
+              type="number" 
+              step="0.01"
+              min="0"
+              placeholder="0,00"
+              value={getConvertedValue('B')}
+              onChange={(e) => handleInputChange('B', parseFloat(e.target.value) || 0)}
+              className="h-10"
+            />
+            {errors.B && <p className="text-sm text-red-500">{errors.B}</p>}
+            <p className="text-xs text-gray-500">{getUnitLabel('B', selectedUnits.B || 'mg_dm3')}</p>
+          </div>
+
+          {/* Cobre (Cu) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="Cu" className="text-sm font-medium text-gray-700">Cobre (Cu)</Label>
+              <UnitSelector
+                nutrient="Cu"
+                selectedUnit={selectedUnits.Cu || 'mg_dm3'}
+                onUnitChange={(unit) => handleUnitChange('Cu', unit)}
+                className="w-20"
+              />
+            </div>
+            <Input 
+              id="Cu" 
+              type="number" 
+              step="0.01"
+              min="0"
+              placeholder="0,00"
+              value={getConvertedValue('Cu')}
+              onChange={(e) => handleInputChange('Cu', parseFloat(e.target.value) || 0)}
+              className="h-10"
+            />
+            {errors.Cu && <p className="text-sm text-red-500">{errors.Cu}</p>}
+            <p className="text-xs text-gray-500">{getUnitLabel('Cu', selectedUnits.Cu || 'mg_dm3')}</p>
+          </div>
+
+          {/* Ferro (Fe) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="Fe" className="text-sm font-medium text-gray-700">Ferro (Fe)</Label>
+              <UnitSelector
+                nutrient="Fe"
+                selectedUnit={selectedUnits.Fe || 'mg_dm3'}
+                onUnitChange={(unit) => handleUnitChange('Fe', unit)}
+                className="w-20"
+              />
+            </div>
+            <Input 
+              id="Fe" 
+              type="number" 
+              step="0.01"
+              min="0"
+              placeholder="0,00"
+              value={getConvertedValue('Fe')}
+              onChange={(e) => handleInputChange('Fe', parseFloat(e.target.value) || 0)}
+              className="h-10"
+            />
+            {errors.Fe && <p className="text-sm text-red-500">{errors.Fe}</p>}
+            <p className="text-xs text-gray-500">{getUnitLabel('Fe', selectedUnits.Fe || 'mg_dm3')}</p>
+          </div>
+
+          {/* Manganês (Mn) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="Mn" className="text-sm font-medium text-gray-700">Manganês (Mn)</Label>
+              <UnitSelector
+                nutrient="Mn"
+                selectedUnit={selectedUnits.Mn || 'mg_dm3'}
+                onUnitChange={(unit) => handleUnitChange('Mn', unit)}
+                className="w-20"
+              />
+            </div>
+            <Input 
+              id="Mn" 
+              type="number" 
+              step="0.01"
+              min="0"
+              placeholder="0,00"
+              value={getConvertedValue('Mn')}
+              onChange={(e) => handleInputChange('Mn', parseFloat(e.target.value) || 0)}
+              className="h-10"
+            />
+            {errors.Mn && <p className="text-sm text-red-500">{errors.Mn}</p>}
+            <p className="text-xs text-gray-500">{getUnitLabel('Mn', selectedUnits.Mn || 'mg_dm3')}</p>
+          </div>
+
+          {/* Zinco (Zn) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="Zn" className="text-sm font-medium text-gray-700">Zinco (Zn)</Label>
+              <UnitSelector
+                nutrient="Zn"
+                selectedUnit={selectedUnits.Zn || 'mg_dm3'}
+                onUnitChange={(unit) => handleUnitChange('Zn', unit)}
+                className="w-20"
+              />
+            </div>
+            <Input 
+              id="Zn" 
+              type="number" 
+              step="0.01"
+              min="0"
+              placeholder="0,00"
+              value={getConvertedValue('Zn')}
+              onChange={(e) => handleInputChange('Zn', parseFloat(e.target.value) || 0)}
+              className="h-10"
+            />
+            {errors.Zn && <p className="text-sm text-red-500">{errors.Zn}</p>}
+            <p className="text-xs text-gray-500">{getUnitLabel('Zn', selectedUnits.Zn || 'mg_dm3')}</p>
+          </div>
+
+          {/* Molibdênio (Mo) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="Mo" className="text-sm font-medium text-gray-700">Molibdênio (Mo)</Label>
+              <UnitSelector
+                nutrient="Mo"
+                selectedUnit={selectedUnits.Mo || 'mg_dm3'}
+                onUnitChange={(unit) => handleUnitChange('Mo', unit)}
+                className="w-20"
+              />
+            </div>
+            <Input 
+              id="Mo" 
+              type="number" 
+              step="0.01"
+              min="0"
+              placeholder="0,00"
+              value={getConvertedValue('Mo')}
+              onChange={(e) => handleInputChange('Mo', parseFloat(e.target.value) || 0)}
+              className="h-10"
+            />
+            {errors.Mo && <p className="text-sm text-red-500">{errors.Mo}</p>}
+            <p className="text-xs text-gray-500">{getUnitLabel('Mo', selectedUnits.Mo || 'mg_dm3')}</p>
+          </div>
+        </div>
       </div>
 
-      <div className="flex justify-center pt-1">
+      <div className="flex justify-center pt-4">
         <Button 
           type="submit" 
           size="lg"
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
+          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-base font-medium"
         >
           Calcular Saturações e Recomendações
         </Button>

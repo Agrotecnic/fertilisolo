@@ -1,3 +1,5 @@
+import React from 'react';
+import './App.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +20,8 @@ import SupabaseConnectionTest from "./components/SupabaseConnectionTest";
 import EnvConfigHelper from "./components/EnvConfigHelper";
 import ReportGenerator from "./components/ReportGenerator";
 import { NetworkStatusChecker } from "./components/NetworkStatusChecker";
+
+
 
 const queryClient = new QueryClient();
 

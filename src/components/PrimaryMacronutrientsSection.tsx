@@ -28,30 +28,30 @@ export const PrimaryMacronutrientsSection: React.FC<PrimaryMacronutrientsSection
   onUnitChange
 }) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-1">
-      <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-0 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[8px]">CTC (T)</CardTitle>
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <Card className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <CardHeader className="pb-2 pt-3 px-3">
+          <CardTitle className="text-gray-800 text-sm font-semibold">CTC (T)</CardTitle>
           <div className="flex items-center justify-between">
-            <CardDescription className="text-gray-600 text-[6px]">
+            <CardDescription className="text-gray-600 text-xs">
               {getUnitLabel('T', selectedUnits.T)}
             </CardDescription>
             <UnitSelector
               nutrient="T"
               selectedUnit={selectedUnits.T}
               onUnitChange={(unit) => onUnitChange('T', unit)}
-              className="w-12"
+              className="w-16"
             />
           </div>
         </CardHeader>
-        <CardContent className="pt-0 px-1 pb-1">
+        <CardContent className="pt-0 px-3 pb-3">
           <FormattedInput
             value={T}
             onChange={onTChange}
             placeholder="0,00"
-            className={`h-5 text-[8px] text-gray-800 ${errors.T ? 'border-red-500' : ''}`}
+            className={`h-10 text-sm text-gray-800 border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-500 ${errors.T ? 'border-red-500' : ''}`}
           />
-          {errors.T && <span className="text-red-500 text-[6px]">{errors.T}</span>}
+          {errors.T && <span className="text-red-500 text-xs mt-1">{errors.T}</span>}
         </CardContent>
       </Card>
 
@@ -66,7 +66,7 @@ export const PrimaryMacronutrientsSection: React.FC<PrimaryMacronutrientsSection
               nutrient="Ca"
               selectedUnit={selectedUnits.Ca}
               onUnitChange={(unit) => onUnitChange('Ca', unit)}
-              className="w-12"
+              className="w-16"
             />
           </div>
         </CardHeader>
