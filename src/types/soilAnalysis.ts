@@ -2,6 +2,7 @@
 export interface SoilData {
   id?: string;
   location: string;
+  crop: string; // Cultura cultivada
   date: string;
   organicMatter: number;
   T: number; // CTC total (cmolc/dm³)

@@ -9,6 +9,8 @@ import { BasicInfoSection } from '@/components/BasicInfoSection';
 import { PrimaryMacronutrientsSection } from '@/components/PrimaryMacronutrientsSection';
 import { SecondaryMacronutrientsSection } from '@/components/SecondaryMacronutrientsSection';
 import { MicronutrientsSection } from '@/components/MicronutrientsSection';
+import { getDefaultUnits, convertSoilDataToStandard } from '@/utils/unitConversions';
+import { SelectedUnits } from '@/types/units';
 
 interface SoilAnalysisFormProps {
   onAnalysisComplete: (data: SoilData, results: CalculationResult) => void;
@@ -31,12 +33,16 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
     Mn: 0,
     Zn: 0,
     Mo: 0,
+    argila: 35, // Adicionando o campo argila que estava faltando
   });
   
   // Armazenar valores temporários durante a digitação
   const [tempInputValues, setTempInputValues] = useState<Record<string, string>>({});
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Adicionar estado para unidades selecionadas
+  const [selectedUnits, setSelectedUnits] = useState<SelectedUnits>(getDefaultUnits());
 
   const handleInputChange = (field: keyof typeof formData, value: string | number) => {
     const numericFields = ['organicMatter', 'T', 'Ca', 'Mg', 'K', 'P', 'S', 'B', 'Cu', 'Fe', 'Mn', 'Zn', 'Mo'];
@@ -118,15 +124,25 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleUnitChange = (nutrient: string, unit: string) => {
+    setSelectedUnits(prev => ({
+      ...prev,
+      [nutrient]: unit
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) return;
 
     try {
-      const results = calculateSoilAnalysis(formData);
+      // Converter dados para unidades padrão antes dos cálculos
+      const standardFormData = convertSoilDataToStandard(formData, selectedUnits);
+      
+      const results = calculateSoilAnalysis(standardFormData);
       const analysisData: SoilData = {
-        ...formData,
+        ...standardFormData, // Salvar em unidades padrão
         id: Date.now().toString(),
         date: new Date().toISOString().split('T')[0],
       };
@@ -190,6 +206,8 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
           onKChange={(value) => handleInputChange('K', value)}
           onPChange={(value) => handleInputChange('P', value)}
           errors={errors}
+          selectedUnits={selectedUnits}
+          onUnitChange={handleUnitChange}
         />
       </div>
 
@@ -202,6 +220,8 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
           onSChange={(value) => handleInputChange('S', value)}
           onOrganicMatterChange={(value) => handleInputChange('organicMatter', value)}
           errors={errors}
+          selectedUnits={selectedUnits}
+          onUnitChange={handleUnitChange}
         />
       </div>
 
@@ -222,6 +242,8 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
           onZnChange={(value) => handleInputChange('Zn', value)}
           onMoChange={(value) => handleInputChange('Mo', value)}
           errors={errors}
+          selectedUnits={selectedUnits}
+          onUnitChange={handleUnitChange}
         />
       </div>
 

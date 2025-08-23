@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { SoilData } from '@/pages/Index';
+import { SoilData } from '@/types/soilAnalysis';
 import { getAnalysisHistory, deleteAnalysisFromHistory, clearAnalysisHistory } from '@/utils/analysisStorage';
 import { calculateSoilAnalysis } from '@/utils/soilCalculations';
 import { Trash2, Eye, MapPin, Calendar, AlertTriangle } from 'lucide-react';

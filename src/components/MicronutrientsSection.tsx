@@ -1,6 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FormattedInput } from '@/components/FormattedInput';
+import { UnitSelector } from '@/components/UnitSelector';
+import { getUnitLabel } from '@/utils/unitConversions';
 
 interface MicronutrientsSectionProps {
   B: number | string;
@@ -16,19 +18,33 @@ interface MicronutrientsSectionProps {
   onZnChange: (value: number | string) => void;
   onMoChange: (value: number | string) => void;
   errors: Record<string, string>;
+  selectedUnits: Record<string, string>;
+  onUnitChange: (nutrient: string, unit: string) => void;
 }
 
 export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
   B, Cu, Fe, Mn, Zn, Mo,
   onBChange, onCuChange, onFeChange, onMnChange, onZnChange, onMoChange,
-  errors
+  errors,
+  selectedUnits,
+  onUnitChange
 }) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-1">
       <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-0 pt-1 px-1">
           <CardTitle className="text-gray-800 text-[8px]">Boro (B)</CardTitle>
-          <CardDescription className="text-gray-600 text-[6px]">mg/dm³</CardDescription>
+          <div className="flex items-center justify-between">
+            <CardDescription className="text-gray-600 text-[6px]">
+              {getUnitLabel('B', selectedUnits.B)}
+            </CardDescription>
+            <UnitSelector
+              nutrient="B"
+              selectedUnit={selectedUnits.B}
+              onUnitChange={(unit) => onUnitChange('B', unit)}
+              className="w-12"
+            />
+          </div>
         </CardHeader>
         <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
@@ -44,7 +60,17 @@ export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
       <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-0 pt-1 px-1">
           <CardTitle className="text-gray-800 text-[8px]">Cobre (Cu)</CardTitle>
-          <CardDescription className="text-gray-600 text-[6px]">mg/dm³</CardDescription>
+          <div className="flex items-center justify-between">
+            <CardDescription className="text-gray-600 text-[6px]">
+              {getUnitLabel('Cu', selectedUnits.Cu)}
+            </CardDescription>
+            <UnitSelector
+              nutrient="Cu"
+              selectedUnit={selectedUnits.Cu}
+              onUnitChange={(unit) => onUnitChange('Cu', unit)}
+              className="w-12"
+            />
+          </div>
         </CardHeader>
         <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
@@ -60,7 +86,17 @@ export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
       <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-0 pt-1 px-1">
           <CardTitle className="text-gray-800 text-[8px]">Ferro (Fe)</CardTitle>
-          <CardDescription className="text-gray-600 text-[6px]">mg/dm³</CardDescription>
+          <div className="flex items-center justify-between">
+            <CardDescription className="text-gray-600 text-[6px]">
+              {getUnitLabel('Fe', selectedUnits.Fe)}
+            </CardDescription>
+            <UnitSelector
+              nutrient="Fe"
+              selectedUnit={selectedUnits.Fe}
+              onUnitChange={(unit) => onUnitChange('Fe', unit)}
+              className="w-12"
+            />
+          </div>
         </CardHeader>
         <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
@@ -76,7 +112,17 @@ export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
       <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-0 pt-1 px-1">
           <CardTitle className="text-gray-800 text-[8px]">Manganês (Mn)</CardTitle>
-          <CardDescription className="text-gray-600 text-[6px]">mg/dm³</CardDescription>
+          <div className="flex items-center justify-between">
+            <CardDescription className="text-gray-600 text-[6px]">
+              {getUnitLabel('Mn', selectedUnits.Mn)}
+            </CardDescription>
+            <UnitSelector
+              nutrient="Mn"
+              selectedUnit={selectedUnits.Mn}
+              onUnitChange={(unit) => onUnitChange('Mn', unit)}
+              className="w-12"
+            />
+          </div>
         </CardHeader>
         <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
@@ -92,7 +138,17 @@ export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
       <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-0 pt-1 px-1">
           <CardTitle className="text-gray-800 text-[8px]">Zinco (Zn)</CardTitle>
-          <CardDescription className="text-gray-600 text-[6px]">mg/dm³</CardDescription>
+          <div className="flex items-center justify-between">
+            <CardDescription className="text-gray-600 text-[6px]">
+              {getUnitLabel('Zn', selectedUnits.Zn)}
+            </CardDescription>
+            <UnitSelector
+              nutrient="Zn"
+              selectedUnit={selectedUnits.Zn}
+              onUnitChange={(unit) => onUnitChange('Zn', unit)}
+              className="w-12"
+            />
+          </div>
         </CardHeader>
         <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
@@ -108,7 +164,17 @@ export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
       <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-0 pt-1 px-1">
           <CardTitle className="text-gray-800 text-[8px]">Molibdênio (Mo)</CardTitle>
-          <CardDescription className="text-gray-600 text-[6px]">mg/dm³</CardDescription>
+          <div className="flex items-center justify-between">
+            <CardDescription className="text-gray-600 text-[6px]">
+              {getUnitLabel('Mo', selectedUnits.Mo)}
+            </CardDescription>
+            <UnitSelector
+              nutrient="Mo"
+              selectedUnit={selectedUnits.Mo}
+              onUnitChange={(unit) => onUnitChange('Mo', unit)}
+              className="w-12"
+            />
+          </div>
         </CardHeader>
         <CardContent className="pt-0 px-1 pb-1">
           <FormattedInput
