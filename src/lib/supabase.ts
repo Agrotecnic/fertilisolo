@@ -205,6 +205,124 @@ export type Database = {
           created_at?: string;
         };
       };
+      // Novas tabelas para multi-tenant
+      organizations: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          logo_url: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          slug: string;
+          logo_url?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          slug?: string;
+          logo_url?: string | null;
+          is_active?: boolean;
+          updated_at?: string;
+        };
+      };
+      organization_themes: {
+        Row: {
+          id: string;
+          organization_id: string;
+          primary_color: string;
+          primary_foreground: string;
+          secondary_color: string;
+          secondary_foreground: string;
+          accent_color: string;
+          accent_foreground: string;
+          background_color: string;
+          foreground_color: string;
+          card_color: string;
+          card_foreground: string;
+          border_color: string;
+          input_color: string;
+          muted_color: string;
+          muted_foreground: string;
+          border_radius: string;
+          font_family: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          primary_color?: string;
+          primary_foreground?: string;
+          secondary_color?: string;
+          secondary_foreground?: string;
+          accent_color?: string;
+          accent_foreground?: string;
+          background_color?: string;
+          foreground_color?: string;
+          card_color?: string;
+          card_foreground?: string;
+          border_color?: string;
+          input_color?: string;
+          muted_color?: string;
+          muted_foreground?: string;
+          border_radius?: string;
+          font_family?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organization_id?: string;
+          primary_color?: string;
+          primary_foreground?: string;
+          secondary_color?: string;
+          secondary_foreground?: string;
+          accent_color?: string;
+          accent_foreground?: string;
+          background_color?: string;
+          foreground_color?: string;
+          card_color?: string;
+          card_foreground?: string;
+          border_color?: string;
+          input_color?: string;
+          muted_color?: string;
+          muted_foreground?: string;
+          border_radius?: string;
+          font_family?: string;
+          updated_at?: string;
+        };
+      };
+      user_organizations: {
+        Row: {
+          id: string;
+          user_id: string;
+          organization_id: string;
+          role: 'owner' | 'admin' | 'member';
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          organization_id: string;
+          role?: 'owner' | 'admin' | 'member';
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          organization_id?: string;
+          role?: 'owner' | 'admin' | 'member';
+        };
+      };
     };
   };
 }; 

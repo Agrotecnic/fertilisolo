@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import ResetPassword from "./pages/ResetPassword";
+import AdminPanel from "./pages/AdminPanel";
 import { useAuth } from "./hooks/useAuth";
 import { AuthBox } from "./components/AuthBox";
 import { Loader2 } from "lucide-react";
@@ -20,6 +21,7 @@ import SupabaseConnectionTest from "./components/SupabaseConnectionTest";
 import EnvConfigHelper from "./components/EnvConfigHelper";
 import ReportGenerator from "./components/ReportGenerator";
 import { NetworkStatusChecker } from "./components/NetworkStatusChecker";
+import { ThemeProvider } from "./providers/ThemeProvider";
 
 
 
@@ -85,7 +87,7 @@ const AppContent = () => {
   };
 
   return (
-    <>
+    <ThemeProvider showLoader={false}>
       <Routes>
         {/* Rota principal: landing page para usuários não logados */}
         <Route 
@@ -102,6 +104,15 @@ const AppContent = () => {
           element={
             <ProtectedRoute>
               <Index />
+            </ProtectedRoute>
+          } 
+        />
+        {/* Rota de painel de administração: para admins/owners */}
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute>
+              <AdminPanel />
             </ProtectedRoute>
           } 
         />
@@ -132,7 +143,7 @@ const AppContent = () => {
 
       {/* Componente para verificar status da conexão */}
       <NetworkStatusChecker />
-    </>
+    </ThemeProvider>
   );
 };
 

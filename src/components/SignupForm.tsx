@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,10 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, UserPlus } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserType } from '@/lib/supabase';
+import { DynamicLogo } from '@/components/DynamicLogo';
+import { validateInvite, acceptInvite } from '@/lib/organizationServices';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const formSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -26,6 +29,9 @@ interface SignupFormProps {
 
 export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [inviteToken, setInviteToken] = useState<string | null>(null);
+  const [inviteInfo, setInviteInfo] = useState<any>(null);
+  const [loadingInvite, setLoadingInvite] = useState(false);
   const { toast } = useToast();
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -35,6 +41,35 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
   });
 
   const selectedUserType = watch('userType');
+
+  // Detectar token de convite na URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('invite');
+    
+    if (token) {
+      setInviteToken(token);
+      setLoadingInvite(true);
+      
+      // Validar convite
+      validateInvite(token).then(({ data, error }) => {
+        setLoadingInvite(false);
+        if (data) {
+          setInviteInfo(data);
+          toast({
+            title: `Convite para ${data.organization.name}! 🎉`,
+            description: `Você foi convidado como ${data.role === 'admin' ? 'Administrador' : 'Membro'}. Complete seu cadastro abaixo.`,
+          });
+        } else if (error) {
+          toast({
+            variant: 'destructive',
+            title: 'Convite inválido',
+            description: error.message || 'Este convite expirou ou já foi utilizado.',
+          });
+        }
+      });
+    }
+  }, []);
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
@@ -67,11 +102,31 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
           console.error('Erro ao fazer login automático:', loginError);
         }
       }
-      
-      toast({
-        title: 'Conta criada com sucesso!',
-        description: 'Você já está logado no sistema.',
-      });
+
+      // Se houver convite, aceitar automaticamente
+      if (inviteToken && authData?.user) {
+        console.log('Aceitando convite automático...');
+        const { error: inviteError } = await acceptInvite(inviteToken, authData.user.id);
+        
+        if (inviteError) {
+          console.error('Erro ao aceitar convite:', inviteError);
+          toast({
+            variant: 'destructive',
+            title: 'Aviso',
+            description: 'Conta criada, mas houve um problema ao aceitar o convite. Entre em contato com o administrador.',
+          });
+        } else {
+          toast({
+            title: 'Bem-vindo(a) à organização! 🎉',
+            description: `Conta criada e você foi adicionado à ${inviteInfo?.organization?.name || 'organização'}!`,
+          });
+        }
+      } else {
+        toast({
+          title: 'Conta criada com sucesso!',
+          description: 'Você já está logado no sistema.',
+        });
+      }
       
       onSignupSuccess();
     } catch (error: any) {
@@ -94,15 +149,35 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     <Card className="w-full max-w-md mx-auto bg-white/90 shadow-lg">
       <CardHeader className="space-y-1">
         <div className="flex items-center justify-center gap-3 mb-2">
-          <img src="/logo-fertilisolo.png" alt="Logo FertiliSolo" className="h-12" />
-          <CardTitle className="text-2xl font-bold text-center text-green-800">FertiliSolo</CardTitle>
+          <DynamicLogo size="md" className="h-12" />
+          <CardTitle className="text-2xl font-bold text-center text-primary">FertiliSolo</CardTitle>
         </div>
-        <CardTitle className="text-xl font-bold text-center text-green-700">Criar Conta</CardTitle>
+        <CardTitle className="text-xl font-bold text-center text-primary">Criar Conta</CardTitle>
         <CardDescription className="text-center">
           Crie uma nova conta para acessar o sistema
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {/* Alert de Convite */}
+        {loadingInvite && (
+          <Alert className="mb-4 bg-blue-50 border-blue-200">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <AlertDescription>
+              Validando convite...
+            </AlertDescription>
+          </Alert>
+        )}
+        {inviteInfo && (
+          <Alert className="mb-4 bg-green-50 border-green-200">
+            <UserPlus className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-900">
+              <strong>Convite para {inviteInfo.organization.name}</strong>
+              <br />
+              Você será adicionado como {inviteInfo.role === 'admin' ? 'Administrador' : 'Membro'}
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -161,7 +236,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
           </div>
           <Button 
             type="submit" 
-            className="w-full bg-green-600 hover:bg-green-700" 
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" 
             disabled={isLoading}
           >
             {isLoading ? (

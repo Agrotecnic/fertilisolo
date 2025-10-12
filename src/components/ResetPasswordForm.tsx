@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { updateUserPassword, getCurrentSession } from '@/lib/custom-email-handler';
+import { DynamicLogo } from '@/components/DynamicLogo';
 
 const formSchema = z.object({
   password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
@@ -74,7 +75,7 @@ export const ResetPasswordForm: React.FC = () => {
     return (
       <Card className="w-full max-w-md mx-auto bg-white/90 shadow-lg">
         <CardContent className="pt-6 flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </CardContent>
       </Card>
     );
@@ -85,10 +86,10 @@ export const ResetPasswordForm: React.FC = () => {
       <Card className="w-full max-w-md mx-auto bg-white/90 shadow-lg">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center gap-3 mb-2">
-            <img src="/logo-fertilisolo.png" alt="Logo FertiliSolo" className="h-12" />
-            <CardTitle className="text-2xl font-bold text-center text-green-800">FertiliSolo</CardTitle>
+            <DynamicLogo size="md" className="h-12" />
+            <CardTitle className="text-2xl font-bold text-center text-primary">FertiliSolo</CardTitle>
           </div>
-          <CardTitle className="text-xl font-bold text-center text-green-700">
+          <CardTitle className="text-xl font-bold text-center text-primary">
             Link Inválido
           </CardTitle>
           <CardDescription className="text-center">
@@ -112,10 +113,10 @@ export const ResetPasswordForm: React.FC = () => {
     <Card className="w-full max-w-md mx-auto bg-white/90 shadow-lg">
       <CardHeader className="space-y-1">
         <div className="flex items-center justify-center gap-3 mb-2">
-          <img src="/logo-fertilisolo.png" alt="Logo FertiliSolo" className="h-12" />
-          <CardTitle className="text-2xl font-bold text-center text-green-800">FertiliSolo</CardTitle>
+          <DynamicLogo size="md" className="h-12" />
+          <CardTitle className="text-2xl font-bold text-center text-primary">FertiliSolo</CardTitle>
         </div>
-        <CardTitle className="text-xl font-bold text-center text-green-700">
+        <CardTitle className="text-xl font-bold text-center text-primary">
           {isSuccess ? 'Senha Redefinida' : 'Redefinir Senha'}
         </CardTitle>
         <CardDescription className="text-center">
@@ -161,7 +162,7 @@ export const ResetPasswordForm: React.FC = () => {
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-green-600 hover:bg-green-700" 
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" 
               disabled={isLoading}
             >
               {isLoading ? (

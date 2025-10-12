@@ -532,7 +532,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
         <Button 
           type="submit" 
           size="lg"
-          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-base font-medium"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-base font-medium"
         >
           Calcular Saturações e Recomendações
         </Button>

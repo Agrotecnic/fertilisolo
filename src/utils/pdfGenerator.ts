@@ -19,6 +19,121 @@ declare module 'jspdf' {
 }
 
 /**
+ * Interface para opções de tema do PDF
+ */
+interface PDFThemeOptions {
+  primaryColor?: string;
+  secondaryColor?: string;
+  accentColor?: string;
+  logo?: string; // Base64 string
+  organizationName?: string;
+}
+
+/**
+ * Converte cor hexadecimal para RGB
+ */
+function hexToRgb(hex: string): [number, number, number] {
+  hex = hex.replace(/^#/, '');
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return [r, g, b];
+}
+
+/**
+ * Adiciona logo no canto superior direito com proporção correta
+ * @param insideHeader - Se true, posiciona dentro da faixa colorida (páginas 2 e 3)
+ */
+function addLogoToPage(pdf: jsPDF, logo: string, pageWidth: number, marginY: number, insideHeader: boolean = false) {
+  return new Promise<void>((resolve) => {
+    try {
+      console.log('🖼️ Adicionando logo ao PDF (canto superior direito)...');
+      
+      // Detectar tipo de imagem
+      let imageType: 'PNG' | 'JPEG' | 'JPG' = 'PNG';
+      if (logo.includes('data:image/jpeg') || logo.includes('data:image/jpg')) {
+        imageType = 'JPEG';
+      }
+      
+      // Criar uma imagem para obter dimensões reais
+      const img = new Image();
+      img.onload = () => {
+        try {
+          // Dimensões máximas dependendo do contexto
+          const maxLogoHeight = insideHeader ? 12 : 15; // Menor se dentro do header
+          
+          // Calcular proporção mantendo aspect ratio original
+          const aspectRatio = img.naturalWidth / img.naturalHeight;
+          
+          let logoWidth: number;
+          let logoHeight: number;
+          
+          // Sempre manter a altura máxima e calcular largura proporcionalmente
+          logoHeight = maxLogoHeight;
+          logoWidth = maxLogoHeight * aspectRatio;
+          
+          // Limitar largura máxima
+          const maxLogoWidth = insideHeader ? 30 : 25;
+          if (logoWidth > maxLogoWidth) {
+            logoWidth = maxLogoWidth;
+            logoHeight = maxLogoWidth / aspectRatio;
+          }
+          
+          console.log(`📐 Dimensões do logo: ${img.naturalWidth}x${img.naturalHeight}px (ratio: ${aspectRatio.toFixed(2)})`);
+          console.log(`📏 Logo no PDF: ${logoWidth.toFixed(1)}x${logoHeight.toFixed(1)}mm`);
+          
+          // Posição no canto superior direito
+          const logoX = pageWidth - logoWidth - 10; // 10mm de margem da direita
+          
+          // Posição Y depende se está dentro do header ou não
+          let logoY: number;
+          if (insideHeader) {
+            // Centralizar verticalmente dentro da faixa de 20mm
+            logoY = (20 - logoHeight) / 2;
+          } else {
+            logoY = marginY;
+          }
+          
+          // Se estiver dentro do header (páginas 2 e 3), adicionar fundo branco para destaque
+          if (insideHeader) {
+            const padding = 2; // 2mm de padding ao redor do logo
+            const bgX = logoX - padding;
+            const bgY = logoY - padding;
+            const bgWidth = logoWidth + (padding * 2);
+            const bgHeight = logoHeight + (padding * 2);
+            
+            // Desenhar retângulo branco com bordas arredondadas
+            pdf.setFillColor(255, 255, 255); // Branco
+            pdf.roundedRect(bgX, bgY, bgWidth, bgHeight, 1, 1, 'F'); // Bordas de 1mm de raio
+            
+            console.log(`🎨 Fundo branco adicionado: ${bgWidth.toFixed(1)}x${bgHeight.toFixed(1)}mm`);
+          }
+          
+          // Adicionar logo
+          pdf.addImage(logo, imageType, logoX, logoY, logoWidth, logoHeight);
+          console.log(`✅ Logo adicionado: X=${logoX.toFixed(1)}mm, Y=${logoY.toFixed(1)}mm, W=${logoWidth.toFixed(1)}mm, H=${logoHeight.toFixed(1)}mm`);
+          resolve();
+        } catch (error) {
+          console.error('❌ Erro ao processar logo:', error);
+          resolve();
+        }
+      };
+      
+      img.onerror = () => {
+        console.error('❌ Erro ao carregar imagem do logo');
+        resolve();
+      };
+      
+      img.src = logo;
+    } catch (error) {
+      console.error('❌ Erro ao adicionar logo:', error);
+      resolve();
+    }
+  });
+}
+
+/**
  * Função para determinar o nível de um nutriente
  */
 function getNutrientLevel(value: number | undefined, lowThreshold: number, highThreshold: number): string {
@@ -365,10 +480,22 @@ const renderReportTemplate = (soilData: SoilData, results: CalculationResult, cu
   return container;
 };
 
-export const generatePDFReport = async (soilData: SoilData, results: CalculationResult, cultureName?: string) => {
+export const generatePDFReport = async (
+  soilData: SoilData, 
+  results: CalculationResult, 
+  cultureName?: string,
+  themeOptions?: PDFThemeOptions
+) => {
   try {
+    console.log('📄 generatePDFReport - Opções de tema recebidas:', {
+      hasPrimaryColor: !!themeOptions?.primaryColor,
+      primaryColor: themeOptions?.primaryColor,
+      hasLogo: !!themeOptions?.logo,
+      organizationName: themeOptions?.organizationName
+    });
+    
     // Usar a função generatePDF que já tem todas as páginas incluindo a primeira
-    const { pdf, filename } = generatePDF(soilData, undefined, undefined, cultureName);
+    const { pdf, filename } = await generatePDF(soilData, undefined, undefined, cultureName, themeOptions);
     pdf.save(filename);
     
     return true;
@@ -403,14 +530,34 @@ function getCTCLevel(value: number | undefined): string {
   return "Alta";
 }
 
-export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: string, cultureName?: string) => {
+export const generatePDF = async (
+  soilData: SoilData, 
+  farmName?: string, 
+  plotName?: string, 
+  cultureName?: string,
+  themeOptions?: PDFThemeOptions
+) => {
   try {
+    console.log('📄 generatePDF - Opções de tema recebidas:', {
+      hasPrimaryColor: !!themeOptions?.primaryColor,
+      primaryColor: themeOptions?.primaryColor,
+      hasLogo: !!themeOptions?.logo,
+      organizationName: themeOptions?.organizationName
+    });
+    
     const pdf = new jsPDF();
+    
+    // Cor primária do tema ou padrão verde
+    const primaryColor: [number, number, number] = themeOptions?.primaryColor
+      ? hexToRgb(themeOptions.primaryColor)
+      : [76, 175, 80]; // Verde padrão
+    
+    console.log('🎨 Cor primária do PDF:', primaryColor);
     
     // Configurações do PDF
     pdf.setProperties({
-      title: 'Relatório de Análise de Solo - Fertilisolo',
-      author: 'Fertilisolo',
+      title: `Relatório de Análise de Solo - ${themeOptions?.organizationName || 'Fertilisolo'}`,
+      author: themeOptions?.organizationName || 'Fertilisolo',
       subject: 'Análise e Recomendação de Fertilizantes',
       keywords: 'solo, fertilizantes, análise, agricultura'
     });
@@ -423,13 +570,18 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     const pageWidth = 210; // A4 width in mm
     const contentWidth = pageWidth - (marginX * 2);
     
-    // Sem logotipo conforme solicitado
+    // Logo personalizado no canto superior direito (PÁGINA 1)
+    if (themeOptions?.logo) {
+      await addLogoToPage(pdf, themeOptions.logo, pageWidth, marginY, false);
+    } else {
+      console.log('⚠️ Nenhum logo fornecido para o PDF');
+    }
 
-    // Header Superior conforme modelo Fertilisolo
-    pdf.setTextColor(51, 51, 51); // #333333
+    // Header Superior com cor personalizada
+    pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     pdf.setFontSize(18); // 18pt negrito
     pdf.setFont('helvetica', 'bold');
-    pdf.text('Fertilisolo', marginX, marginY + 10);
+    pdf.text(themeOptions?.organizationName || 'Fertilisolo', marginX, marginY + 10);
     
     // Subtítulo (cinza)
     pdf.setTextColor(102, 102, 102); // #666666
@@ -456,8 +608,13 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     const col3Width = 52;
     const gap = 3;
     
-    // Coluna 1 - Detalhes (Verde claro #E8F5E8)
-    pdf.setFillColor(232, 245, 232);
+    // Coluna 1 - Detalhes (Cor primária clara)
+    const lightPrimaryColor: [number, number, number] = [
+      Math.min(255, primaryColor[0] + 180),
+      Math.min(255, primaryColor[1] + 180),
+      Math.min(255, primaryColor[2] + 180)
+    ];
+    pdf.setFillColor(lightPrimaryColor[0], lightPrimaryColor[1], lightPrimaryColor[2]);
     pdf.rect(marginX, colY, col1Width, colHeight, 'F');
     pdf.setDrawColor(200, 200, 200);
     pdf.setLineWidth(0.5);
@@ -483,9 +640,9 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     // Argila - na mesma linha
     pdf.text(`Argila: ${(soilData.argila || 0).toFixed(0)}%`, marginX + 2, colY + 38);
     
-    // Coluna 2 - Macronutrientes (Verde claro #E8F5E8)
+    // Coluna 2 - Macronutrientes (Cor primária clara)
     const col2X = marginX + col1Width + gap;
-    pdf.setFillColor(232, 245, 232);
+    pdf.setFillColor(lightPrimaryColor[0], lightPrimaryColor[1], lightPrimaryColor[2]);
     pdf.rect(col2X, colY, col2Width, colHeight, 'F');
     pdf.rect(col2X, colY, col2Width, colHeight, 'S');
     
@@ -689,14 +846,17 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     
     pdf.addPage();
     
-    // Sem logotipo conforme solicitado
-    
-    // Header da Página 2
-    pdf.setFillColor(76, 175, 80);
+    // Header da Página 2 com cor primária (ANTES do logo para ficar atrás)
+    pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 20, 'F');
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(16);
     pdf.text('Detalhes da Recomendação de Fertilizantes', 15, 13);
+    
+    // Logo personalizado DENTRO da faixa do topo (PÁGINA 2) - adicionado DEPOIS para ficar na frente
+    if (themeOptions?.logo) {
+      await addLogoToPage(pdf, themeOptions.logo, pageWidth, marginY, true);
+    }
 
     // Tabela Completa de Fertilizantes
     const allFertilizerColumns = ['Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio'];
@@ -759,14 +919,17 @@ export const generatePDF = (soilData: SoilData, farmName?: string, plotName?: st
     
     pdf.addPage();
     
-    // Sem logotipo conforme solicitado
-    
-    // Header da Página 3
-    pdf.setFillColor(76, 175, 80);
+    // Header da Página 3 com cor primária (ANTES do logo para ficar atrás)
+    pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 20, 'F');
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(16);
     pdf.text('Análise Detalhada de Nutrientes', 15, 13);
+    
+    // Logo personalizado DENTRO da faixa do topo (PÁGINA 3) - adicionado DEPOIS para ficar na frente
+    if (themeOptions?.logo) {
+      await addLogoToPage(pdf, themeOptions.logo, pageWidth, marginY, true);
+    }
 
     // Tabela de Análise Completa
     const detailedColumns = ['Nutriente', 'Valor Encontrado', 'Unidade', 'Nível', 'Recomendação'];

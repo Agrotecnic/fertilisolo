@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { AlertCircle, Loader2, ArrowLeft } from 'lucide-react';
 import { sendPasswordResetEmail } from '@/lib/custom-email-handler';
+import { DynamicLogo } from '@/components/DynamicLogo';
 
 const formSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -55,10 +56,10 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
     <Card className="w-full max-w-md mx-auto bg-white/90 shadow-lg">
       <CardHeader className="space-y-1">
         <div className="flex items-center justify-center gap-3 mb-2">
-          <img src="/logo-fertilisolo.png" alt="Logo FertiliSolo" className="h-12" />
-          <CardTitle className="text-2xl font-bold text-center text-green-800">FertiliSolo</CardTitle>
+          <DynamicLogo size="md" className="h-12" />
+          <CardTitle className="text-2xl font-bold text-center text-primary">FertiliSolo</CardTitle>
         </div>
-        <CardTitle className="text-xl font-bold text-center text-green-700">
+        <CardTitle className="text-xl font-bold text-center text-primary">
           {emailSent ? 'Email Enviado' : 'Recuperar Senha'}
         </CardTitle>
         <CardDescription className="text-center">
@@ -88,7 +89,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-green-600 hover:bg-green-700" 
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" 
               disabled={isLoading}
             >
               {isLoading ? (

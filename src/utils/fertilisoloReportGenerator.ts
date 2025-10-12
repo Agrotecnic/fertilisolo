@@ -10,6 +10,33 @@ import {
 } from './soilCalculations';
 import { fertilizerSources } from './fertilizerSources';
 
+/**
+ * Converte cor hexadecimal para RGB
+ */
+function hexToRgb(hex: string): [number, number, number] {
+  // Remove o # se existir
+  hex = hex.replace(/^#/, '');
+  
+  // Converte para RGB
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  
+  return [r, g, b];
+}
+
+/**
+ * Interface para opções de tema do PDF
+ */
+interface PDFThemeOptions {
+  primaryColor?: string;
+  secondaryColor?: string;
+  accentColor?: string;
+  logo?: string;
+  organizationName?: string;
+}
+
 // Estendendo o jsPDF com autotable
 declare module 'jspdf' {
   interface jsPDF {
@@ -60,29 +87,37 @@ function getMicroRecommendation(nutrient: string, level: string): string {
 /**
  * Gera o relatório profissional em PDF seguindo o estilo Fertilisolo
  */
-export const generateFertilisoloReport = (soilData: SoilData, results: CalculationResult, cultureName?: string, farmName?: string, plotName?: string) => {
+export const generateFertilisoloReport = (
+  soilData: SoilData, 
+  results: CalculationResult, 
+  cultureName?: string, 
+  farmName?: string, 
+  plotName?: string,
+  themeOptions?: PDFThemeOptions
+) => {
   try {
     // Criar um novo documento PDF
     const pdf = new jsPDF();
 
     // Configurações do PDF
+    const orgName = themeOptions?.organizationName || 'Fertilisolo';
     pdf.setProperties({
-      title: 'Relatório de Análise de Solo - Fertilisolo',
-      author: 'Fertilisolo',
+      title: `Relatório de Análise de Solo - ${orgName}`,
+      author: orgName,
       subject: 'Análise e Recomendação de Fertilizantes',
       keywords: 'solo, fertilizantes, análise, agricultura'
     });
 
-    // Gerar as 3 páginas do relatório
-    generatePage1(pdf, soilData, results, cultureName, farmName, plotName);
-    generatePage2(pdf, soilData, results, cultureName);
-    generatePage3(pdf, soilData, results);
+    // Gerar as 3 páginas do relatório com as cores personalizadas
+    generatePage1(pdf, soilData, results, cultureName, farmName, plotName, themeOptions);
+    generatePage2(pdf, soilData, results, cultureName, themeOptions);
+    generatePage3(pdf, soilData, results, themeOptions);
 
     // Adicionar rodapés a todas as páginas
-    addFooters(pdf);
+    addFooters(pdf, themeOptions);
 
     // Nome do arquivo para download
-    const filename = `Fertilisolo_${soilData.location || "Local"}_${new Date().toISOString().split('T')[0]}.pdf`;
+    const filename = `${orgName}_${soilData.location || "Local"}_${new Date().toISOString().split('T')[0]}.pdf`;
     
     // Retornar o PDF para download
     return { pdf, filename };
@@ -95,23 +130,65 @@ export const generateFertilisoloReport = (soilData: SoilData, results: Calculati
 /**
  * Gera a primeira página do relatório
  */
-function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResult, cultureName?: string, farmName?: string, plotName?: string) {
-  // Cores principais
-  const greenColor: [number, number, number] = [76, 175, 80]; // #4CAF50
-  const blueColor: [number, number, number] = [33, 150, 243]; // #2196F3
+function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResult, cultureName?: string, farmName?: string, plotName?: string, themeOptions?: PDFThemeOptions) {
+  console.log('📄 Página 1 - Opções recebidas:', {
+    hasPrimaryColor: !!themeOptions?.primaryColor,
+    primaryColor: themeOptions?.primaryColor,
+    hasLogo: !!themeOptions?.logo,
+    organizationName: themeOptions?.organizationName
+  });
+  
+  // Cores personalizáveis (usa tema ou cores padrão)
+  const greenColor: [number, number, number] = themeOptions?.primaryColor 
+    ? hexToRgb(themeOptions.primaryColor) 
+    : [76, 175, 80]; // #4CAF50
+  const blueColor: [number, number, number] = themeOptions?.secondaryColor 
+    ? hexToRgb(themeOptions.secondaryColor) 
+    : [33, 150, 243]; // #2196F3
   const grayLight: [number, number, number] = [245, 245, 245]; // #F5F5F5
   const grayBorder: [number, number, number] = [224, 224, 224]; // #E0E0E0
+  
+  console.log('🎨 Cores RGB calculadas:', {
+    primary: greenColor,
+    secondary: blueColor
+  });
   
   // Header Superior
   pdf.setFillColor(greenColor[0], greenColor[1], greenColor[2]);
   pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 20, 'F');
   pdf.setTextColor(255, 255, 255);
+  
+  // Adicionar logo se disponível
+  let textStartX = 15;
+  if (themeOptions?.logo) {
+    try {
+      console.log('🖼️ Adicionando logo ao PDF...');
+      
+      // Detectar o tipo de imagem a partir do base64
+      let imageType: 'PNG' | 'JPEG' | 'JPG' = 'PNG';
+      if (themeOptions.logo.includes('data:image/jpeg') || themeOptions.logo.includes('data:image/jpg')) {
+        imageType = 'JPEG';
+      }
+      
+      // Adicionar logo no canto esquerdo do header
+      pdf.addImage(themeOptions.logo, imageType, 15, 5, 10, 10);
+      textStartX = 30; // Ajustar posição do texto para não sobrepor o logo
+      console.log('✅ Logo adicionado ao PDF com sucesso');
+    } catch (error) {
+      console.error('❌ Erro ao adicionar logo ao PDF:', error);
+    }
+  } else {
+    console.log('⚠️ Nenhum logo fornecido para o PDF');
+  }
+  
   pdf.setFontSize(16);
-  pdf.text('Fertilisolo', 15, 13);
+  const orgName = themeOptions?.organizationName || 'Fertilisolo';
+  pdf.text(orgName, textStartX, 13);
+  console.log(`📝 Nome da organização: ${orgName}`);
   
   const dataAtual = new Date().toLocaleDateString('pt-BR');
   pdf.setFontSize(10);
-  pdf.text(`Relatório gerado em: ${dataAtual}`, 15, 18);
+  pdf.text(`Relatório gerado em: ${dataAtual}`, textStartX, 18);
   
   // Nome da fazenda/local no canto superior direito
   pdf.setTextColor(255, 255, 255);
@@ -390,12 +467,14 @@ function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResul
 /**
  * Gera a segunda página do relatório
  */
-function generatePage2(pdf: jsPDF, soilData: SoilData, results: CalculationResult, cultureName?: string) {
+function generatePage2(pdf: jsPDF, soilData: SoilData, results: CalculationResult, cultureName?: string, themeOptions?: PDFThemeOptions) {
   // Adicionar nova página
   pdf.addPage();
   
-  // Cores principais
-  const greenColor: [number, number, number] = [76, 175, 80]; // #4CAF50 - corrigido para o tipo [number, number, number]
+  // Cores personalizáveis (usa tema ou cores padrão)
+  const greenColor: [number, number, number] = themeOptions?.primaryColor 
+    ? hexToRgb(themeOptions.primaryColor) 
+    : [76, 175, 80]; // #4CAF50
   
   // Título da página
   pdf.setFillColor(greenColor[0], greenColor[1], greenColor[2]);
@@ -669,12 +748,14 @@ function generatePage2(pdf: jsPDF, soilData: SoilData, results: CalculationResul
 /**
  * Gera a terceira página do relatório
  */
-function generatePage3(pdf: jsPDF, soilData: SoilData, results: CalculationResult) {
+function generatePage3(pdf: jsPDF, soilData: SoilData, results: CalculationResult, themeOptions?: PDFThemeOptions) {
   // Adicionar nova página
   pdf.addPage();
   
-  // Cores principais
-  const greenColor: [number, number, number] = [76, 175, 80]; // #4CAF50
+  // Cores personalizáveis (usa tema ou cores padrão)
+  const greenColor: [number, number, number] = themeOptions?.primaryColor 
+    ? hexToRgb(themeOptions.primaryColor) 
+    : [76, 175, 80]; // #4CAF50
   
   // Título da página
   pdf.setFillColor(greenColor[0], greenColor[1], greenColor[2]);
@@ -792,16 +873,17 @@ function generatePage3(pdf: jsPDF, soilData: SoilData, results: CalculationResul
 /**
  * Adiciona rodapés a todas as páginas do relatório
  */
-function addFooters(pdf: jsPDF) {
+function addFooters(pdf: jsPDF, themeOptions?: PDFThemeOptions) {
   const pageCount = pdf.getNumberOfPages();
   const dataAtual = new Date().toLocaleDateString('pt-BR');
+  const orgName = themeOptions?.organizationName || 'Fertilisolo';
   
   for (let i = 1; i <= pageCount; i++) {
     pdf.setPage(i);
     pdf.setFontSize(8);
     pdf.setTextColor(100, 100, 100);
-    pdf.text(`Fertilisolo - Análise e recomendação de fertilizantes        Página ${i}/${pageCount}`, 15, 285);
-    pdf.text(`Relatório gerado por sistema especialista    Contato: suporte@fertilisolo.com.br`, 15, 290);
+    pdf.text(`${orgName} - Análise e recomendação de fertilizantes        Página ${i}/${pageCount}`, 15, 285);
+    pdf.text(`Relatório gerado por sistema especialista`, 15, 290);
   }
 }
 

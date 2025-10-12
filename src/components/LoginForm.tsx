@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase';
 import { SUPABASE_URL } from '@/lib/env';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ForgotPasswordForm } from './ForgotPasswordForm';
+import { DynamicLogo } from '@/components/DynamicLogo';
 
 const formSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -92,10 +93,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onCreateAc
     <Card className="w-full max-w-md mx-auto bg-white/90 shadow-lg">
       <CardHeader className="space-y-1">
         <div className="flex items-center justify-center gap-3 mb-2">
-          <img src="/logo-fertilisolo.png" alt="Logo FertiliSolo" className="h-12" />
-          <CardTitle className="text-2xl font-bold text-center text-green-800">FertiliSolo</CardTitle>
+          <DynamicLogo size="md" className="h-12" />
+          <CardTitle className="text-2xl font-bold text-center text-primary">FertiliSolo</CardTitle>
         </div>
-        <CardTitle className="text-xl font-bold text-center text-green-700">Login</CardTitle>
+        <CardTitle className="text-xl font-bold text-center text-primary">Login</CardTitle>
         <CardDescription className="text-center">
           Entre com seu email e senha para acessar o sistema
         </CardDescription>
@@ -146,7 +147,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onCreateAc
               <button 
                 type="button" 
                 onClick={() => setShowForgotPassword(true)}
-                className="text-xs text-green-700 hover:text-green-800 hover:underline"
+                className="text-xs text-primary hover:text-primary/80 hover:underline"
               >
                 Esqueceu sua senha?
               </button>
@@ -154,7 +155,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onCreateAc
           </div>
           <Button 
             type="submit" 
-            className="w-full bg-green-600 hover:bg-green-700" 
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" 
             disabled={isLoading || !isSupabaseConfigured}
           >
             {isLoading ? (
@@ -174,7 +175,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onCreateAc
         </p>
         <Button 
           variant="outline" 
-          className="w-full border-green-600 text-green-700 hover:bg-green-50 font-medium"
+          className="w-full border-primary text-primary hover:bg-primary/10 font-medium"
           onClick={onCreateAccountClick}
         >
           <UserPlus className="mr-2 h-4 w-4" />

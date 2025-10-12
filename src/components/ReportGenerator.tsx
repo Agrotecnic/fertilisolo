@@ -17,6 +17,7 @@ import {
 } from '@/utils/soilCalculations';
 import { SoilData, CalculationResult, PhosphorusAnalysis } from '@/types/soilAnalysis';
 import { Badge } from '@/components/ui/badge';
+import { useTheme } from '@/providers/ThemeProvider';
 
 // Estendendo o jsPDF com autotable
 declare module 'jspdf' {
@@ -108,6 +109,7 @@ const sampleData: ReportData = {
 };
 
 export default function ReportGenerator() {
+  const { theme, logo, organizationName } = useTheme();
   const [reportData, setReportData] = useState<ReportData>(sampleData);
   const [loading, setLoading] = useState(false);
   const [calculationResults, setCalculationResults] = useState<CalculationResult | null>(null);
@@ -294,38 +296,100 @@ export default function ReportGenerator() {
     }
   };
 
-  const handleExportPDF = () => {
+  // Função auxiliar para converter imagem URL para base64
+  const convertImageToBase64 = async (url: string): Promise<string> => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Erro ao converter imagem para base64:', error);
+      throw error;
+    }
+  };
+
+  const handleExportPDF = async () => {
     setLoading(true);
     
     if (reportData) {
-      // Converter SoilAnalysis para SoilData para compatibilidade
-      const soilData: SoilData = {
-        location: reportData.soilAnalysis.location || "",
-        date: new Date().toISOString().split('T')[0],
-        organicMatter: reportData.soilAnalysis.organic_matter || 0,
-        T: reportData.soilAnalysis.T || 0,
-        P: reportData.soilAnalysis.P || 0,
-        argila: reportData.soilAnalysis.argila || 35, // valor padrão se não fornecido
-        K: reportData.soilAnalysis.K || 0,
-        Ca: reportData.soilAnalysis.calcium || 0,
-        Mg: reportData.soilAnalysis.magnesium || 0,
-        S: reportData.soilAnalysis.sulfur || 0,
-        B: reportData.soilAnalysis.boron || 0,
-        Cu: reportData.soilAnalysis.copper || 0,
-        Fe: reportData.soilAnalysis.iron || 0,
-        Mn: reportData.soilAnalysis.manganese || 0,
-        Zn: reportData.soilAnalysis.zinc || 0
-      };
-      
       try {
-        const { pdf, filename } = pdfGenerator.generatePDF(
+        console.log('═══════════════════════════════════════════════════════');
+        console.log('🎨 INICIANDO GERAÇÃO DE PDF COM PERSONALIZAÇÃO (ReportGenerator)');
+        console.log('═══════════════════════════════════════════════════════');
+        console.log('📊 Dados do tema:', {
+          temTheme: !!theme,
+          temLogo: !!logo,
+          organizationName: organizationName,
+          primaryColor: theme?.primary_color,
+          secondaryColor: theme?.secondary_color
+        });
+        console.log('🖼️ URL do Logo:', logo);
+        console.log('═══════════════════════════════════════════════════════');
+
+        // Converter SoilAnalysis para SoilData para compatibilidade
+        const soilData: SoilData = {
+          location: reportData.soilAnalysis.location || "",
+          date: new Date().toISOString().split('T')[0],
+          organicMatter: reportData.soilAnalysis.organic_matter || 0,
+          T: reportData.soilAnalysis.T || 0,
+          P: reportData.soilAnalysis.P || 0,
+          argila: reportData.soilAnalysis.argila || 35,
+          K: reportData.soilAnalysis.K || 0,
+          Ca: reportData.soilAnalysis.calcium || 0,
+          Mg: reportData.soilAnalysis.magnesium || 0,
+          S: reportData.soilAnalysis.sulfur || 0,
+          B: reportData.soilAnalysis.boron || 0,
+          Cu: reportData.soilAnalysis.copper || 0,
+          Fe: reportData.soilAnalysis.iron || 0,
+          Mn: reportData.soilAnalysis.manganese || 0,
+          Zn: reportData.soilAnalysis.zinc || 0
+        };
+        
+        // Converter logo para base64 se disponível
+        let logoBase64: string | undefined = undefined;
+        if (logo) {
+          try {
+            console.log('🖼️ Convertendo logo para base64...');
+            logoBase64 = await convertImageToBase64(logo);
+            console.log('✅ Logo convertido com sucesso');
+          } catch (error) {
+            console.warn('⚠️ Erro ao converter logo, PDF será gerado sem logo:', error);
+          }
+        }
+
+        // Preparar opções de tema para o PDF
+        const themeOptions = {
+          primaryColor: theme?.primary_color,
+          secondaryColor: theme?.secondary_color,
+          accentColor: theme?.accent_color,
+          logo: logoBase64,
+          organizationName: organizationName || 'Fertilisolo'
+        };
+
+        console.log('📄 Opções de tema para PDF:', {
+          primaryColor: themeOptions.primaryColor,
+          secondaryColor: themeOptions.secondaryColor,
+          hasLogo: !!themeOptions.logo,
+          organizationName: themeOptions.organizationName
+        });
+
+        const { pdf, filename } = await pdfGenerator.generatePDF(
           soilData, 
           reportData.soilAnalysis.farm_name, 
-          reportData.soilAnalysis.location
+          reportData.soilAnalysis.location,
+          undefined,
+          themeOptions
         );
         pdf.save(filename);
+        
+        console.log('✅ PDF gerado e salvo com sucesso');
       } catch (error) {
-        console.error("Erro ao gerar PDF:", error);
+        console.error("❌ Erro ao gerar PDF:", error);
       }
     }
     

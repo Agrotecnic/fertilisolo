@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Check, Leaf, BarChart, BarChart2, Beaker, Database, Shield } from 'lucide-react';
+import { DynamicLogo } from '@/components/DynamicLogo';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,15 +13,15 @@ const LandingPage: React.FC = () => {
       <nav className="bg-white border-b border-gray-200 fixed w-full z-50">
         <div className="container mx-auto flex justify-between items-center py-4 px-4 md:px-6">
           <div className="flex items-center space-x-2">
-            <img src="/logo-fertilisolo.png" alt="FertiliSolo Logo" className="h-8 md:h-10" />
-            <span className="text-green-600 font-bold text-xl md:text-2xl">FertiliSolo</span>
+            <DynamicLogo size="sm" className="h-8 md:h-10" />
+            <span className="text-primary font-bold text-xl md:text-2xl">FertiliSolo</span>
           </div>
           <div className="flex items-center space-x-4">
             <Link to="/login">
               <Button variant="ghost">Login</Button>
             </Link>
             <Link to="/login">
-              <Button className="bg-green-600 hover:bg-green-700">Registrar</Button>
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Registrar</Button>
             </Link>
           </div>
         </div>
@@ -40,14 +41,14 @@ const LandingPage: React.FC = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/login">
                 <Button 
-                  className="bg-green-600 hover:bg-green-700 text-white text-lg py-6 px-8 rounded-lg"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-6 px-8 rounded-lg"
                 >
                   Começar agora
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 </Link>
                 <Link to="/relatorio" className="w-full sm:w-auto">
-                  <Button variant="outline" className="w-full border-green-600 text-green-700 hover:bg-green-50">
+                  <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10">
                     Ver demonstração de relatório
                   </Button>
                 </Link>
@@ -82,8 +83,8 @@ const LandingPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Feature 1 */}
             <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition duration-300">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <Beaker className="h-6 w-6 text-green-600" />
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <Beaker className="h-6 w-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold text-green-800 mb-3">
                 Análise de Solo Intuitiva
@@ -95,8 +96,8 @@ const LandingPage: React.FC = () => {
 
             {/* Feature 2 */}
             <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition duration-300">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <BarChart className="h-6 w-6 text-green-600" />
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <BarChart className="h-6 w-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold text-green-800 mb-3">
                 Cálculo de Saturações
@@ -108,8 +109,8 @@ const LandingPage: React.FC = () => {
 
             {/* Feature 3 */}
             <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition duration-300">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <Leaf className="h-6 w-6 text-green-600" />
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <Leaf className="h-6 w-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold text-green-800 mb-3">
                 Recomendações Precisas
@@ -121,8 +122,8 @@ const LandingPage: React.FC = () => {
 
             {/* Feature 4 */}
             <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition duration-300">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <Database className="h-6 w-6 text-green-600" />
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <Database className="h-6 w-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold text-green-800 mb-3">
                 Histórico de Análises
@@ -134,8 +135,8 @@ const LandingPage: React.FC = () => {
 
             {/* Feature 5 */}
             <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition duration-300">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <BarChart2 className="h-6 w-6 text-green-600" />
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <BarChart2 className="h-6 w-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold text-green-800 mb-3">
                 Insights Visuais
@@ -147,8 +148,8 @@ const LandingPage: React.FC = () => {
 
             {/* Feature 6 */}
             <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition duration-300">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-green-600" />
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <Shield className="h-6 w-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold text-green-800 mb-3">
                 Disponível Offline
@@ -176,8 +177,8 @@ const LandingPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 mx-auto">
-                <span className="text-2xl font-bold text-green-600">1</span>
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
+                <span className="text-2xl font-bold text-primary">1</span>
               </div>
               <h3 className="text-xl font-semibold text-green-800 mb-3">
                 Insira os Dados
@@ -189,8 +190,8 @@ const LandingPage: React.FC = () => {
 
             {/* Step 2 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 mx-auto">
-                <span className="text-2xl font-bold text-green-600">2</span>
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
+                <span className="text-2xl font-bold text-primary">2</span>
               </div>
               <h3 className="text-xl font-semibold text-green-800 mb-3">
                 Obtenha a Análise
@@ -202,8 +203,8 @@ const LandingPage: React.FC = () => {
 
             {/* Step 3 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 mx-auto">
-                <span className="text-2xl font-bold text-green-600">3</span>
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
+                <span className="text-2xl font-bold text-primary">3</span>
               </div>
               <h3 className="text-xl font-semibold text-green-800 mb-3">
                 Aplique as Recomendações
@@ -232,7 +233,7 @@ const LandingPage: React.FC = () => {
             {/* Benefit 1 */}
             <div className="flex items-start">
               <div className="mt-1 mr-4">
-                <Check className="h-6 w-6 text-green-600" />
+                <Check className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-green-800 mb-2">
@@ -247,7 +248,7 @@ const LandingPage: React.FC = () => {
             {/* Benefit 2 */}
             <div className="flex items-start">
               <div className="mt-1 mr-4">
-                <Check className="h-6 w-6 text-green-600" />
+                <Check className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-green-800 mb-2">
@@ -262,7 +263,7 @@ const LandingPage: React.FC = () => {
             {/* Benefit 3 */}
             <div className="flex items-start">
               <div className="mt-1 mr-4">
-                <Check className="h-6 w-6 text-green-600" />
+                <Check className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-green-800 mb-2">
@@ -277,7 +278,7 @@ const LandingPage: React.FC = () => {
             {/* Benefit 4 */}
             <div className="flex items-start">
               <div className="mt-1 mr-4">
-                <Check className="h-6 w-6 text-green-600" />
+                <Check className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-green-800 mb-2">
@@ -293,7 +294,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-green-600">
+      <section className="py-16 md:py-24 bg-primary">
         <div className="container mx-auto px-4 md:px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Pronto para otimizar sua produção?
@@ -303,7 +304,7 @@ const LandingPage: React.FC = () => {
           </p>
           <Button 
             onClick={() => navigate('/login')} 
-            className="bg-white text-green-600 hover:bg-green-50 text-lg py-6 px-8 rounded-lg"
+            className="bg-white text-primary hover:bg-primary/10 text-lg py-6 px-8 rounded-lg"
           >
             Começar agora
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -317,7 +318,7 @@ const LandingPage: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-8 md:mb-0">
               <div className="flex items-center space-x-2">
-                <img src="/logo-fertilisolo.png" alt="FertiliSolo Logo" className="h-8 invert" />
+                <DynamicLogo size="sm" className="h-8 invert" />
                 <span className="font-bold text-xl">FertiliSolo</span>
               </div>
               <p className="mt-2 text-gray-400">

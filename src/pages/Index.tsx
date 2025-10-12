@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/select';
 import { FarmManagementButton } from '@/components/farm/FarmManagementButton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { AdminAccessButton } from '@/components/AdminAccessButton';
 
 const schema = z.object({
   location: z.string().min(1, "Localização é obrigatória"),
@@ -276,7 +277,7 @@ const Index = () => {
           <Link to="/relatorio" className="hidden md:block">
             <Button 
               variant="outline" 
-              className="border-green-600 text-green-700 hover:bg-green-50 shadow-md flex items-center gap-2 text-sm md:text-base py-1 px-2 md:py-2 md:px-4"
+              className="border-primary text-primary hover:bg-primary/10 shadow-md flex items-center gap-2 text-sm md:text-base py-1 px-2 md:py-2 md:px-4"
             >
               <FileText className="h-4 w-4 md:h-5 md:w-5" />
               Ver Modelo de Relatório
@@ -297,23 +298,23 @@ const Index = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Versão para telas médias e grandes */}
           <TabsList className="hidden md:grid w-full grid-cols-5 mb-8 bg-white shadow-sm">
-            <TabsTrigger value="input" className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+            <TabsTrigger value="input" className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Calculator className="h-4 w-4" />
               Nova Análise
             </TabsTrigger>
-            <TabsTrigger value="results" disabled={!results} className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+            <TabsTrigger value="results" disabled={!results} className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <FileText className="h-4 w-4" />
               Resultados
             </TabsTrigger>
-            <TabsTrigger value="insights" disabled={!results} className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+            <TabsTrigger value="insights" disabled={!results} className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Brain className="h-4 w-4" />
               Insights
             </TabsTrigger>
-            <TabsTrigger value="recommendations" disabled={!results} className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+            <TabsTrigger value="recommendations" disabled={!results} className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Leaf className="h-4 w-4" />
               Recomendações
             </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+            <TabsTrigger value="history" className="flex items-center gap-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Database className="h-4 w-4" />
               Histórico
             </TabsTrigger>
@@ -322,26 +323,26 @@ const Index = () => {
           {/* Versão para dispositivos móveis - layout em duas linhas */}
           <div className="md:hidden mb-4">
             <TabsList className="grid w-full grid-cols-3 mb-2 bg-white shadow-sm text-xs">
-              <TabsTrigger value="input" className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+              <TabsTrigger value="input" className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <Calculator className="h-4 w-4" />
                 <span>Nova</span>
               </TabsTrigger>
-              <TabsTrigger value="results" disabled={!results} className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+              <TabsTrigger value="results" disabled={!results} className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <FileText className="h-4 w-4" />
                 <span>Resultados</span>
               </TabsTrigger>
-              <TabsTrigger value="insights" disabled={!results} className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+              <TabsTrigger value="insights" disabled={!results} className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <Brain className="h-4 w-4" />
                 <span>Insights</span>
               </TabsTrigger>
             </TabsList>
             
             <TabsList className="grid w-full grid-cols-2 bg-white shadow-sm text-xs">
-              <TabsTrigger value="recommendations" disabled={!results} className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+              <TabsTrigger value="recommendations" disabled={!results} className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <Leaf className="h-4 w-4" />
                 <span>Recomendações</span>
               </TabsTrigger>
-              <TabsTrigger value="history" className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary-dark data-[state=active]:text-white">
+              <TabsTrigger value="history" className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <Database className="h-4 w-4" />
                 <span>Histórico</span>
               </TabsTrigger>
@@ -349,10 +350,10 @@ const Index = () => {
           </div>
 
           <TabsContent value="input">
-            <Card className="bg-white border-secondary-dark/10 shadow-sm">
-              <CardHeader className="border-b border-secondary-dark/10">
-                <CardTitle className="text-lg md:text-xl text-primary-dark flex items-center gap-2" style={titleStyle}>
-                  <Calculator className="h-4 w-4 md:h-5 md:w-5 text-secondary-dark" />
+            <Card className="bg-white border-border shadow-sm">
+              <CardHeader className="border-b border-border">
+                <CardTitle className="text-lg md:text-xl text-primary flex items-center gap-2" style={titleStyle}>
+                  <Calculator className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                   Entrada de Dados da Análise do Solo
                 </CardTitle>
                 <CardDescription className="text-xs md:text-sm text-neutral-medium">
@@ -364,7 +365,7 @@ const Index = () => {
                   <Link to="/relatorio" className="w-full">
                     <Button 
                       variant="outline" 
-                      className="border-green-600 text-green-700 hover:bg-green-50 w-full flex items-center justify-center gap-2"
+                      className="border-primary text-primary hover:bg-primary/10 w-full flex items-center justify-center gap-2"
                     >
                       <FileText className="h-4 w-4" />
                       Ver Modelo de Relatório
@@ -450,8 +451,8 @@ const Index = () => {
             {soilData && results ? (
               <div className="space-y-4 md:space-y-6">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl md:text-2xl font-bold text-primary-dark" style={titleStyle}>Resultados da Análise</h2>
-                  <Button onClick={resetAnalysis} variant="outline" className="border-secondary-dark/20 text-secondary-dark hover:bg-secondary-dark/5 text-xs md:text-sm py-1 px-2 md:py-2 md:px-4">
+                  <h2 className="text-xl md:text-2xl font-bold text-primary" style={titleStyle}>Resultados da Análise</h2>
+                  <Button onClick={resetAnalysis} variant="outline" className="border-primary text-primary hover:bg-primary/10 text-xs md:text-sm py-1 px-2 md:py-2 md:px-4">
                     Nova Análise
                   </Button>
                 </div>
@@ -467,7 +468,7 @@ const Index = () => {
           <TabsContent value="insights">
             {soilData && results ? (
               <div className="space-y-4 md:space-y-6">
-                <h2 className="text-xl md:text-2xl font-bold text-primary-dark" style={titleStyle}>Insights da Análise</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-primary" style={titleStyle}>Insights da Análise</h2>
                 <SoilInsights soilData={soilData} results={results} />
               </div>
             ) : (
@@ -480,7 +481,7 @@ const Index = () => {
           <TabsContent value="recommendations">
             {soilData && results ? (
               <div className="space-y-4 md:space-y-6">
-                <h2 className="text-xl md:text-2xl font-bold text-primary-dark" style={titleStyle}>Recomendações de Adubação</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-primary" style={titleStyle}>Recomendações de Adubação</h2>
                 <FertilizerRecommendations soilData={soilData} results={results} cultureName={selectedCrop} />
               </div>
             ) : (
@@ -491,10 +492,10 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="history">
-            <Card className="bg-white border-secondary-dark/10 shadow-sm">
-              <CardHeader className="border-b border-secondary-dark/10">
-                <CardTitle className="text-lg md:text-xl text-primary-dark flex items-center gap-2" style={titleStyle}>
-                  <Database className="h-4 w-4 md:h-5 md:w-5 text-secondary-dark" />
+            <Card className="bg-white border-border shadow-sm">
+              <CardHeader className="border-b border-border">
+                <CardTitle className="text-lg md:text-xl text-primary flex items-center gap-2" style={titleStyle}>
+                  <Database className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                   Histórico de Análises
                 </CardTitle>
                 <CardDescription className="text-xs md:text-sm text-neutral-medium">
@@ -508,6 +509,9 @@ const Index = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Botão flutuante de acesso ao painel admin */}
+      <AdminAccessButton />
     </div>
   );
 };

@@ -15,20 +15,20 @@ export const SaturationsCard: React.FC<SaturationsCardProps> = ({ soilData, resu
   const titleStyle = { fontFamily: 'Inter, sans-serif' };
   
   const getStatusIcon = (isAdequate: boolean) => {
-    if (isAdequate) return <CheckCircle className="h-4 w-4 text-primary-dark" />;
-    return <XCircle className="h-4 w-4 text-accent-dark" />;
+    if (isAdequate) return <CheckCircle className="h-4 w-4 text-primary" />;
+    return <XCircle className="h-4 w-4 text-accent" />;
   };
 
   const getStatusColor = (isAdequate: boolean) => {
     return isAdequate ? 
-      'bg-primary-light/10 text-primary-dark border-primary-light/20' : 
-      'bg-accent-dark/10 text-accent-dark border-accent-dark/20';
+      'bg-primary/10 text-primary border-primary/20' : 
+      'bg-accent/10 text-accent border-accent/20';
   };
 
   return (
-    <Card className="bg-white border-secondary-dark/10 shadow-sm">
-      <CardHeader className="pb-2 border-b border-secondary-dark/10">
-        <CardTitle className="text-primary-dark" style={titleStyle}>Saturações Atuais por Bases</CardTitle>
+    <Card className="bg-white border-border shadow-sm">
+      <CardHeader className="pb-2 border-b border-border">
+        <CardTitle className="text-primary" style={titleStyle}>Saturações Atuais por Bases</CardTitle>
         <CardDescription className="text-neutral-medium">Porcentagem de cada nutriente em relação à CTC</CardDescription>
       </CardHeader>
       <CardContent className="pt-4">

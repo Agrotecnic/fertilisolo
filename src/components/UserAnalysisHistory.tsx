@@ -10,8 +10,10 @@ import { Trash2, Eye, MapPin, Calendar, AlertTriangle, Download } from 'lucide-r
 import { toast } from '@/hooks/use-toast';
 import * as pdfGenerator from '@/utils/pdfGenerator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useTheme } from '@/providers/ThemeProvider';
 
 export const UserAnalysisHistory: React.FC = () => {
+  const { theme, logo, organizationName } = useTheme();
   const [history, setHistory] = useState<SoilData[]>([]);
   const [selectedAnalysis, setSelectedAnalysis] = useState<SoilData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -44,23 +46,85 @@ export const UserAnalysisHistory: React.FC = () => {
     setSelectedAnalysis(analysis);
   };
 
+  // Função auxiliar para converter imagem URL para base64
+  const convertImageToBase64 = async (url: string): Promise<string> => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Erro ao converter imagem para base64:', error);
+      throw error;
+    }
+  };
+
   const handleExportPDF = async (analysis: SoilData) => {
     try {
+      console.log('═══════════════════════════════════════════════════════');
+      console.log('🎨 INICIANDO GERAÇÃO DE PDF COM PERSONALIZAÇÃO (Histórico)');
+      console.log('═══════════════════════════════════════════════════════');
+      console.log('📊 Dados do tema:', {
+        temTheme: !!theme,
+        temLogo: !!logo,
+        organizationName: organizationName,
+        primaryColor: theme?.primary_color,
+        secondaryColor: theme?.secondary_color
+      });
+      console.log('🖼️ URL do Logo:', logo);
+      console.log('═══════════════════════════════════════════════════════');
+
       // Calcular resultados da análise para incluir no PDF
       const results = calculateSoilAnalysis(analysis);
       
-      // Usar a função generatePDFReport em vez de generatePDF para incluir os resultados calculados
+      // Converter logo para base64 se disponível
+      let logoBase64: string | undefined = undefined;
+      if (logo) {
+        try {
+          console.log('🖼️ Convertendo logo para base64...');
+          logoBase64 = await convertImageToBase64(logo);
+          console.log('✅ Logo convertido com sucesso');
+        } catch (error) {
+          console.warn('⚠️ Erro ao converter logo, PDF será gerado sem logo:', error);
+        }
+      }
+
+      // Preparar opções de tema para o PDF
+      const themeOptions = {
+        primaryColor: theme?.primary_color,
+        secondaryColor: theme?.secondary_color,
+        accentColor: theme?.accent_color,
+        logo: logoBase64,
+        organizationName: organizationName || 'Fertilisolo'
+      };
+
+      console.log('📄 Opções de tema para PDF:', {
+        primaryColor: themeOptions.primaryColor,
+        secondaryColor: themeOptions.secondaryColor,
+        hasLogo: !!themeOptions.logo,
+        organizationName: themeOptions.organizationName
+      });
+
+      // Gerar PDF com personalização
       await pdfGenerator.generatePDFReport(
         analysis, 
-        results
+        results,
+        undefined,
+        themeOptions
       );
+      
+      console.log('✅ PDF gerado e salvo com sucesso');
       
       toast({
         title: "PDF Gerado",
         description: "O relatório foi gerado com sucesso.",
       });
     } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
+      console.error('❌ Erro ao gerar PDF:', error);
       toast({
         variant: 'destructive',
         title: 'Erro ao gerar PDF',
@@ -157,11 +221,11 @@ export const UserAnalysisHistory: React.FC = () => {
       <div className="md:col-span-2">
         <div className="space-y-4">
           {history.map((analysis, index) => (
-            <Card key={index} className="bg-white/80 backdrop-blur-sm border hover:border-primary-dark/50 transition-colors">
+            <Card key={index} className="bg-white/80 backdrop-blur-sm border hover:border-primary/50 transition-colors">
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-primary-dark">{analysis.location}</CardTitle>
+                    <CardTitle className="text-primary">{analysis.location}</CardTitle>
                     <CardDescription className="flex items-center gap-1 mt-1">
                       <Calendar className="h-3 w-3" />
                       {analysis.date}
