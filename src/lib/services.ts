@@ -219,29 +219,55 @@ export const getFarmPlots = async (farmId: string) => {
  */
 export const saveSoilAnalysis = async (analysis: SoilData, plotId?: string) => {
   try {
+    console.log('🔍 [SAVE] Iniciando salvamento de análise...');
+    
     // Verificar se o usuário está autenticado
     const { data: { session } } = await supabase.auth.getSession();
+    console.log('🔍 [SAVE] Session:', session ? 'Existe' : 'NULL', 'User ID:', session?.user?.id);
+    
     if (!session?.user) {
       throw new Error('Usuário não autenticado');
     }
 
     // Verificar se plotId é válido (não vazio)
     const validPlotId = plotId && plotId.trim() !== '' ? plotId : null;
+    console.log('🔍 [SAVE] Plot ID:', validPlotId);
 
     // Converter para o formato do banco
     const analysisDB = convertSoilDataToDBFormat(analysis, session.user.id, validPlotId);
+    console.log('🔍 [SAVE] Dados convertidos para DB:', {
+      user_id: analysisDB.user_id,
+      location: analysisDB.location,
+      collection_date: analysisDB.collection_date,
+      hasValues: {
+        Ca: !!analysisDB.calcium,
+        Mg: !!analysisDB.magnesium,
+        K: !!analysisDB.potassium
+      }
+    });
 
     // Inserir análise no banco de dados
+    console.log('🔍 [SAVE] Tentando inserir no Supabase...');
     const { data, error } = await supabase
       .from('soil_analyses')
       .insert(analysisDB)
       .select();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ [SAVE] Erro do Supabase:', error);
+      throw error;
+    }
     
+    console.log('✅ [SAVE] Análise salva com sucesso!', data);
     return { data, error: null };
   } catch (error: any) {
-    console.error('Erro ao salvar análise de solo:', error);
+    console.error('❌ [SAVE] Erro ao salvar análise de solo:', error);
+    console.error('❌ [SAVE] Detalhes do erro:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    });
     return { data: null, error };
   }
 };
