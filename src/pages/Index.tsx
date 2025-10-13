@@ -90,10 +90,41 @@ const Index = () => {
     }
   });
 
-  const handleAnalysisComplete = (data: SoilData, calculatedResults: CalculationResult) => {
+  const handleAnalysisComplete = async (data: SoilData, calculatedResults: CalculationResult) => {
+    console.log('🎯 [ANALYSIS] handleAnalysisComplete chamado!');
+    console.log('🎯 [ANALYSIS] Dados recebidos:', data);
+    
     setSoilData(data);
     setResults(calculatedResults);
     setActiveTab('results');
+    
+    // Salvar no Supabase
+    try {
+      console.log('🎯 [ANALYSIS] Iniciando salvamento no Supabase...');
+      setIsLoading(true);
+      
+      const { data: savedAnalysis, error } = await saveSoilAnalysis(data, null);
+      
+      if (error) {
+        console.error('🎯 [ANALYSIS] Erro ao salvar:', error);
+        throw error;
+      }
+      
+      console.log('🎯 [ANALYSIS] Análise salva com sucesso!', savedAnalysis);
+      toast({
+        title: "Análise salva com sucesso!",
+        description: "Os dados foram salvos no banco de dados.",
+      });
+    } catch (error: any) {
+      console.error('🎯 [ANALYSIS] Erro no processo de salvamento:', error);
+      toast({
+        variant: 'destructive',
+        title: "Erro ao salvar análise",
+        description: error.message || "Ocorreu um erro ao salvar os dados."
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const resetAnalysis = () => {
@@ -219,8 +250,12 @@ const Index = () => {
     setResults(results);
     setActiveTab('results');
     
+    console.log('🚀 [INDEX] Iniciando processo de salvamento da análise...');
+    console.log('🚀 [INDEX] soilData a ser salvo:', soilData);
+    
     // Salvar a análise no Supabase
     try {
+      console.log('🚀 [INDEX] Dentro do try block de salvamento');
       setIsLoading(true);
       // Verificar se o plotId é válido (não é vazio e não é 'none')
       const validPlotId = data.selectedPlotId && 
@@ -229,6 +264,7 @@ const Index = () => {
                           ? data.selectedPlotId 
                           : null;
       
+      console.log('🚀 [INDEX] Chamando saveSoilAnalysis com plotId:', validPlotId);
       const { data: savedAnalysis, error } = await saveSoilAnalysis(soilData, validPlotId);
       
       if (error) throw error;
