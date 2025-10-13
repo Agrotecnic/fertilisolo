@@ -44,11 +44,14 @@ export function useOrganizationTheme(): UseOrganizationThemeReturn {
       const { data: userOrg, error: userOrgError } = await getUserOrganization();
 
       if (userOrgError) {
-        throw userOrgError;
+        console.warn('⚠️ Erro ao buscar organização:', userOrgError.message);
+        setLoading(false);
+        return;
       }
 
       if (!userOrg || !userOrg.organizations) {
-        // Usuário não pertence a nenhuma organização
+        // Usuário não pertence a nenhuma organização - isso é normal
+        console.log('ℹ️ Usuário não vinculado a nenhuma organização (usando tema padrão)');
         setLoading(false);
         return;
       }
