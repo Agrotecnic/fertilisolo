@@ -11,17 +11,19 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
       <nav className="bg-white border-b border-gray-200 fixed w-full z-50">
-        <div className="container mx-auto flex justify-between items-center py-4 px-4 md:px-6">
-          <div className="flex items-center space-x-2">
-            <DynamicLogo size="sm" className="h-8 md:h-10" />
-            <span className="text-primary font-bold text-xl md:text-2xl">FertiliSolo</span>
+        <div className="container mx-auto flex justify-between items-center py-3 px-3 md:py-4 md:px-6">
+          <div className="flex items-center space-x-1 md:space-x-2">
+            <DynamicLogo size="sm" className="h-7 md:h-10" />
+            <span className="text-primary font-bold text-base md:text-xl lg:text-2xl whitespace-nowrap">FertiliSolo</span>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
             <Link to="/login">
-              <Button variant="ghost">Login</Button>
+              <Button variant="ghost" className="text-sm md:text-base px-3 md:px-4 py-2">Login</Button>
             </Link>
             <Link to="/login">
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Registrar</Button>
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm md:text-base px-3 md:px-4 py-2 whitespace-nowrap">
+                Registrar
+              </Button>
             </Link>
           </div>
         </div>
