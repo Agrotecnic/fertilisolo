@@ -34,24 +34,24 @@ const LandingPage: React.FC = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-green-900 mb-4">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-green-900 mb-4">
                 Potencialize a produtividade da sua lavoura
               </h1>
-              <p className="text-xl text-gray-700 mb-8">
+              <p className="text-lg md:text-xl text-gray-700 mb-6 md:mb-8">
                 Sistema completo de análise de solo e recomendação de adubação com base em saturação por bases.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/login">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+                <Link to="/login" className="w-full sm:w-auto">
                 <Button 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-6 px-8 rounded-lg"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-base md:text-lg py-5 md:py-6 px-6 md:px-8 rounded-lg w-full sm:w-auto"
                 >
                   Começar agora
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
                 </Button>
                 </Link>
                 <Link to="/relatorio" className="w-full sm:w-auto">
-                  <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10">
-                    Ver demonstração de relatório
+                  <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 text-base md:text-lg py-5 md:py-6">
+                    Ver demonstração
                   </Button>
                 </Link>
               </div>
@@ -296,20 +296,20 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-primary">
+      <section className="py-12 md:py-16 lg:py-24 bg-primary">
         <div className="container mx-auto px-4 md:px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 md:mb-4">
             Pronto para otimizar sua produção?
           </h2>
-          <p className="text-xl text-green-50 max-w-3xl mx-auto mb-8">
+          <p className="text-base md:text-lg lg:text-xl text-green-50 max-w-3xl mx-auto mb-6 md:mb-8">
             Comece a usar o FertiliSolo hoje mesmo e transforme a forma como você gerencia a fertilidade do seu solo.
           </p>
           <Button 
             onClick={() => navigate('/login')} 
-            className="bg-white text-primary hover:bg-primary/10 text-lg py-6 px-8 rounded-lg"
+            className="bg-white text-primary hover:bg-primary/10 text-base md:text-lg py-5 md:py-6 px-6 md:px-8 rounded-lg w-full max-w-xs mx-auto sm:w-auto"
           >
             Começar agora
-            <ArrowRight className="ml-2 h-5 w-5" />
+            <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
           </Button>
         </div>
       </section>

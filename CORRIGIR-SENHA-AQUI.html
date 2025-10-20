@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Correção de Recuperação de Senha - Fertilisolo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        h2 {
+            color: #667eea;
+            margin: 30px 0 15px 0;
+            font-size: 24px;
+        }
+
+        h3 {
+            color: #555;
+            margin: 20px 0 10px 0;
+            font-size: 18px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .alert {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .alert-info {
+            background: #cff4fc;
+            border-left: 4px solid #0dcaf0;
+            color: #055160;
+        }
+
+        .alert-success {
+            background: #d1e7dd;
+            border-left: 4px solid #198754;
+            color: #0f5132;
+        }
+
+        .big-button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin: 15px 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .big-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        code {
+            background: #f5f5f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #d63384;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .grid-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 5px;
+        }
+
+        .badge-success {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 12px;
+            margin: 8px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .emoji {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card Principal -->
+        <div class="card">
+            <h1>🔧 Correção de Recuperação de Senha</h1>
+            <p class="subtitle">Fertilisolo - Problema com redirecionamento para FertiliFolha</p>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ PROBLEMA IDENTIFICADO:</strong><br>
+                O link de recuperação de senha está redirecionando para o <strong>FertiliFolha</strong> ao invés do <strong>Fertilisolo</strong>!
+            </div>
+
+            <div class="alert alert-info">
+                <strong>💡 SOLUÇÃO:</strong><br>
+                Configurar as URLs corretas no Dashboard do Supabase.<br>
+                <strong>Tempo necessário:</strong> 5 minutos<br>
+                <strong>Dificuldade:</strong> ⭐ Muito Fácil
+            </div>
+
+            <a href="https://supabase.com/dashboard/project/crtdfzqejhkccglatcmc/auth/url-configuration" 
+               class="big-button" 
+               target="_blank"
+               rel="noopener noreferrer">
+                🚀 ABRIR DASHBOARD DO SUPABASE (CLIQUE AQUI)
+            </a>
+        </div>
+
+        <!-- Passos -->
+        <div class="card">
+            <h2>📋 Passo a Passo (5 minutos)</h2>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Clique no botão roxo acima</strong><br>
+                Vai abrir o Dashboard do Supabase na página correta.
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Configure o Site URL</strong><br>
+                Na página que abriu, procure o campo <code>Site URL</code> e cole:
+                <div class="code-block">https://f8e9736e.fertilisolo.pages.dev</div>
+                <span class="highlight">Não adicione barra / no final!</span>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Adicione as Redirect URLs</strong><br>
+                Clique em <code>[+] Add URL</code> e adicione estas 4 URLs (uma por vez):
+                <div class="code-block">
+https://f8e9736e.fertilisolo.pages.dev/**<br>
+https://f8e9736e.fertilisolo.pages.dev/auth/callback<br>
+https://f8e9736e.fertilisolo.pages.dev/reset-password<br>
+http://localhost:5173/**
+                </div>
+            </div>
+
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>Salve as Alterações</strong><br>
+                Role até o final da página e clique no botão verde <strong>"Save"</strong>.<br>
+                Aguarde a mensagem: ✅ <em>"Configuration updated successfully"</em>
+            </div>
+
+            <div class="step">
+                <span class="step-number">5</span>
+                <strong>Teste!</strong><br>
+                Abra o arquivo <code>scripts/test-password-recovery.html</code> no navegador ou teste manualmente.
+            </div>
+        </div>
+
+        <!-- Configurações -->
+        <div class="card">
+            <h2>🎯 Configurações Corretas</h2>
+            
+            <h3>Site URL:</h3>
+            <div class="code-block">https://f8e9736e.fertilisolo.pages.dev</div>
+
+            <h3>Redirect URLs (adicionar todas):</h3>
+            <div class="code-block">
+https://f8e9736e.fertilisolo.pages.dev/**<br>
+https://f8e9736e.fertilisolo.pages.dev/auth/callback<br>
+https://f8e9736e.fertilisolo.pages.dev/reset-password<br>
+http://localhost:5173/**
+            </div>
+
+            <div class="grid">
+                <div class="grid-item">
+                    <div class="emoji">✅</div>
+                    <strong>Projeto Correto</strong><br>
+                    <span class="badge badge-success">Fertilisolo</span><br>
+                    <code>crtdfzqejhkccglatcmc</code>
+                </div>
+                <div class="grid-item">
+                    <div class="emoji">❌</div>
+                    <strong>Projeto Errado</strong><br>
+                    <span class="badge badge-danger">FertiliFolha</span><br>
+                    <code>zgrzfrvumlsnxqsgnqay</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teste -->
+        <div class="card">
+            <h2>🧪 Como Testar</h2>
+            
+            <h3>Opção 1: Teste Manual</h3>
+            <ol>
+                <li>Acesse: <a href="https://f8e9736e.fertilisolo.pages.dev" target="_blank">https://f8e9736e.fertilisolo.pages.dev</a></li>
+                <li>Clique em "Esqueci minha senha"</li>
+                <li>Digite: <code>ederguirau@gmail.com</code></li>
+                <li>Verifique o email</li>
+                <li>Clique no link do email</li>
+                <li><strong>VERIFICAR:</strong> Deve abrir <span class="highlight">Fertilisolo</span>, não FertiliFolha</li>
+            </ol>
+
+            <h3>Opção 2: Ferramenta de Teste</h3>
+            <p>Abra o arquivo no navegador:</p>
+            <div class="code-block">scripts/test-password-recovery.html</div>
+        </div>
+
+        <!-- Checklist -->
+        <div class="card">
+            <h2>✅ Checklist de Verificação</h2>
+            <ul class="checklist">
+                <li>☐ Acessei o Dashboard do Supabase</li>
+                <li>☐ Selecionei o projeto <strong>Fertilisolo</strong></li>
+                <li>☐ Configurei o <strong>Site URL</strong></li>
+                <li>☐ Adicionei as 4 <strong>Redirect URLs</strong></li>
+                <li>☐ Cliquei em <strong>Save</strong></li>
+                <li>☐ Recebi confirmação de sucesso</li>
+                <li>☐ Testei recuperação de senha</li>
+                <li>☐ Link abriu Fertilisolo (não FertiliFolha)</li>
+            </ul>
+        </div>
+
+        <!-- Documentação -->
+        <div class="card">
+            <h2>📚 Documentação Criada</h2>
+            <p>Para mais detalhes, consulte:</p>
+            <ul>
+                <li><strong>GUIA-VISUAL-CORRECAO-URL.md</strong> - Guia completo com capturas de tela</li>
+                <li><strong>CORRECAO-URL-RECUPERACAO-SENHA.md</strong> - Análise técnica detalhada</li>
+                <li><strong>RESUMO-CORRECAO-SENHA.md</strong> - Resumo executivo</li>
+                <li><strong>scripts/test-password-recovery.html</strong> - Ferramenta de teste</li>
+            </ul>
+        </div>
+
+        <!-- Resultado -->
+        <div class="card">
+            <h2>🎯 Resultado Esperado</h2>
+            
+            <div class="alert alert-danger" style="background: #f8d7da; border-color: #dc3545; color: #721c24;">
+                <strong>❌ ANTES (ERRADO):</strong><br>
+                Email de recuperação → Clica no link → Abre <strong>FertiliFolha</strong>
+            </div>
+
+            <div class="alert alert-success">
+                <strong>✅ DEPOIS (CORRETO):</strong><br>
+                Email de recuperação → Clica no link → Abre <strong>Fertilisolo</strong>
+            </div>
+        </div>
+
+        <!-- Botão Final -->
+        <div class="card">
+            <h2>🚀 Pronto para Começar?</h2>
+            <p>Clique no botão abaixo para abrir o Dashboard e fazer a correção:</p>
+            <a href="https://supabase.com/dashboard/project/crtdfzqejhkccglatcmc/auth/url-configuration" 
+               class="big-button" 
+               target="_blank"
+               rel="noopener noreferrer">
+                ✨ COMEÇAR CORREÇÃO AGORA
+            </a>
+            <p style="text-align: center; margin-top: 15px; color: #666;">
+                Tempo estimado: <strong>5 minutos</strong> • Dificuldade: <strong>⭐ Muito Fácil</strong>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔍 Verificação de Configuração:');
+        console.log('');
+        console.log('✅ Projeto Correto: Fertilisolo (crtdfzqejhkccglatcmc)');
+        console.log('❌ Projeto Errado: FertiliFolha (zgrzfrvumlsnxqsgnqay)');
+        console.log('');
+        console.log('📋 URLs Corretas:');
+        console.log('Site URL: https://f8e9736e.fertilisolo.pages.dev');
+        console.log('Redirect URLs:');
+        console.log('  1. https://f8e9736e.fertilisolo.pages.dev/**');
+        console.log('  2. https://f8e9736e.fertilisolo.pages.dev/auth/callback');
+        console.log('  3. https://f8e9736e.fertilisolo.pages.dev/reset-password');
+        console.log('  4. http://localhost:5173/**');
+        console.log('');
+        console.log('🔗 Dashboard: https://supabase.com/dashboard/project/crtdfzqejhkccglatcmc/auth/url-configuration');
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,126 @@
+═══════════════════════════════════════════════════════════════
+  🔧 PROBLEMA: RECUPERAÇÃO DE SENHA ABRE PROJETO ERRADO
+═══════════════════════════════════════════════════════════════
+
+SITUAÇÃO:
+  Email de recuperação → Link → Abre FertiliFolha ❌
+  
+CORREÇÃO NECESSÁRIA:
+  Email de recuperação → Link → Abre Fertilisolo ✅
+
+═══════════════════════════════════════════════════════════════
+
+⚡ SOLUÇÃO RÁPIDA (5 MINUTOS)
+
+1. Abra no navegador: CORRIGIR-SENHA-AQUI.html
+2. Clique no botão roxo
+3. Siga as instruções na tela
+4. Salve as alterações
+5. Teste!
+
+═══════════════════════════════════════════════════════════════
+
+📚 DOCUMENTAÇÃO CRIADA
+
+6 arquivos para te ajudar:
+
+1. ⭐ CORRIGIR-SENHA-AQUI.html
+   → COMECE POR AQUI! Página visual com tudo que você precisa
+
+2. 📖 GUIA-VISUAL-CORRECAO-URL.md
+   → Guia completo passo a passo com screenshots
+
+3. 🔧 CORRECAO-URL-RECUPERACAO-SENHA.md
+   → Análise técnica detalhada do problema
+
+4. 📋 RESUMO-CORRECAO-SENHA.md
+   → Resumo executivo e próximos passos
+
+5. 🧪 scripts/test-password-recovery.html
+   → Ferramenta para testar após a correção
+
+6. 📚 README-PROBLEMA-SENHA.md
+   → Índice geral de toda a documentação
+
+═══════════════════════════════════════════════════════════════
+
+🎯 O QUE FAZER AGORA
+
+PASSO 1: Abra este arquivo no navegador:
+  
+  CORRIGIR-SENHA-AQUI.html
+
+PASSO 2: Siga as instruções visuais
+  
+  Tem botões que levam direto para o Dashboard
+  Tem as URLs para copiar e colar
+  Tem checklist de verificação
+
+PASSO 3: Teste
+  
+  Use scripts/test-password-recovery.html
+  Ou teste manualmente
+
+═══════════════════════════════════════════════════════════════
+
+⚙️ CONFIGURAÇÕES CORRETAS
+
+Site URL:
+  https://f8e9736e.fertilisolo.pages.dev
+
+Redirect URLs (adicionar 4):
+  https://f8e9736e.fertilisolo.pages.dev/**
+  https://f8e9736e.fertilisolo.pages.dev/auth/callback
+  https://f8e9736e.fertilisolo.pages.dev/reset-password
+  http://localhost:5173/**
+
+Link Direto para Dashboard:
+  https://supabase.com/dashboard/project/crtdfzqejhkccglatcmc/auth/url-configuration
+
+═══════════════════════════════════════════════════════════════
+
+✅ PROJETOS
+
+Fertilisolo  (CORRETO): crtdfzqejhkccglatcmc ✅
+FertiliFolha (ERRADO):  zgrzfrvumlsnxqsgnqay ❌
+
+═══════════════════════════════════════════════════════════════
+
+⏱️ TEMPO ESTIMADO
+
+Configuração: 5 minutos
+Teste:        2 minutos
+Total:        7 minutos
+
+═══════════════════════════════════════════════════════════════
+
+🆘 PRECISA DE AJUDA?
+
+Leia os outros arquivos de documentação:
+  - GUIA-VISUAL-CORRECAO-URL.md (mais detalhado)
+  - README-PROBLEMA-SENHA.md (índice completo)
+
+Ou abra o console do navegador (F12) e verifique os erros.
+
+═══════════════════════════════════════════════════════════════
+
+📊 RESUMO
+
+Problema:     URLs configuradas erradas
+Impacto:      Recuperação de senha não funciona
+Solução:      Configurar URLs corretas no Dashboard
+Dificuldade:  ⭐ Muito Fácil
+Tempo:        5 minutos
+
+═══════════════════════════════════════════════════════════════
+
+🚀 COMECE AGORA!
+
+Abra no navegador: CORRIGIR-SENHA-AQUI.html
+
+═══════════════════════════════════════════════════════════════
+
+Criado: 19/10/2025
+Responsável: Deyvid Bueno
+Projeto: Fertilisolo
+
