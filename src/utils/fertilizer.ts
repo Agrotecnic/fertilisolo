@@ -210,9 +210,11 @@ export const calculateNutrientNeeds = ({
   const pInSoil = validatedSoilData.P;
   const p2o5InSoil = pInSoil * 2.29;
   
-  // Converte K do solo para K2O (fator 1.2)
-  const kInSoil = validatedSoilData.K;
-  const k2oInSoil = kInSoil * 1.2;
+  // Converte K do solo de mg/dm³ para K2O em kg/ha
+  // K está em mg/dm³, converter primeiro para cmolc/dm³ e depois para K2O
+  const kInSoil = validatedSoilData.K; // mg/dm³
+  const kCmolcInSoil = kInSoil / 390; // cmolc/dm³
+  const k2oInSoil = kCmolcInSoil * 950; // kg/ha de K2O
   
   // Calcular saturações
   const sumBases = validatedSoilData.Ca + validatedSoilData.Mg + (validatedSoilData.K / 390);

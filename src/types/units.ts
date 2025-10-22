@@ -26,7 +26,7 @@ export const NUTRIENT_UNITS: NutrientUnits = {
     options: [
       { value: 'cmolc_dm3', label: 'cmolc/dm³', conversionFactor: 1 },
       { value: 'meq_100g', label: 'meq/100g', conversionFactor: 1 },
-      { value: 'mg_dm3', label: 'mg/dm³', conversionFactor: 20 }
+      { value: 'mg_dm3', label: 'mg/dm³', conversionFactor: 0.005 } // 1 cmolc/dm³ = 200 mg/dm³
     ]
   },
   Mg: {
@@ -34,15 +34,15 @@ export const NUTRIENT_UNITS: NutrientUnits = {
     options: [
       { value: 'cmolc_dm3', label: 'cmolc/dm³', conversionFactor: 1 },
       { value: 'meq_100g', label: 'meq/100g', conversionFactor: 1 },
-      { value: 'mg_dm3', label: 'mg/dm³', conversionFactor: 12 }
+      { value: 'mg_dm3', label: 'mg/dm³', conversionFactor: 0.00833 } // 1 cmolc/dm³ = 120 mg/dm³
     ]
   },
   K: {
     default: 'mg_dm3',
     options: [
       { value: 'mg_dm3', label: 'mg/dm³', conversionFactor: 1 },
-      { value: 'cmolc_dm3', label: 'cmolc/dm³', conversionFactor: 0.02 },
-      { value: 'meq_100g', label: 'meq/100g', conversionFactor: 0.04 }
+      { value: 'cmolc_dm3', label: 'cmolc/dm³', conversionFactor: 390 }, // 1 cmolc/dm³ = 390 mg/dm³
+      { value: 'meq_100g', label: 'meq/100g', conversionFactor: 390 } // meq/100g = cmolc/dm³
     ]
   },
   P: {

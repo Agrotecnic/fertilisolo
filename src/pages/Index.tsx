@@ -7,7 +7,7 @@ import { AnalysisResults } from '@/components/AnalysisResults';
 import { FertilizerRecommendations } from '@/components/FertilizerRecommendations';
 import { UserAnalysisHistory } from '@/components/UserAnalysisHistory';
 import { SoilInsights } from '@/components/SoilInsights';
-import { Calculator, Leaf, FileText, History, Brain, LogOut, PlusCircleIcon, SearchIcon, ClipboardListIcon, SettingsIcon, FileTextIcon, AreaChartIcon, Database } from 'lucide-react';
+import { Calculator, Leaf, FileText, History, Brain, LogOut, PlusCircleIcon, SearchIcon, ClipboardListIcon, SettingsIcon, FileTextIcon, AreaChartIcon, Database, BookOpen } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
@@ -309,19 +309,30 @@ const Index = () => {
       
       <div className="container mx-auto px-2 md:px-4 py-4 md:py-8">
         {/* Botões de ação */}
-        <div className="flex justify-between mb-4">
-          <Link to="/relatorio" className="hidden md:block">
-            <Button 
-              variant="outline" 
-              className="border-primary text-primary hover:bg-primary/10 shadow-md flex items-center gap-2 text-sm md:text-base py-1 px-2 md:py-2 md:px-4"
-            >
-              <FileText className="h-4 w-4 md:h-5 md:w-5" />
-              Ver Modelo de Relatório
-            </Button>
-          </Link>
+        <div className="flex justify-between items-center mb-4 gap-2">
+          <div className="flex gap-2">
+            <Link to="/relatorio" className="hidden md:block">
+              <Button 
+                variant="outline" 
+                className="border-primary text-primary hover:bg-primary/10 shadow-md flex items-center gap-2 text-sm md:text-base py-1 px-2 md:py-2 md:px-4"
+              >
+                <FileText className="h-4 w-4 md:h-5 md:w-5" />
+                Ver Modelo de Relatório
+              </Button>
+            </Link>
+            <Link to="/metodologia" className="hidden md:block">
+              <Button 
+                variant="outline" 
+                className="border-green-600 text-green-700 hover:bg-green-50 shadow-md flex items-center gap-2 text-sm md:text-base py-1 px-2 md:py-2 md:px-4"
+              >
+                <BookOpen className="h-4 w-4 md:h-5 md:w-5" />
+                Metodologia Técnica
+              </Button>
+            </Link>
+          </div>
           <Button 
             variant="destructive" 
-            className="bg-red-600 hover:bg-red-700 shadow-md flex items-center gap-1 md:gap-2 text-sm md:text-base py-1 px-2 md:py-2 md:px-4 ml-auto"
+            className="bg-red-600 hover:bg-red-700 shadow-md flex items-center gap-1 md:gap-2 text-sm md:text-base py-1 px-2 md:py-2 md:px-4"
             onClick={handleLogout}
           >
             <LogOut className="h-4 w-4 md:h-5 md:w-5" />

@@ -1,27 +1,33 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Check, Leaf, BarChart, BarChart2, Beaker, Database, Shield } from 'lucide-react';
+import { ArrowRight, Check, Leaf, BarChart, BarChart2, Beaker, Database, Shield, BookOpen } from 'lucide-react';
 import { DynamicLogo } from '@/components/DynamicLogo';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       {/* Navbar */}
-      <nav className="bg-white border-b border-gray-200 fixed w-full z-50">
-        <div className="container mx-auto flex justify-between items-center py-3 px-3 md:py-4 md:px-6">
-          <div className="flex items-center space-x-1 md:space-x-2">
-            <DynamicLogo size="sm" className="h-7 md:h-10" />
-            <span className="text-primary font-bold text-base md:text-xl lg:text-2xl whitespace-nowrap">FertiliSolo</span>
+      <nav className="bg-white border-b border-gray-200 fixed w-full z-50 overflow-hidden">
+        <div className="max-w-7xl mx-auto flex justify-between items-center py-3 px-4 md:py-4 md:px-6 lg:px-8">
+          <div className="flex items-center space-x-2 flex-shrink-0">
+            <DynamicLogo size="sm" className="h-8 md:h-10 flex-shrink-0" />
+            <span className="text-primary font-bold text-lg md:text-xl lg:text-2xl">FertiliSolo</span>
           </div>
-          <div className="flex items-center space-x-2 md:space-x-4">
-            <Link to="/login">
-              <Button variant="ghost" className="text-sm md:text-base px-3 md:px-4 py-2">Login</Button>
+          <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+            <Link to="/metodologia">
+              <Button variant="ghost" size="sm" className="text-sm md:text-base hidden md:flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Metodologia
+              </Button>
             </Link>
             <Link to="/login">
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm md:text-base px-3 md:px-4 py-2 whitespace-nowrap">
+              <Button variant="ghost" size="sm" className="text-sm md:text-base">Login</Button>
+            </Link>
+            <Link to="/login">
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm md:text-base">
                 Registrar
               </Button>
             </Link>
@@ -30,8 +36,8 @@ const LandingPage: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-28 md:pt-32 pb-16 md:pb-24 bg-gradient-to-r from-green-50 to-green-100">
-        <div className="container mx-auto px-4 md:px-6">
+      <section className="pt-28 md:pt-32 pb-16 md:pb-24 bg-gradient-to-r from-green-50 to-green-100 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-green-900 mb-4">
@@ -71,8 +77,8 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 md:py-24 bg-white">
-        <div className="container mx-auto px-4 md:px-6">
+      <section className="py-16 md:py-24 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-4">
               Tudo o que você precisa para otimizar sua adubação
@@ -165,8 +171,8 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* How it Works Section */}
-      <section className="py-16 md:py-24 bg-gray-50">
-        <div className="container mx-auto px-4 md:px-6">
+      <section className="py-16 md:py-24 bg-gray-50 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-4">
               Como funciona
@@ -220,8 +226,8 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 md:py-24 bg-white">
-        <div className="container mx-auto px-4 md:px-6">
+      <section className="py-16 md:py-24 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-4">
               Benefícios do FertiliSolo
@@ -296,8 +302,8 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-12 md:py-16 lg:py-24 bg-primary">
-        <div className="container mx-auto px-4 md:px-6 text-center">
+      <section className="py-12 md:py-16 lg:py-24 bg-primary overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 text-center">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 md:mb-4">
             Pronto para otimizar sua produção?
           </h2>
@@ -315,8 +321,8 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-4 md:px-6">
+      <footer className="bg-gray-900 text-white py-12 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-8 md:mb-0">
               <div className="flex items-center space-x-2">

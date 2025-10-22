@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import ResetPassword from "./pages/ResetPassword";
 import AdminPanel from "./pages/AdminPanel";
+import { TechnicalMethodology } from "./pages/TechnicalMethodology";
 import { useAuth } from "./hooks/useAuth";
 import { AuthBox } from "./components/AuthBox";
 import { Loader2 } from "lucide-react";
@@ -128,6 +129,11 @@ const AppContent = () => {
         <Route 
           path="/reset-password" 
           element={<ResetPassword />} 
+        />
+        {/* Rota de Metodologia Técnica - pública e educativa */}
+        <Route 
+          path="/metodologia" 
+          element={<TechnicalMethodology />} 
         />
         {/* Rotas de teste */}
         <Route path="/teste-dados" element={<DataTester />} />

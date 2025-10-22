@@ -244,17 +244,20 @@ export const calculateHAl = (organicMatter: number): number => {
 // Funções auxiliares para cálculo de necessidades
 export const calculateCalciumNeed = (Ca: number): number => {
   const ideal = 3.0; // Valor ideal de Ca em cmolc/dm³
-  return Ca < ideal ? Math.round((ideal - Ca) * 20) / 10 : 0;
+  // Retorna a necessidade em cmolc/dm³
+  return Ca < ideal ? Math.round((ideal - Ca) * 10) / 10 : 0;
 };
 
 export const calculateMagnesiumNeed = (Mg: number): number => {
   const ideal = 1.0; // Valor ideal de Mg em cmolc/dm³
-  return Mg < ideal ? Math.round((ideal - Mg) * 15) / 10 : 0;
+  // Retorna a necessidade em cmolc/dm³
+  return Mg < ideal ? Math.round((ideal - Mg) * 10) / 10 : 0;
 };
 
 export const calculatePotassiumNeed = (K: number): number => {
   const ideal = 0.15; // Valor ideal de K em cmolc/dm³
-  return K < ideal ? Math.round((ideal - K) * 100) / 10 : 0;
+  // Retorna a necessidade em cmolc/dm³
+  return K < ideal ? Math.round((ideal - K) * 1000) / 1000 : 0;
 };
 
 export const calculatePhosphorusNeedWithArgila = (P: number, argila: number): number => {
@@ -296,6 +299,39 @@ export const calculateZincNeedFromValue = (Zn: number): number => {
 export const calculateMolybdenumNeedFromValue = (Mo: number = 0): number => {
   // Valor padrão para Mo, raramente testado
   return 0;
+};
+
+/**
+ * Converte necessidade de Ca de cmolc/dm³ para kg/ha de CaO
+ * Considera camada de 0-20cm e densidade do solo de 1,2 g/cm³
+ */
+export const convertCaNeedToKgHa = (needCmolc: number): number => {
+  // 1 cmolc/dm³ = 400 kg/ha de Ca metálico (considerando 0-20cm)
+  // Ca metálico → CaO: multiplicar por 1.4
+  // 1 cmolc/dm³ ≈ 560 kg/ha de CaO
+  return Math.round(needCmolc * 560);
+};
+
+/**
+ * Converte necessidade de Mg de cmolc/dm³ para kg/ha de MgO
+ * Considera camada de 0-20cm e densidade do solo de 1,2 g/cm³
+ */
+export const convertMgNeedToKgHa = (needCmolc: number): number => {
+  // 1 cmolc/dm³ = 240 kg/ha de Mg metálico (considerando 0-20cm)
+  // Mg metálico → MgO: multiplicar por 1.67
+  // 1 cmolc/dm³ ≈ 400 kg/ha de MgO
+  return Math.round(needCmolc * 400);
+};
+
+/**
+ * Converte necessidade de K de cmolc/dm³ para kg/ha de K2O
+ * Considera camada de 0-20cm e densidade do solo de 1,2 g/cm³
+ */
+export const convertKNeedToKgHa = (needCmolc: number): number => {
+  // 1 cmolc/dm³ de K = 780 kg/ha de K metálico (considerando 0-20cm)
+  // K metálico → K2O: multiplicar por 1.2
+  // 1 cmolc/dm³ ≈ 936 kg/ha de K2O (arredondado para 950 por segurança)
+  return Math.round(needCmolc * 950);
 };
 
 // Função para calcular resultados completos
@@ -350,13 +386,13 @@ export const calculateResultsWithArgilaInterpretation = (soil: SoilData): Calcul
     Mo: true // Padrão para Molibdênio
   };
   
-  // Adicionar recomendações específicas
+  // Adicionar recomendações específicas  
   const recommendations = {
     macronutrientes: {
       P: `Aplicar ${needs.P} kg/ha de P2O5. ${fosforoAnalise.observacao}`,
-      K: `Aplicar ${needs.K} kg/ha de K2O`,
-      Ca: `Aplicar ${needs.Ca} kg/ha de CaO`,
-      Mg: `Aplicar ${needs.Mg} kg/ha de MgO`,
+      K: `Aplicar ${convertKNeedToKgHa(needs.K)} kg/ha de K2O`,
+      Ca: `Aplicar ${convertCaNeedToKgHa(needs.Ca)} kg/ha de CaO`,
+      Mg: `Aplicar ${convertMgNeedToKgHa(needs.Mg)} kg/ha de MgO`,
       S: `Aplicar ${needs.S} kg/ha de enxofre`
     },
     micronutrientes: {
@@ -372,10 +408,10 @@ export const calculateResultsWithArgilaInterpretation = (soil: SoilData): Calcul
   // Adicionar fertilizantes recomendados
   const fertilizers = {
     macronutrientes: [
-      { nome: "Superfosfato Simples", quantidade: needs.P * 5, unidade: "kg/ha" },
-      { nome: "Cloreto de Potássio", quantidade: needs.K * 1.7, unidade: "kg/ha" },
-      { nome: "Calcário Dolomítico", quantidade: needs.Ca * 2.5, unidade: "t/ha" },
-      { nome: "Sulfato de Amônio", quantidade: needs.S * 4.8, unidade: "kg/ha" }
+      { nome: "Superfosfato Simples", quantidade: Math.round(needs.P * 5.56), unidade: "kg/ha" }, // 18% P2O5
+      { nome: "Cloreto de Potássio", quantidade: Math.round(convertKNeedToKgHa(needs.K) / 0.6), unidade: "kg/ha" }, // 60% K2O
+      { nome: "Calcário Dolomítico", quantidade: Math.round((convertCaNeedToKgHa(needs.Ca) + convertMgNeedToKgHa(needs.Mg)) / 1000), unidade: "t/ha" }, // Fornece Ca e Mg
+      { nome: "Sulfato de Amônio", quantidade: Math.round(needs.S * 4.8), unidade: "kg/ha" } // ~21% S
     ],
     micronutrientes: [
       { nome: "Bórax", quantidade: needs.B * 9, unidade: "kg/ha" },

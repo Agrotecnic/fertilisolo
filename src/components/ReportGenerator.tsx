@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react';
 import { getCrops, getFertilizerSources } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Printer, Download, Send } from 'lucide-react';
+import { Printer, Download, Send, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
@@ -109,6 +110,7 @@ const sampleData: ReportData = {
 };
 
 export default function ReportGenerator() {
+  const navigate = useNavigate();
   const { theme, logo, organizationName } = useTheme();
   const [reportData, setReportData] = useState<ReportData>(sampleData);
   const [loading, setLoading] = useState(false);
@@ -424,7 +426,17 @@ export default function ReportGenerator() {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Relatório de Análise de Solo</h2>
+        <div className="flex items-center gap-4">
+          <Button 
+            onClick={() => navigate(-1)} 
+            variant="ghost" 
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar
+          </Button>
+          <h2 className="text-2xl font-bold text-gray-800">Relatório de Análise de Solo</h2>
+        </div>
         <div className="space-x-2">
           <Button onClick={handleGenerateReport} variant="outline" className="bg-green-50 text-green-600 border-green-200 hover:bg-green-100">
             Analisar Solo
