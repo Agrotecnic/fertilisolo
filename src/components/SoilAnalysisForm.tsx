@@ -13,6 +13,7 @@ import { PrimaryMacronutrientsSection } from '@/components/PrimaryMacronutrients
 import { SecondaryMacronutrientsSection } from '@/components/SecondaryMacronutrientsSection';
 import { MicronutrientsSection } from '@/components/MicronutrientsSection';
 import { UnitSelector } from '@/components/UnitSelector';
+import { FormattedInput } from '@/components/FormattedInput';
 // Removendo importações complexas por enquanto
 
 interface SoilAnalysisFormProps {
@@ -318,15 +319,11 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
                 className="w-20"
               />
             </div>
-            <Input 
-              id="S" 
-              type="number" 
-              step="0.01"
-              min="0"
-              placeholder="0,00"
+            <FormattedInput
               value={formData.S}
-              onChange={(e) => handleInputChange('S', parseFloat(e.target.value) || 0)}
-              className="h-10"
+              onChange={(value) => handleInputChange('S', value)}
+              placeholder="0,00"
+              className="h-10 text-sm text-gray-800 border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-500"
             />
             {errors.S && <p className="text-sm text-red-500">{errors.S}</p>}
             <p className="text-xs text-gray-500">{getUnitLabel('S', selectedUnits.S || 'mg_dm3')}</p>
@@ -361,15 +358,11 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
                 className="w-20"
               />
             </div>
-            <Input 
-              id="organicMatter" 
-              type="number" 
-              step="0.01"
-              min="0"
-              placeholder="0,00"
+            <FormattedInput
               value={formData.organicMatter}
-              onChange={(e) => handleInputChange('organicMatter', parseFloat(e.target.value) || 0)}
-              className="h-10"
+              onChange={(value) => handleInputChange('organicMatter', value)}
+              placeholder="0,00"
+              className="h-10 text-sm text-gray-800 border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-500"
             />
             {errors.organicMatter && <p className="text-sm text-red-500">{errors.organicMatter}</p>}
             <p className="text-xs text-gray-500">{getUnitLabel('organicMatter', selectedUnits.organicMatter || 'percent')}</p>
