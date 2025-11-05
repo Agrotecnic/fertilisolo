@@ -3,6 +3,7 @@ export interface SoilData {
   id?: string;
   location: string;
   crop: string; // Cultura cultivada
+  targetYield?: number; // Produtividade esperada (ton/ha)
   date: string;
   organicMatter: number;
   T: number; // CTC total (cmolc/dm³)

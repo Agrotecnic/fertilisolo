@@ -34,6 +34,7 @@ import {
 import { FarmManagementButton } from '@/components/farm/FarmManagementButton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AdminAccessButton } from '@/components/AdminAccessButton';
+import { getCropIdentifier } from '@/components/BasicInfoSection';
 
 const schema = z.object({
   location: z.string().min(1, "Localização é obrigatória"),
@@ -62,11 +63,14 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<string>('input');
   const { signOut } = useAuth();
   const navigate = useNavigate();
-  const [selectedCrop, setSelectedCrop] = useState<string>("soja");
-  const [targetYield, setTargetYield] = useState<number>(4);
   const [plots, setPlots] = useState<Plot[]>([]);
   const [farms, setFarms] = useState<Farm[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Estados para os dados do talhão selecionado
+  const [selectedFarmName, setSelectedFarmName] = useState<string>('');
+  const [selectedPlotName, setSelectedPlotName] = useState<string>('');
+  const [selectedFarmLocation, setSelectedFarmLocation] = useState<string>('');
 
   const { register, handleSubmit, formState: { errors }, setValue, watch, control } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -153,9 +157,12 @@ const Index = () => {
   const titleStyle = { fontFamily: 'Inter, sans-serif' };
 
   const onSelectPlot = async (plotId: string) => {
-    // Se o valor for 'none', limpe o campo selectedPlotId
+    // Se o valor for 'none', limpe os dados
     if (plotId === 'none') {
       setValue('selectedPlotId', '');
+      setSelectedFarmName('');
+      setSelectedPlotName('');
+      setSelectedFarmLocation('');
       return;
     }
     
@@ -165,13 +172,15 @@ const Index = () => {
     if (plotId) {
       const selectedPlot = plots.find(plot => plot.id === plotId);
       if (selectedPlot) {
-        // Se o talhão tem uma fazenda associada, preencha o nome da fazenda no campo de localização
-        const farmName = farms.find(farm => farm.id === selectedPlot.farm_id)?.name;
-        if (farmName) {
-          setValue('location', `${farmName} - ${selectedPlot.name}`);
-        } else {
-          setValue('location', selectedPlot.name);
-        }
+        // Buscar dados da fazenda
+        const farm = farms.find(farm => farm.id === selectedPlot.farm_id);
+        const farmName = farm?.name || '';
+        const farmLocation = farm?.location || '';
+        
+        // Atualizar os estados para passar ao formulário
+        setSelectedPlotName(selectedPlot.name);
+        setSelectedFarmName(farmName);
+        setSelectedFarmLocation(farmLocation);
       }
     }
   };
@@ -205,85 +214,6 @@ const Index = () => {
     loadFarmsAndPlots();
   }, []);
 
-  const onSubmit = async (data: FormData) => {
-    // Cálculos para a recomendação de fertilizantes
-    const crop = plantNeedsReference[selectedCrop];
-    
-    if (!crop) {
-      alert('Cultura não encontrada');
-      return;
-    }
-    
-    const soilData: SoilData = {
-      location: data.location,
-      date: data.date,
-      organicMatter: data.organicMatter,
-      T: data.T,
-      P: data.P,
-      argila: data.argila,
-      K: data.K,
-      Ca: data.Ca,
-      Mg: data.Mg,
-      S: data.S,
-      B: data.B,
-      Cu: data.Cu,
-      Fe: data.Fe,
-      Mn: data.Mn,
-      Zn: data.Zn,
-    };
-    
-    // Calcular necessidades
-    const results = calculateNutrientNeeds({
-      soilData,
-      cropNeeds: crop,
-      targetYield
-    });
-    
-    // DEBUG: Verificar se os dados estão sendo gerados corretamente
-    console.log("DEBUG - Dados do solo:", soilData);
-    console.log("DEBUG - Resultados do cálculo:", results);
-    console.log("DEBUG - Cultura selecionada:", selectedCrop);
-    console.log("DEBUG - Produtividade alvo:", targetYield);
-    
-    // Atualizar o estado para que os componentes tenham acesso aos dados
-    setSoilData(soilData);
-    setResults(results);
-    setActiveTab('results');
-    
-    console.log('🚀 [INDEX] Iniciando processo de salvamento da análise...');
-    console.log('🚀 [INDEX] soilData a ser salvo:', soilData);
-    
-    // Salvar a análise no Supabase
-    try {
-      console.log('🚀 [INDEX] Dentro do try block de salvamento');
-      setIsLoading(true);
-      // Verificar se o plotId é válido (não é vazio e não é 'none')
-      const validPlotId = data.selectedPlotId && 
-                          data.selectedPlotId.trim() !== '' && 
-                          data.selectedPlotId !== 'none' 
-                          ? data.selectedPlotId 
-                          : null;
-      
-      console.log('🚀 [INDEX] Chamando saveSoilAnalysis com plotId:', validPlotId);
-      const { data: savedAnalysis, error } = await saveSoilAnalysis(soilData, validPlotId);
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Análise salva com sucesso!",
-        description: "Os dados da análise foram salvos no banco de dados.",
-      });
-    } catch (error: any) {
-      console.error('Erro ao salvar análise:', error);
-      toast({
-        variant: 'destructive',
-        title: "Erro ao salvar análise",
-        description: error.message || "Ocorreu um erro ao salvar os dados."
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleFarmDataUpdated = (farmPlots: Plot[]) => {
     setPlots(farmPlots);
@@ -421,8 +351,8 @@ const Index = () => {
                 </div>
                 <div className="space-y-4">
                   {/* Informações básicas */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="space-y-2 w-full">
                       <div className="flex justify-between items-center">
                         <Label htmlFor="plot">Talhão (opcional)</Label>
                         <FarmManagementButton onDataUpdated={loadFarmsAndPlots} />
@@ -452,43 +382,15 @@ const Index = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="crop">Cultura</Label>
-                      <Select 
-                        value={selectedCrop}
-                        onValueChange={setSelectedCrop}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a cultura" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="soja">Soja</SelectItem>
-                          <SelectItem value="milho">Milho</SelectItem>
-                          <SelectItem value="algodao">Algodão</SelectItem>
-                          <SelectItem value="cafe">Café</SelectItem>
-                          <SelectItem value="cana">Cana-de-açúcar</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="targetYield">Produtividade Esperada (ton/ha)</Label>
-                      <Input 
-                        id="targetYield" 
-                        type="number" 
-                        step="0.1"
-                        min="0"
-                        value={targetYield}
-                        onChange={(e) => setTargetYield(Number(e.target.value))}
-                        placeholder="Ex: 4.0"
-                      />
-                      <p className="text-xs text-gray-500">Produtividade esperada em toneladas por hectare</p>
-                    </div>
                   </div>
                   
                   {/* Formulário de análise do solo */}
-                  <SoilAnalysisForm onAnalysisComplete={handleAnalysisComplete} />
+                  <SoilAnalysisForm 
+                    onAnalysisComplete={handleAnalysisComplete}
+                    selectedFarmName={selectedFarmName}
+                    selectedPlotName={selectedPlotName}
+                    selectedFarmLocation={selectedFarmLocation}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -529,7 +431,7 @@ const Index = () => {
             {soilData && results ? (
               <div className="space-y-4 md:space-y-6">
                 <h2 className="text-xl md:text-2xl font-bold text-primary" style={titleStyle}>Recomendações de Adubação</h2>
-                <FertilizerRecommendations soilData={soilData} results={results} cultureName={selectedCrop} />
+                <FertilizerRecommendations soilData={soilData} results={results} cultureName={getCropIdentifier(soilData.crop)} />
               </div>
             ) : (
               <div className="p-4 text-center">

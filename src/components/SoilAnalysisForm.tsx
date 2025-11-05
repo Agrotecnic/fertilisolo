@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
@@ -17,12 +17,21 @@ import { UnitSelector } from '@/components/UnitSelector';
 
 interface SoilAnalysisFormProps {
   onAnalysisComplete: (data: SoilData, results: CalculationResult) => void;
+  selectedFarmName?: string;
+  selectedPlotName?: string;
+  selectedFarmLocation?: string;
 }
 
-export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisComplete }) => {
+export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ 
+  onAnalysisComplete,
+  selectedFarmName,
+  selectedPlotName,
+  selectedFarmLocation
+}) => {
   const [formData, setFormData] = useState<Omit<SoilData, 'id' | 'date'>>({
     location: '',
     crop: '',
+    targetYield: 4, // Produtividade esperada padrão
     organicMatter: 0,
     T: 0,
     Ca: 0,
@@ -38,6 +47,33 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
     Mo: 0,
     argila: 35, // Adicionando o campo argila que estava faltando
   });
+
+  const [isAutoFilled, setIsAutoFilled] = useState(false);
+
+  // Preencher automaticamente quando um talhão for selecionado
+  useEffect(() => {
+    if (selectedPlotName) {
+      const locationValue = selectedFarmName 
+        ? `${selectedFarmName} - ${selectedPlotName}` 
+        : selectedPlotName;
+      
+      setFormData(prev => ({
+        ...prev,
+        location: locationValue
+      }));
+
+      setIsAutoFilled(true);
+
+      // Mostrar notificação ao usuário
+      toast({
+        title: "Talhão selecionado!",
+        description: `As informações de "${locationValue}" foram preenchidas automaticamente.`,
+        duration: 3000,
+      });
+    } else {
+      setIsAutoFilled(false);
+    }
+  }, [selectedPlotName, selectedFarmName]);
   
   // Armazenar valores temporários durante a digitação
   const [tempInputValues, setTempInputValues] = useState<Record<string, string>>({});
@@ -240,41 +276,16 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({ onAnalysisCo
         </Alert>
       )}
 
-      {/* Informações Básicas */}
-      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-800 mb-3">Informações Básicas</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="location" className="text-sm font-medium text-gray-700">Localização</Label>
-            <Input 
-              id="location" 
-              value={formData.location || ''}
-              onChange={(e) => handleInputChange('location', e.target.value)}
-              placeholder="Ex: Fazenda São João"
-              className="h-10"
-            />
-            {errors.location && <p className="text-sm text-red-500">{errors.location}</p>}
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="date" className="text-sm font-medium text-gray-700">Data da Coleta</Label>
-            <Input 
-              id="date" 
-              type="date" 
-              value={formData.date || new Date().toISOString().split('T')[0]}
-              onChange={(e) => handleInputChange('date', e.target.value)}
-              className="h-10"
-            />
-            {errors.date && <p className="text-sm text-red-500">{errors.date}</p>}
-          </div>
-        </div>
-      </div>
-
       <BasicInfoSection
         location={formData.location || ''}
         crop={formData.crop || ''}
+        date={formData.date}
+        targetYield={formData.targetYield}
+        isAutoFilled={isAutoFilled}
         onLocationChange={(value) => handleInputChange('location', value)}
         onCropChange={(value) => handleInputChange('crop', value)}
+        onDateChange={(value) => handleInputChange('date', value)}
+        onTargetYieldChange={(value) => handleInputChange('targetYield', value)}
         errors={errors}
       />
 
