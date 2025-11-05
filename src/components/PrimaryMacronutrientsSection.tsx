@@ -135,7 +135,7 @@ export const PrimaryMacronutrientsSection: React.FC<PrimaryMacronutrientsSection
 
       <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-0 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[8px]">Fósforo (P)</CardTitle>
+          <CardTitle className="text-gray-800 text-[8px]">Fósforo (P-resina)</CardTitle>
           <div className="flex items-center justify-between">
             <CardDescription className="text-gray-600 text-[6px]">
               {getUnitLabel('P', selectedUnits.P)}
