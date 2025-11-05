@@ -153,9 +153,9 @@ function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResul
     secondary: blueColor
   });
   
-  // Header Superior
+  // Header Superior (altura aumentada para melhor espaçamento)
   pdf.setFillColor(greenColor[0], greenColor[1], greenColor[2]);
-  pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 20, 'F');
+  pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 25, 'F');
   pdf.setTextColor(255, 255, 255);
   
   // Adicionar logo se disponível
@@ -183,170 +183,180 @@ function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   
   pdf.setFontSize(16);
   const orgName = themeOptions?.organizationName || 'Fertilisolo';
-  pdf.text(orgName, textStartX, 13);
+  pdf.text(orgName, textStartX, 15);
   console.log(`📝 Nome da organização: ${orgName}`);
   
   const dataAtual = new Date().toLocaleDateString('pt-BR');
   pdf.setFontSize(10);
-  pdf.text(`Relatório gerado em: ${dataAtual}`, textStartX, 18);
+  pdf.text(`Relatório gerado em: ${dataAtual}`, textStartX, 21);
   
   // Nome da fazenda/local no canto superior direito
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(12);
   const location = `${farmName || soilData.location || "Não especificado"}`;
-  pdf.text(location, 195 - pdf.getTextWidth(location), 13);
+  pdf.text(location, 195 - pdf.getTextWidth(location), 15);
   
   // Data da coleta
   const dataColeta = soilData.date ? new Date(soilData.date).toLocaleDateString('pt-BR') : dataAtual;
   const textDataColeta = `Data da coleta: ${dataColeta}`;
   pdf.setFontSize(10);
-  pdf.text(textDataColeta, 195 - pdf.getTextWidth(textDataColeta), 18);
+  pdf.text(textDataColeta, 195 - pdf.getTextWidth(textDataColeta), 21);
 
   // Linha divisória
   pdf.setDrawColor(greenColor[0], greenColor[1], greenColor[2]);
   pdf.setLineWidth(0.5);
-  pdf.line(15, 25, 195, 25);
+  pdf.line(15, 28, 195, 28);
   
   // SEÇÃO 1: Detalhes da Análise (Lado Esquerdo)
   pdf.setFillColor(grayLight[0], grayLight[1], grayLight[2]);
-  pdf.roundedRect(15, 30, 55, 40, 3, 3, 'F');
+  pdf.roundedRect(15, 32, 55, 44, 3, 3, 'F');
   
   pdf.setFontSize(11);
   pdf.setTextColor(greenColor[0], greenColor[1], greenColor[2]);
-  pdf.text('Detalhes', 17, 38);
+  pdf.text('Detalhes', 17, 40);
   
-  pdf.setFontSize(9);
+  pdf.setFontSize(10);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('Cultura:', 17, 46);
-  pdf.text(cultureName || "Não especificada", 45, 46);
-  pdf.text('Matéria Orgânica:', 17, 53);
-  pdf.text(`${formatNumber(soilData.organicMatter)}%`, 45, 53);
-  pdf.text('Argila:', 17, 60);
-  pdf.text(`${formatNumber(soilData.argila)}%`, 45, 60);
+  pdf.text('Cultura:', 17, 49);
+  pdf.text(cultureName || "Não especificada", 45, 49);
+  pdf.text('Matéria Orgânica:', 17, 57);
+  pdf.text(`${formatNumber(soilData.organicMatter)}%`, 45, 57);
+  pdf.text('Argila:', 17, 65);
+  pdf.text(`${formatNumber(soilData.argila)}%`, 45, 65);
   
   // SEÇÃO 2: Macronutrientes (Centro)
   pdf.setFillColor(grayLight[0], grayLight[1], grayLight[2]);
-  pdf.roundedRect(75, 30, 55, 40, 3, 3, 'F');
+  pdf.roundedRect(75, 32, 55, 52, 3, 3, 'F');
   
   pdf.setFontSize(11);
   pdf.setTextColor(greenColor[0], greenColor[1], greenColor[2]);
-  pdf.text('Macronutrientes', 77, 38);
+  pdf.text('Macronutrientes', 77, 40);
   
   pdf.setFontSize(9);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('CTC (T):', 77, 46);
-  pdf.text(`${formatNumber(soilData.T)} cmolc/dm³`, 115, 46);
-  pdf.text('Fósforo (P):', 77, 53);
-  pdf.text(`${formatNumber(soilData.P)} mg/dm³`, 115, 53);
-  pdf.text('Potássio (K):', 77, 60);
+  pdf.text('CTC (T):', 77, 49);
+  pdf.text(`${formatNumber(soilData.T)} cmolc/dm³`, 115, 49);
+  pdf.text('Fósforo (P):', 77, 57);
+  pdf.text(`${formatNumber(soilData.P)} mg/dm³`, 115, 57);
+  pdf.text('Potássio (K):', 77, 65);
   const kCmolc = (soilData.K || 0) / 390;
-  pdf.text(`${formatNumber(kCmolc)} cmolc/dm³`, 115, 60);
-  pdf.text('Cálcio (Ca):', 77, 67);
-  pdf.text(`${formatNumber(soilData.Ca)} cmolc/dm³`, 115, 67);
-  pdf.text('Magnésio (Mg):', 77, 74);
-  pdf.text(`${formatNumber(soilData.Mg)} cmolc/dm³`, 115, 74);
+  pdf.text(`${formatNumber(kCmolc)} cmolc/dm³`, 115, 65);
+  pdf.text('Cálcio (Ca):', 77, 73);
+  pdf.text(`${formatNumber(soilData.Ca)} cmolc/dm³`, 115, 73);
+  pdf.text('Magnésio (Mg):', 77, 81);
+  pdf.text(`${formatNumber(soilData.Mg)} cmolc/dm³`, 115, 81);
   
   // SEÇÃO 3: Informação Importante (Lado Direito - Box Azul)
   pdf.setFillColor(blueColor[0], blueColor[1], blueColor[2], 0.1); // Azul com opacidade
   pdf.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
-  pdf.roundedRect(135, 30, 55, 40, 3, 3, 'FD');
+  pdf.roundedRect(135, 32, 55, 52, 3, 3, 'FD');
   
   pdf.setFontSize(11);
   pdf.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
-  pdf.text('Informação Importante', 137, 38);
+  pdf.text('Informação Importante', 137, 40);
   
+  pdf.setFontSize(9);
+  pdf.text('Opções de Correção:', 137, 49);
+  pdf.text('As fontes de nutrientes listadas', 137, 57);
+  pdf.text('são alternativas.', 137, 63);
   pdf.setFontSize(8);
-  pdf.text('Opções de Correção:', 137, 46);
-  pdf.text('As fontes de nutrientes listadas', 137, 53);
-  pdf.text('são alternativas.', 137, 58);
-  pdf.setFontSize(7);
-  pdf.text('Escolha apenas uma fonte para cada', 137, 65);
-  pdf.text('tipo de nutriente com base na', 137, 70);
-  pdf.text('disponibilidade, custo e benefícios.', 137, 75);
+  pdf.text('Escolha apenas uma fonte para cada', 137, 71);
+  pdf.text('tipo de nutriente com base na', 137, 77);
+  pdf.text('disponibilidade, custo e benefícios.', 137, 83);
   
   // SEÇÃO 4: Análise Visual de Necessidades
   pdf.setTextColor(0, 0, 0);
   pdf.setFontSize(14);
-  pdf.text('Análise Visual de Necessidades', 15, 85);
+  pdf.text('Análise Visual de Necessidades', 15, 95);
+  
+  // Adicionar linha separadora
+  pdf.setDrawColor(greenColor[0], greenColor[1], greenColor[2]);
+  pdf.setLineWidth(0.5);
+  pdf.line(15, 98, 195, 98);
   
   // Título Macronutrientes
-  pdf.setFontSize(11);
+  pdf.setFontSize(12);
   pdf.setTextColor(greenColor[0], greenColor[1], greenColor[2]);
-  pdf.text('Macronutrientes', 15, 95);
+  pdf.text('Macronutrientes', 15, 106);
   
   // Barras de Progresso para Macronutrientes
-  pdf.setFontSize(9);
+  pdf.setFontSize(10);
   pdf.setTextColor(0, 0, 0);
   
   // Fósforo
   const pLevel = getNutrientLevel(soilData.P, 10, 20);
   const pAdequate = pLevel !== "Baixo";
-  pdf.text('Fósforo (P):', 15, 105);
-  pdf.text(pLevel, 180, 105);
-  drawNutrientBar(pdf, 70, 105, soilData.P || 0, 30, pAdequate);
+  pdf.text('Fósforo (P):', 15, 116);
+  pdf.text(pLevel, 180, 116);
+  drawNutrientBar(pdf, 70, 116, soilData.P || 0, 30, pAdequate);
   
   // Potássio
   const kLevel = getNutrientLevel(kCmolc, 0.15, 0.30);
   const kAdequate = kLevel !== "Baixo";
-  pdf.text('Potássio (K):', 15, 115);
-  pdf.text(kLevel, 180, 115);
-  drawNutrientBar(pdf, 70, 115, kCmolc, 0.5, kAdequate);
+  pdf.text('Potássio (K):', 15, 129);
+  pdf.text(kLevel, 180, 129);
+  drawNutrientBar(pdf, 70, 129, kCmolc, 0.5, kAdequate);
   
   // Cálcio
   const caLevel = getNutrientLevel(soilData.Ca, 2.0, 4.0);
   const caAdequate = caLevel !== "Baixo";
-  pdf.text('Cálcio (Ca):', 15, 125);
-  pdf.text(caLevel, 180, 125);
-  drawNutrientBar(pdf, 70, 125, soilData.Ca || 0, 6.0, caAdequate);
+  pdf.text('Cálcio (Ca):', 15, 142);
+  pdf.text(caLevel, 180, 142);
+  drawNutrientBar(pdf, 70, 142, soilData.Ca || 0, 6.0, caAdequate);
   
   // Magnésio
   const mgLevel = getNutrientLevel(soilData.Mg, 0.8, 1.5);
   const mgAdequate = mgLevel !== "Baixo";
-  pdf.text('Magnésio (Mg):', 15, 135);
-  pdf.text(mgLevel, 180, 135);
-  drawNutrientBar(pdf, 70, 135, soilData.Mg || 0, 2.0, mgAdequate);
+  pdf.text('Magnésio (Mg):', 15, 155);
+  pdf.text(mgLevel, 180, 155);
+  drawNutrientBar(pdf, 70, 155, soilData.Mg || 0, 2.0, mgAdequate);
+  
+  // Separador visual entre macro e micro
+  pdf.setDrawColor(200, 200, 200);
+  pdf.setLineWidth(0.3);
+  pdf.line(15, 163, 195, 163);
   
   // Título Micronutrientes
-  pdf.setFontSize(11);
+  pdf.setFontSize(12);
   pdf.setTextColor(greenColor[0], greenColor[1], greenColor[2]);
-  pdf.text('Micronutrientes', 15, 150);
+  pdf.text('Micronutrientes', 15, 171);
   
   // Barras de Progresso para Micronutrientes
-  pdf.setFontSize(9);
+  pdf.setFontSize(10);
   pdf.setTextColor(0, 0, 0);
   
   // Boro
   const bLevel = getNutrientLevel(soilData.B, 0.3, 0.6);
   const bAdequate = bLevel !== "Baixo";
-  pdf.text('Boro (B):', 15, 160);
-  pdf.text(bLevel, 180, 160);
-  drawNutrientBar(pdf, 70, 160, soilData.B || 0, 1.0, bAdequate);
+  pdf.text('Boro (B):', 15, 181);
+  pdf.text(bLevel, 180, 181);
+  drawNutrientBar(pdf, 70, 181, soilData.B || 0, 1.0, bAdequate);
   
   // Zinco
   const znLevel = getNutrientLevel(soilData.Zn, 1.5, 2.2);
   const znAdequate = znLevel !== "Baixo";
-  pdf.text('Zinco (Zn):', 15, 170);
-  pdf.text(znLevel, 180, 170);
-  drawNutrientBar(pdf, 70, 170, soilData.Zn || 0, 3.0, znAdequate);
+  pdf.text('Zinco (Zn):', 15, 194);
+  pdf.text(znLevel, 180, 194);
+  drawNutrientBar(pdf, 70, 194, soilData.Zn || 0, 3.0, znAdequate);
   
   // Cobre
   const cuLevel = getNutrientLevel(soilData.Cu, 0.8, 1.2);
   const cuAdequate = cuLevel !== "Baixo";
-  pdf.text('Cobre (Cu):', 15, 180);
-  pdf.text(cuLevel, 180, 180);
-  drawNutrientBar(pdf, 70, 180, soilData.Cu || 0, 2.0, cuAdequate);
+  pdf.text('Cobre (Cu):', 15, 207);
+  pdf.text(cuLevel, 180, 207);
+  drawNutrientBar(pdf, 70, 207, soilData.Cu || 0, 2.0, cuAdequate);
   
   // Manganês
   const mnLevel = getNutrientLevel(soilData.Mn, 5, 30);
   const mnAdequate = mnLevel !== "Baixo";
-  pdf.text('Manganês (Mn):', 15, 190);
-  pdf.text(mnLevel, 180, 190);
-  drawNutrientBar(pdf, 70, 190, soilData.Mn || 0, 50, mnAdequate);
+  pdf.text('Manganês (Mn):', 15, 220);
+  pdf.text(mnLevel, 180, 220);
+  drawNutrientBar(pdf, 70, 220, soilData.Mn || 0, 50, mnAdequate);
   
   // SEÇÃO 5: Recomendações de Fertilizantes (Tabela)
   pdf.setFontSize(14);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('Recomendações de Fertilizantes', 15, 205);
+  pdf.text('Recomendações de Fertilizantes', 15, 230);
   
   // Preparar as recomendações de fertilizantes
   const recommendedFertilizers: any[] = [];
@@ -412,24 +422,27 @@ function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   autoTable(pdf, {
     head: [['Fonte de Fertilizante', 'Quantidade', 'Método', 'Época']],
     body: recommendedFertilizers,
-    startY: 210,
+    startY: 235,
     theme: 'grid',
     headStyles: { 
       fillColor: greenColor, 
       textColor: [255, 255, 255],
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      fontSize: 10
     },
     alternateRowStyles: { 
       fillColor: [240, 248, 240] 
     },
     styles: {
-      fontSize: 9
+      fontSize: 10,
+      cellPadding: 4
     },
+    rowPageBreak: 'avoid',
     margin: { left: 15, right: 15 }
   });
   
   // SEÇÃO 6: Notas e Recomendações Especiais
-  const finalY = (pdf as any).lastAutoTable.finalY + 10;
+  const finalY = (pdf as any).lastAutoTable.finalY + 15;
   
   pdf.setFontSize(14);
   pdf.setTextColor(0, 0, 0);
@@ -447,20 +460,20 @@ function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   
   // Exibir as notas em duas colunas
   pdf.setFontSize(9);
-  let yPos = finalY + 10;
+  let yPos = finalY + 15;
   const middleIndex = Math.ceil(notes.length / 2);
   
   // Primeira coluna
   for (let i = 0; i < middleIndex; i++) {
     pdf.text(notes[i], 15, yPos);
-    yPos += 7;
+    yPos += 9;
   }
   
   // Segunda coluna
-  yPos = finalY + 10;
+  yPos = finalY + 15;
   for (let i = middleIndex; i < notes.length; i++) {
     pdf.text(notes[i], 105, yPos);
-    yPos += 7;
+    yPos += 9;
   }
 }
 
@@ -733,14 +746,17 @@ function generatePage2(pdf: jsPDF, soilData: SoilData, results: CalculationResul
     headStyles: { 
       fillColor: greenColor, 
       textColor: [255, 255, 255],
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      fontSize: 10
     },
     alternateRowStyles: { 
       fillColor: [240, 248, 240] 
     },
     styles: {
-      fontSize: 9
+      fontSize: 9,
+      cellPadding: 3.5
     },
+    rowPageBreak: 'avoid',
     margin: { left: 15, right: 15 }
   });
 }
@@ -831,19 +847,22 @@ function generatePage3(pdf: jsPDF, soilData: SoilData, results: CalculationResul
     headStyles: { 
       fillColor: greenColor, 
       textColor: [255, 255, 255],
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      fontSize: 10
     },
     alternateRowStyles: { 
       fillColor: [240, 248, 240] 
     },
     styles: {
-      fontSize: 9
+      fontSize: 9,
+      cellPadding: 3.5
     },
+    rowPageBreak: 'avoid',
     margin: { left: 15, right: 15 }
   });
   
   // Observações Importantes sobre Manejo de Nutrientes
-  const finalY = (pdf as any).lastAutoTable.finalY + 10;
+  const finalY = (pdf as any).lastAutoTable.finalY + 15;
   
   pdf.setFontSize(14);
   pdf.setTextColor(0, 0, 0);
@@ -862,11 +881,11 @@ function generatePage3(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   
   // Exibir as observações
   pdf.setFontSize(9);
-  let yPos = finalY + 10;
+  let yPos = finalY + 15;
   
   observations.forEach(obs => {
     pdf.text(obs, 15, yPos);
-    yPos += 7;
+    yPos += 9;
   });
 }
 
