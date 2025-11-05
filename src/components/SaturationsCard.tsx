@@ -14,6 +14,7 @@ interface SaturationsCardProps {
 export const SaturationsCard: React.FC<SaturationsCardProps> = ({ soilData, results }) => {
   const titleStyle = { fontFamily: 'Inter, sans-serif' };
   
+  
   const getStatusIcon = (isAdequate: boolean) => {
     if (isAdequate) return <CheckCircle className="h-4 w-4 text-primary" />;
     return <XCircle className="h-4 w-4 text-accent" />;
@@ -45,11 +46,16 @@ export const SaturationsCard: React.FC<SaturationsCardProps> = ({ soilData, resu
               </Badge>
             </div>
             <Progress 
-              value={Math.min(results.saturations.Ca, 100)} 
+              value={Math.max(Math.min(results.saturations.Ca, 100), results.saturations.Ca > 0 ? 2 : 0)} 
               className="h-2 bg-bg-lighter"
             />
             <div className="text-xs text-neutral-medium">
               Ideal: 50-60% | Atual: {formatNumberOptional(soilData.Ca)} cmolc/dm³
+              {results.saturations.Ca > 0 && results.saturations.Ca < 5 && (
+                <span className="block text-orange-600 font-medium mt-1">
+                  ⚠️ Nível crítico - Saturação muito baixa
+                </span>
+              )}
             </div>
           </div>
 
@@ -65,11 +71,16 @@ export const SaturationsCard: React.FC<SaturationsCardProps> = ({ soilData, resu
               </Badge>
             </div>
             <Progress 
-              value={Math.min(results.saturations.Mg, 100)} 
+              value={Math.max(Math.min(results.saturations.Mg, 100), results.saturations.Mg > 0 ? 2 : 0)} 
               className="h-2 bg-bg-lighter"
             />
             <div className="text-xs text-neutral-medium">
               Ideal: 15-20% | Atual: {formatNumberOptional(soilData.Mg)} cmolc/dm³
+              {results.saturations.Mg > 0 && results.saturations.Mg < 3 && (
+                <span className="block text-orange-600 font-medium mt-1">
+                  ⚠️ Nível crítico - Saturação muito baixa
+                </span>
+              )}
             </div>
           </div>
 
@@ -85,11 +96,16 @@ export const SaturationsCard: React.FC<SaturationsCardProps> = ({ soilData, resu
               </Badge>
             </div>
             <Progress 
-              value={Math.min(results.saturations.K, 100)} 
+              value={Math.max(Math.min(results.saturations.K, 100), results.saturations.K > 0 ? 2 : 0)} 
               className="h-2 bg-bg-lighter"
             />
             <div className="text-xs text-neutral-medium">
               Ideal: 3-5% | Atual: {formatNumberOptional(soilData.K)} mg/dm³
+              {results.saturations.K > 0 && results.saturations.K < 0.5 && (
+                <span className="block text-orange-600 font-medium mt-1">
+                  ⚠️ Nível crítico - Saturação muito baixa
+                </span>
+              )}
             </div>
           </div>
         </div>
