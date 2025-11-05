@@ -117,7 +117,10 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
           
           // Caso contrário, converter normalmente
           const numValue = parseFloat(value.replace(',', '.')) || 0;
-          setFormData(prev => ({ ...prev, [field]: numValue }));
+          
+          // Converter da unidade selecionada para a unidade padrão antes de armazenar
+          const standardValue = convertToStandardUnit(numValue, field, selectedUnits[field] || '');
+          setFormData(prev => ({ ...prev, [field]: standardValue }));
         } else if (value === '') {
           // Limpar o valor temporário quando vazio
           setTempInputValues(prev => ({ ...prev, [field]: '' }));
@@ -126,11 +129,15 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
           // Tentar converter para número
           const numValue = parseFloat(value.replace(',', '.')) || 0;
           setTempInputValues(prev => ({ ...prev, [field]: value }));
-          setFormData(prev => ({ ...prev, [field]: numValue }));
+          
+          // Converter da unidade selecionada para a unidade padrão antes de armazenar
+          const standardValue = convertToStandardUnit(numValue, field, selectedUnits[field] || '');
+          setFormData(prev => ({ ...prev, [field]: standardValue }));
         }
       } else {
-        // Se já for um número, atualizar diretamente
-        setFormData(prev => ({ ...prev, [field]: value }));
+        // Se já for um número, converter da unidade selecionada para padrão antes de armazenar
+        const standardValue = convertToStandardUnit(value, field, selectedUnits[field] || '');
+        setFormData(prev => ({ ...prev, [field]: standardValue }));
         setTempInputValues(prev => ({ ...prev, [field]: value.toString() }));
       }
     } else {
