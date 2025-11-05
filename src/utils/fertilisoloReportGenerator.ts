@@ -535,9 +535,9 @@ function generatePage2(pdf: jsPDF, soilData: SoilData, results: CalculationResul
     'V6-V8'
   ]);
   
-  // FÓSFORO
-  // Superfosfato Simples
-  const necessidadeP = soilData.P < 15 ? (15 - soilData.P) * 30 : 0;
+  // FÓSFORO (usa results.needs.P que já está em kg/ha de P2O5)
+  // Superfosfato Simples (18% P2O5)
+  const necessidadeP = results.needs.P > 0 ? results.needs.P / 0.18 : 0;
   if (necessidadeP > 0) {
     fertilizerRows.push([
       'Superfosfato Simples', 
@@ -548,8 +548,8 @@ function generatePage2(pdf: jsPDF, soilData: SoilData, results: CalculationResul
     ]);
   }
   
-  // Superfosfato Triplo
-  const necessidadePST = soilData.P < 15 ? (15 - soilData.P) * 15 : 0;
+  // Superfosfato Triplo (45% P2O5)
+  const necessidadePST = results.needs.P > 0 ? results.needs.P / 0.45 : 0;
   if (necessidadePST > 0) {
     fertilizerRows.push([
       'Superfosfato Triplo', 
@@ -560,8 +560,8 @@ function generatePage2(pdf: jsPDF, soilData: SoilData, results: CalculationResul
     ]);
   }
   
-  // MAP
-  const necessidadePMAP = soilData.P < 15 ? (15 - soilData.P) * 12 : 0;
+  // MAP (52% P2O5)
+  const necessidadePMAP = results.needs.P > 0 ? results.needs.P / 0.52 : 0;
   if (necessidadePMAP > 0) {
     fertilizerRows.push([
       'MAP', 
