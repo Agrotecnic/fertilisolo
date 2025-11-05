@@ -40,8 +40,8 @@ export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): Calc
     S: S >= 10,
     B: B >= 0.2 && B <= 0.6,
     Cu: Cu >= 0.8 && Cu <= 1.2,
-    Fe: Fe >= 12 && Fe <= 200, // Limites: mínimo 12, máximo 200 (acima disso pode causar toxicidade)
-    Mn: Mn >= 5 && Mn <= 50, // Limites: mínimo 5, máximo 50 (acima disso pode causar toxicidade)
+    Fe: Fe >= 12 && Fe <= 30, // Faixa Média (Mehlich-1/DTPA): 12-30 mg/dm³
+    Mn: Mn >= 5 && Mn <= 12, // Faixa Média (Mehlich-1/DTPA): 5-12 mg/dm³
     Zn: Zn >= 0.5 && Zn <= 1.2,
     Mo: Mo >= 0.1 && Mo <= 0.2,
   };
@@ -380,8 +380,8 @@ export const calculateResultsWithArgilaInterpretation = (soil: SoilData): Calcul
     S: soil.S >= 10,
     B: soil.B >= 0.3,
     Cu: soil.Cu >= 0.8,
-    Fe: soil.Fe >= 12 && soil.Fe <= 200, // Limites: mínimo 12, máximo 200 (acima disso pode causar toxicidade)
-    Mn: soil.Mn >= 5 && soil.Mn <= 50, // Limites: mínimo 5, máximo 50 (acima disso pode causar toxicidade)
+    Fe: soil.Fe >= 12 && soil.Fe <= 30, // Faixa Média (Mehlich-1/DTPA): 12-30 mg/dm³
+    Mn: soil.Mn >= 5 && soil.Mn <= 12, // Faixa Média (Mehlich-1/DTPA): 5-12 mg/dm³
     Zn: soil.Zn >= 1.5,
     Mo: true // Padrão para Molibdênio
   };

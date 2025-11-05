@@ -80,7 +80,7 @@ export interface CalculationResult {
     Zn: boolean;
     Mo: boolean;
   };
-  recommendations: {
+  recommendations?: {
     macronutrientes: {
       P: string;
       K: string;
@@ -97,7 +97,7 @@ export interface CalculationResult {
       Mo: string;
     };
   };
-  fertilizers: {
+  fertilizers?: {
     macronutrientes: Array<{
       nome: string;
       quantidade: number;

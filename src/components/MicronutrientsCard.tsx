@@ -81,11 +81,11 @@ export const MicronutrientsCard: React.FC<MicronutrientsCardProps> = ({ soilData
             <div className="text-base font-bold text-gray-800 mb-1">
               {soilData.Fe} mg/dm³
             </div>
-            <Badge className={`text-xs ${getStatusColorByValue(soilData.Fe, 12, 200)}`}>
-              {getNutrientStatus(soilData.Fe, 12, 200)}
+            <Badge className={`text-xs ${getStatusColorByValue(soilData.Fe, 12, 30)}`}>
+              {getNutrientStatus(soilData.Fe, 12, 30)}
             </Badge>
             <div className="text-xs text-gray-600 mt-1">
-              Ideal: 12-200
+              Médio: 12-30
             </div>
           </div>
           
@@ -97,11 +97,11 @@ export const MicronutrientsCard: React.FC<MicronutrientsCardProps> = ({ soilData
             <div className="text-base font-bold text-gray-800 mb-1">
               {soilData.Mn} mg/dm³
             </div>
-            <Badge className={`text-xs ${getStatusColorByValue(soilData.Mn, 5, 50)}`}>
-              {getNutrientStatus(soilData.Mn, 5, 50)}
+            <Badge className={`text-xs ${getStatusColorByValue(soilData.Mn, 5, 12)}`}>
+              {getNutrientStatus(soilData.Mn, 5, 12)}
             </Badge>
             <div className="text-xs text-gray-600 mt-1">
-              Ideal: 5-50
+              Médio: 5-12
             </div>
           </div>
           
