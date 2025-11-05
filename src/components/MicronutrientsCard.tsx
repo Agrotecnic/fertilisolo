@@ -20,6 +20,19 @@ export const MicronutrientsCard: React.FC<MicronutrientsCardProps> = ({ soilData
     return isAdequate ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200';
   };
 
+  const getNutrientStatus = (value: number, min: number, max?: number) => {
+    if (value < min) return 'Baixo';
+    if (max && value > max) return 'Alto';
+    return 'Adequado';
+  };
+
+  const getStatusColorByValue = (value: number, min: number, max?: number) => {
+    const status = getNutrientStatus(value, min, max);
+    if (status === 'Adequado') return 'bg-green-100 text-green-800 border-green-200';
+    if (status === 'Alto') return 'bg-orange-100 text-orange-800 border-orange-200';
+    return 'bg-red-100 text-red-800 border-red-200';
+  };
+
   return (
     <Card className="bg-white/80 backdrop-blur-sm border-green-200 h-fit">
       <CardHeader className="pb-3">
@@ -68,11 +81,11 @@ export const MicronutrientsCard: React.FC<MicronutrientsCardProps> = ({ soilData
             <div className="text-base font-bold text-gray-800 mb-1">
               {soilData.Fe} mg/dm³
             </div>
-            <Badge className={`text-xs ${getStatusColor(results.isAdequate.Fe)}`}>
-              {results.isAdequate.Fe ? 'Adequado' : 'Baixo'}
+            <Badge className={`text-xs ${getStatusColorByValue(soilData.Fe, 12, 200)}`}>
+              {getNutrientStatus(soilData.Fe, 12, 200)}
             </Badge>
             <div className="text-xs text-gray-600 mt-1">
-              Ideal: ≥ 5
+              Ideal: 12-200
             </div>
           </div>
           
@@ -84,11 +97,11 @@ export const MicronutrientsCard: React.FC<MicronutrientsCardProps> = ({ soilData
             <div className="text-base font-bold text-gray-800 mb-1">
               {soilData.Mn} mg/dm³
             </div>
-            <Badge className={`text-xs ${getStatusColor(results.isAdequate.Mn)}`}>
-              {results.isAdequate.Mn ? 'Adequado' : 'Baixo'}
+            <Badge className={`text-xs ${getStatusColorByValue(soilData.Mn, 5, 50)}`}>
+              {getNutrientStatus(soilData.Mn, 5, 50)}
             </Badge>
             <div className="text-xs text-gray-600 mt-1">
-              Ideal: ≥ 1,2
+              Ideal: 5-50
             </div>
           </div>
           
