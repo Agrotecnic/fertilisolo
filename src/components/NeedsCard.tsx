@@ -41,7 +41,7 @@ export const NeedsCard: React.FC<NeedsCardProps> = ({ results }) => {
               {formatNumber(results.needs.K)}
             </div>
             <div className="text-sm font-medium text-neutral-dark">
-              mg/dm³ de K
+              cmolc/dm³ de K
             </div>
           </div>
           

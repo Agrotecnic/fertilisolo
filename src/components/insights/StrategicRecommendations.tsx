@@ -23,7 +23,7 @@ const generateStrategicInsights = (soilData: SoilData, results: CalculationResul
   }
 
   if (!isAdequate.K && soilData.T > 0) {
-    const kPercent = (needs.K / 390 / soilData.T * 100);
+    const kPercent = (needs.K / soilData.T * 100);
     insights.push(`ESTRATÉGIA K: Necessário elevar saturação em ${kPercent.toFixed(1)}%. Em solos argilosos, prefira sulfato de K. Em arenosos, monitore lixiviação.`);
   }
 

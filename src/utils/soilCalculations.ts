@@ -54,7 +54,7 @@ export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): Calc
   const needs = {
     Ca: Math.max(0, targetCa - Ca),
     Mg: Math.max(0, targetMg - Mg),
-    K: Math.max(0, (targetK - KCmolc) * 390), // Converter de volta para mg/dm³
+    K: Math.max(0, targetK - KCmolc), // Mantém em cmolc/dm³ para uso correto em calculateFertilizerRecommendations
     P: calculatePhosphorusNeed(P),
     S: calculateSulfurNeed(S),
     B: calculateBoronNeed(B),
