@@ -115,29 +115,27 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
             return;
           }
           
-          // Caso contrário, converter normalmente
-          const numValue = parseFloat(value.replace(',', '.')) || 0;
-          
-          // Converter da unidade selecionada para a unidade padrão antes de armazenar
-          const standardValue = convertToStandardUnit(numValue, field, selectedUnits[field] || '');
-          setFormData(prev => ({ ...prev, [field]: standardValue }));
+          // Armazenar o valor SEM conversão (mantém na unidade do usuário)
+          let numValue = parseFloat(value.replace(',', '.')) || 0;
+          // Arredondar para evitar erros de precisão de ponto flutuante
+          numValue = Math.round(numValue * 1000000) / 1000000;
+          setFormData(prev => ({ ...prev, [field]: numValue }));
         } else if (value === '') {
           // Limpar o valor temporário quando vazio
           setTempInputValues(prev => ({ ...prev, [field]: '' }));
           setFormData(prev => ({ ...prev, [field]: 0 }));
         } else {
           // Tentar converter para número
-          const numValue = parseFloat(value.replace(',', '.')) || 0;
+          let numValue = parseFloat(value.replace(',', '.')) || 0;
+          // Arredondar para evitar erros de precisão de ponto flutuante
+          numValue = Math.round(numValue * 1000000) / 1000000;
           setTempInputValues(prev => ({ ...prev, [field]: value }));
-          
-          // Converter da unidade selecionada para a unidade padrão antes de armazenar
-          const standardValue = convertToStandardUnit(numValue, field, selectedUnits[field] || '');
-          setFormData(prev => ({ ...prev, [field]: standardValue }));
+          // Armazenar o valor SEM conversão (mantém na unidade do usuário)
+          setFormData(prev => ({ ...prev, [field]: numValue }));
         }
       } else {
-        // Se já for um número, converter da unidade selecionada para padrão antes de armazenar
-        const standardValue = convertToStandardUnit(value, field, selectedUnits[field] || '');
-        setFormData(prev => ({ ...prev, [field]: standardValue }));
+        // Se já for um número, armazenar diretamente SEM conversão
+        setFormData(prev => ({ ...prev, [field]: value }));
         setTempInputValues(prev => ({ ...prev, [field]: value.toString() }));
       }
     } else {
@@ -196,7 +194,10 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
       const standardValue = convertToStandardUnit(currentValue, nutrient, oldUnit);
       
       // Depois converter da padrão para a nova unidade
-      const newValue = convertFromStandardUnit(standardValue, nutrient, newUnit);
+      let newValue = convertFromStandardUnit(standardValue, nutrient, newUnit);
+      
+      // Arredondar para 6 casas decimais para evitar erros de precisão de ponto flutuante
+      newValue = Math.round(newValue * 1000000) / 1000000;
       
       // Atualizar o valor no formData
       setFormData(prev => ({
@@ -261,20 +262,6 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
     return formData[field];
   };
 
-  // Obter o valor convertido para a unidade selecionada
-  const getConvertedValue = (field: keyof typeof formData) => {
-    const numericFields = ['organicMatter', 'T', 'Ca', 'Mg', 'K', 'P', 'S', 'B', 'Cu', 'Fe', 'Mn', 'Zn', 'Mo'];
-    if (!numericFields.includes(field)) return formData[field];
-    
-    const value = formData[field];
-    const selectedUnit = selectedUnits[field];
-    
-    if (!selectedUnit || value === 0) return value;
-    
-    // Converter da unidade padrão para a unidade selecionada
-    return convertFromStandardUnit(value, field, selectedUnit);
-  };
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {errors.general && (
@@ -300,11 +287,11 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
       <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
         <h3 className="text-sm font-semibold text-gray-800 mb-3">Macronutrientes Primários</h3>
         <PrimaryMacronutrientsSection
-          T={getConvertedValue('T')}
-          Ca={getConvertedValue('Ca')}
-          Mg={getConvertedValue('Mg')}
-          K={getConvertedValue('K')}
-          P={getConvertedValue('P')}
+          T={formData.T}
+          Ca={formData.Ca}
+          Mg={formData.Mg}
+          K={formData.K}
+          P={formData.P}
           onTChange={(value) => handleInputChange('T', value)}
           onCaChange={(value) => handleInputChange('Ca', value)}
           onMgChange={(value) => handleInputChange('Mg', value)}
@@ -337,7 +324,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
               step="0.01"
               min="0"
               placeholder="0,00"
-              value={getConvertedValue('S')}
+              value={formData.S}
               onChange={(e) => handleInputChange('S', parseFloat(e.target.value) || 0)}
               className="h-10"
             />
@@ -380,7 +367,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
               step="0.01"
               min="0"
               placeholder="0,00"
-              value={getConvertedValue('organicMatter')}
+              value={formData.organicMatter}
               onChange={(e) => handleInputChange('organicMatter', parseFloat(e.target.value) || 0)}
               className="h-10"
             />
@@ -411,7 +398,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
               step="0.01"
               min="0"
               placeholder="0,00"
-              value={getConvertedValue('B')}
+              value={formData.B}
               onChange={(e) => handleInputChange('B', parseFloat(e.target.value) || 0)}
               className="h-10"
             />
@@ -436,7 +423,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
               step="0.01"
               min="0"
               placeholder="0,00"
-              value={getConvertedValue('Cu')}
+              value={formData.Cu}
               onChange={(e) => handleInputChange('Cu', parseFloat(e.target.value) || 0)}
               className="h-10"
             />
@@ -461,7 +448,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
               step="0.01"
               min="0"
               placeholder="0,00"
-              value={getConvertedValue('Fe')}
+              value={formData.Fe}
               onChange={(e) => handleInputChange('Fe', parseFloat(e.target.value) || 0)}
               className="h-10"
             />
@@ -486,7 +473,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
               step="0.01"
               min="0"
               placeholder="0,00"
-              value={getConvertedValue('Mn')}
+              value={formData.Mn}
               onChange={(e) => handleInputChange('Mn', parseFloat(e.target.value) || 0)}
               className="h-10"
             />
@@ -511,7 +498,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
               step="0.01"
               min="0"
               placeholder="0,00"
-              value={getConvertedValue('Zn')}
+              value={formData.Zn}
               onChange={(e) => handleInputChange('Zn', parseFloat(e.target.value) || 0)}
               className="h-10"
             />
@@ -536,7 +523,7 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
               step="0.01"
               min="0"
               placeholder="0,00"
-              value={getConvertedValue('Mo')}
+              value={formData.Mo}
               onChange={(e) => handleInputChange('Mo', parseFloat(e.target.value) || 0)}
               className="h-10"
             />
