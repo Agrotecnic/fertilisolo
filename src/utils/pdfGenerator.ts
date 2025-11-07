@@ -547,12 +547,31 @@ export const generatePDF = async (
     
     const pdf = new jsPDF();
     
-    // Cor primária do tema ou padrão verde
+    // Paleta de cores moderna baseada no modelo HTML
+    const colors = {
+      navyDark: [26, 43, 74] as [number, number, number],
+      navyMedium: [45, 74, 115] as [number, number, number],
+      blueAccent: [0, 123, 255] as [number, number, number],
+      blueLight: [0, 212, 255] as [number, number, number],
+      grayBg: [248, 249, 250] as [number, number, number],
+      grayAlt: [233, 236, 239] as [number, number, number],
+      grayBorder: [222, 226, 230] as [number, number, number],
+      grayText: [73, 80, 87] as [number, number, number],
+      success: [25, 135, 84] as [number, number, number],
+      warning: [255, 193, 7] as [number, number, number],
+      info: [13, 202, 240] as [number, number, number],
+    };
+    
+    // Cor primária do tema ou padrão azul navy
     const primaryColor: [number, number, number] = themeOptions?.primaryColor
       ? hexToRgb(themeOptions.primaryColor)
-      : [76, 175, 80]; // Verde padrão
+      : colors.navyDark;
     
-    console.log('🎨 Cor primária do PDF:', primaryColor);
+    const secondaryColor: [number, number, number] = themeOptions?.secondaryColor
+      ? hexToRgb(themeOptions.secondaryColor)
+      : colors.blueAccent;
+    
+    console.log('🎨 Cores do PDF:', { primary: primaryColor, secondary: secondaryColor });
     
     // Configurações do PDF
     pdf.setProperties({
@@ -577,108 +596,185 @@ export const generatePDF = async (
       console.log('⚠️ Nenhum logo fornecido para o PDF');
     }
 
-    // Header Superior com cor personalizada
-    pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    pdf.setFontSize(18); // 18pt negrito
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(themeOptions?.organizationName || 'Fertilisolo', marginX, marginY + 10);
+    // Header com gradiente (simulando gradient com retângulos sobrepostos)
+    const headerHeight = 25;
     
-    // Subtítulo (cinza)
-    pdf.setTextColor(102, 102, 102); // #666666
+    // Base do gradiente
+    pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    pdf.rect(0, 0, pageWidth, headerHeight, 'F');
+    
+    // Overlay para simular gradiente
+    for (let i = 0; i < 10; i++) {
+      const alpha = i / 10;
+      const r = primaryColor[0] + (colors.navyMedium[0] - primaryColor[0]) * alpha;
+      const g = primaryColor[1] + (colors.navyMedium[1] - primaryColor[1]) * alpha;
+      const b = primaryColor[2] + (colors.navyMedium[2] - primaryColor[2]) * alpha;
+      
+      pdf.setFillColor(r, g, b);
+      const sliceHeight = headerHeight / 10;
+      pdf.rect(0, i * sliceHeight, pageWidth, sliceHeight, 'F');
+    }
+    
+    // Barra azul clara na base do header (como no modelo HTML)
+    pdf.setFillColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+    pdf.rect(0, headerHeight, pageWidth, 4, 'F');
+    
+    // Texto do header
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(themeOptions?.organizationName || 'Fertilisolo', marginX, 15);
+    
+    // Subtítulo
     pdf.setFontSize(10);
     pdf.setFont('helvetica', 'normal');
-    pdf.text(`Relatório gerado em: ${new Date().toLocaleDateString('pt-BR')}`, marginX, marginY + 18);
+    pdf.text(`Relatório gerado em: ${new Date().toLocaleDateString('pt-BR')}`, marginX, 21);
     
-    // Canto superior direito - ajustado para não estrapolar
-    pdf.setTextColor(51, 51, 51);
-    pdf.setFontSize(10);
+    // Canto superior direito
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
     const locationText = `${farmName || soilData.location || "Não especificado"}`;
-    const dateText = `Data da coleta: ${soilData.date ? new Date(soilData.date).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR')}`;
+    pdf.text(locationText, pageWidth - pdf.getTextWidth(locationText) - marginX, 15);
     
-    // Centralizar texto no espaço disponível (até onde começa o logo)
-    const rightSectionX = 120;
-    pdf.text(locationText, rightSectionX, marginY + 10);
-    pdf.text(dateText, rightSectionX, marginY + 18);
+    const dateText = `Data da coleta: ${soilData.date ? new Date(soilData.date).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR')}`;
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(dateText, pageWidth - pdf.getTextWidth(dateText) - marginX, 21);
 
-    // Seção 1: Layout de 3 Colunas (Y = 40) - larguras ajustadas
-    const colY = 40;
+    // Função auxiliar para desenhar card com sombra
+    const drawCard = (x: number, y: number, width: number, height: number, withShadow: boolean = true) => {
+      if (withShadow) {
+        // Sombra (simulada com retângulo cinza deslocado)
+        pdf.setFillColor(200, 200, 200);
+        pdf.roundedRect(x + 1, y + 1, width, height, 3, 3, 'F');
+      }
+      
+      // Card branco
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(colors.grayBorder[0], colors.grayBorder[1], colors.grayBorder[2]);
+      pdf.setLineWidth(0.5);
+      pdf.roundedRect(x, y, width, height, 3, 3, 'FD');
+    };
+    
+    // Seção 1: Layout de 3 Colunas (Y = 34) - larguras ajustadas
+    const colY = 34;
     const colHeight = 50;
     const col1Width = 52;
     const col2Width = 58;
     const col3Width = 52;
     const gap = 3;
     
-    // Coluna 1 - Detalhes (Cor primária clara)
-    const lightPrimaryColor: [number, number, number] = [
-      Math.min(255, primaryColor[0] + 180),
-      Math.min(255, primaryColor[1] + 180),
-      Math.min(255, primaryColor[2] + 180)
-    ];
-    pdf.setFillColor(lightPrimaryColor[0], lightPrimaryColor[1], lightPrimaryColor[2]);
-    pdf.rect(marginX, colY, col1Width, colHeight, 'F');
-    pdf.setDrawColor(200, 200, 200);
-    pdf.setLineWidth(0.5);
-    pdf.rect(marginX, colY, col1Width, colHeight, 'S');
+    // Coluna 1 - Detalhes da Análise (Card branco)
+    drawCard(marginX, colY, col1Width, colHeight);
     
     // Título da coluna 1
-    pdf.setTextColor(51, 51, 51);
+    pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     pdf.setFontSize(11);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('Detalhes', marginX + 3, colY + 10);
+    pdf.text('Detalhes da Análise', marginX + 3, colY + 8);
     
-    // Conteúdo da coluna 1 - dados na mesma linha após os dois pontos
-    pdf.setFontSize(8); // Reduzido
+    // Conteúdo da coluna 1
+    pdf.setFontSize(8);
     pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
     
-    // Cultura - na mesma linha
+    // Cultura
     const culturaText = cultureName || "Não especificada";
-    pdf.text(`Cultura: ${culturaText}`, marginX + 2, colY + 18);
+    pdf.text('Cultura:', marginX + 2, colY + 17);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(culturaText, marginX + 2, colY + 22);
     
-    // Matéria Orgânica - na mesma linha
-    pdf.text(`Mat. Orgânica: ${(soilData.organicMatter || 0).toFixed(1)}%`, marginX + 2, colY + 28);
+    // Matéria Orgânica
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+    pdf.text('Matéria Orgânica:', marginX + 2, colY + 30);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(colors.success[0], colors.success[1], colors.success[2]);
+    pdf.text(`${(soilData.organicMatter || 0).toFixed(1)}%`, marginX + 2, colY + 35);
     
-    // Argila - na mesma linha
-    pdf.text(`Argila: ${(soilData.argila || 0).toFixed(0)}%`, marginX + 2, colY + 38);
+    // Argila
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+    pdf.text('Argila:', marginX + 2, colY + 43);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`${(soilData.argila || 0).toFixed(0)}%`, marginX + 2, colY + 48);
     
-    // Coluna 2 - Macronutrientes (Cor primária clara)
+    // Coluna 2 - Macronutrientes (Card branco)
     const col2X = marginX + col1Width + gap;
-    pdf.setFillColor(lightPrimaryColor[0], lightPrimaryColor[1], lightPrimaryColor[2]);
-    pdf.rect(col2X, colY, col2Width, colHeight, 'F');
-    pdf.rect(col2X, colY, col2Width, colHeight, 'S');
+    drawCard(col2X, colY, col2Width, colHeight);
     
-    pdf.setFontSize(12);
+    pdf.setFontSize(11);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('Macronutrientes', col2X + 3, colY + 10);
+    pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    pdf.text('Macronutrientes', col2X + 3, colY + 8);
     
-    pdf.setFontSize(7); // Reduzido para caber
+    pdf.setFontSize(7.5);
     pdf.setFont('helvetica', 'normal');
-    // Dados na mesma linha após os dois pontos
-    pdf.text(`CTC: ${formatNumber(soilData.T)} cmolc/dm³`, col2X + 2, colY + 18);
-    pdf.text(`P: ${formatNumber(soilData.P)} mg/dm³`, col2X + 2, colY + 26);
-    pdf.text(`K: ${formatNumber((soilData.K || 0) / 390)} cmolc/dm³`, col2X + 2, colY + 34);
-    pdf.text(`Ca: ${formatNumber(soilData.Ca)} cmolc/dm³`, col2X + 2, colY + 42);
-    pdf.text(`Mg: ${formatNumber(soilData.Mg)} cmolc/dm³`, col2X + 2, colY + 50);
+    pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+    
+    const kCmolc = (soilData.K || 0) / 390;
+    
+    pdf.text('CTC (T):', col2X + 2, colY + 17);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`${formatNumber(soilData.T)} cmolc/dm³`, col2X + 32, colY + 17);
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+    pdf.text('Fósforo (P):', col2X + 2, colY + 24);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`${formatNumber(soilData.P)} mg/dm³`, col2X + 32, colY + 24);
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+    pdf.text('Potássio (K):', col2X + 2, colY + 31);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`${formatNumber(kCmolc)} cmolc/dm³`, col2X + 32, colY + 31);
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+    pdf.text('Cálcio (Ca):', col2X + 2, colY + 38);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`${formatNumber(soilData.Ca)} cmolc/dm³`, col2X + 32, colY + 38);
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+    pdf.text('Magnésio (Mg):', col2X + 2, colY + 45);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`${formatNumber(soilData.Mg)} cmolc/dm³`, col2X + 32, colY + 45);
 
-    // Coluna 3 - Informação Importante (Azul claro #E3F2FD)
+    // Coluna 3 - Informação Importante (Box amarelo com ⚠️)
     const col3X = col2X + col2Width + gap;
-    pdf.setFillColor(227, 242, 253);
-    pdf.rect(col3X, colY, col3Width, colHeight, 'F');
-    pdf.rect(col3X, colY, col3Width, colHeight, 'S');
     
-    pdf.setFontSize(10); // Reduzido
+    // Fundo amarelo claro
+    pdf.setFillColor(255, 249, 230);
+    pdf.setDrawColor(colors.warning[0], colors.warning[1], colors.warning[2]);
+    pdf.setLineWidth(3);
+    pdf.roundedRect(col3X, colY, col3Width, colHeight, 3, 3, 'FD');
+    
+    pdf.setFontSize(10);
     pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(51, 51, 51);
-    pdf.text('Informação Importante', col3X + 3, colY + 10);
+    pdf.setTextColor(colors.warning[0] - 50, colors.warning[1] - 50, 0);
+    pdf.text('⚠️ Importante', col3X + 3, colY + 9);
     
-    pdf.setFontSize(7); // Reduzido para caber
+    pdf.setFontSize(7.5);
     pdf.setFont('helvetica', 'normal');
-    // Texto mais conciso com espaçamento reduzido
-    pdf.text('Opções de Correção:', col3X + 2, colY + 16);
-    pdf.text('As fontes listadas são', col3X + 2, colY + 21);
-    pdf.text('alternativas.', col3X + 2, colY + 26);
-    pdf.text('Escolha APENAS UMA', col3X + 2, colY + 32);
-    pdf.text('fonte para cada tipo', col3X + 2, colY + 37);
-    pdf.text('de nutriente.', col3X + 2, colY + 42);
+    pdf.setTextColor(146, 64, 14); // Marrom escuro
+    pdf.text('As fontes listadas em cada', col3X + 2, colY + 18);
+    pdf.text('tabela são alternativas.', col3X + 2, colY + 24);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Escolha APENAS UMA fonte', col3X + 2, colY + 32);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('para cada tipo de nutriente,', col3X + 2, colY + 38);
+    pdf.text('de acordo com disponibilidade', col3X + 2, colY + 44);
+    pdf.text('e custo no mercado local.', col3X + 2, colY + 50);
 
     // Seção 2: Análise Visual de Necessidades (Y = 100) - espaçamento corrigido
     let visualY = 100;
@@ -789,15 +885,22 @@ export const generatePDF = async (
         startY: recY + 5,
         theme: 'grid',
         headStyles: { 
-          fillColor: [128, 128, 128], // Header cinza
+          fillColor: primaryColor,
           textColor: [255, 255, 255], 
-          fontSize: 10 
+          fontSize: 10,
+          fontStyle: 'bold',
+          halign: 'center'
         },
-        alternateRowStyles: { fillColor: [245, 245, 245] }, // Cinza claro
+        alternateRowStyles: { fillColor: colors.grayBg },
         styles: { 
           fontSize: 10, 
           cellPadding: 3,
-          textColor: [51, 51, 51]
+          textColor: [51, 51, 51],
+          lineColor: colors.grayBorder,
+          lineWidth: 0.1
+        },
+        columnStyles: {
+          1: { halign: 'right', fontStyle: 'bold', textColor: colors.success }
         },
         margin: { left: marginX, right: marginX }
       });
@@ -906,9 +1009,23 @@ export const generatePDF = async (
       body: allFertilizerRows,
       startY: 25,
       theme: 'grid',
-      headStyles: { fillColor: [76, 175, 80], textColor: [255, 255, 255], fontSize: 10 },
-      alternateRowStyles: { fillColor: [240, 248, 240] },
-      styles: { fontSize: 9, cellPadding: 2 },
+      headStyles: { 
+        fillColor: primaryColor, 
+        textColor: [255, 255, 255], 
+        fontSize: 10,
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+      alternateRowStyles: { fillColor: colors.grayBg },
+      styles: { 
+        fontSize: 9, 
+        cellPadding: 2,
+        lineColor: colors.grayBorder,
+        lineWidth: 0.1
+      },
+      columnStyles: {
+        1: { halign: 'right', fontStyle: 'bold', textColor: colors.success }
+      },
       margin: { left: 15, right: 15 }
     });
 
@@ -956,9 +1073,23 @@ export const generatePDF = async (
       body: detailedRows,
       startY: 25,
       theme: 'grid',
-      headStyles: { fillColor: [76, 175, 80], textColor: [255, 255, 255], fontSize: 10 },
-      alternateRowStyles: { fillColor: [240, 248, 240] },
-      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { 
+        fillColor: primaryColor, 
+        textColor: [255, 255, 255], 
+        fontSize: 10,
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+      alternateRowStyles: { fillColor: colors.grayBg },
+      styles: { 
+        fontSize: 8, 
+        cellPadding: 2,
+        lineColor: colors.grayBorder,
+        lineWidth: 0.1
+      },
+      columnStyles: {
+        1: { halign: 'right', fontStyle: 'bold' }
+      },
       margin: { left: 15, right: 15 }
     });
 
