@@ -797,164 +797,123 @@ export const generatePDF = async (
     pdf.text('de acordo com disponibilidade', col3X + 3, colY + 44);
     pdf.text('e custo no mercado local.', col3X + 3, colY + 50);
 
-    // Seção 2: Análise Visual de Necessidades (Y = 100) - espaçamento corrigido
-    let visualY = 100;
-    pdf.setFontSize(14);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(51, 51, 51);
-    pdf.text('Análise Visual de Necessidades', marginX, visualY);
+    // ============ PÁGINA 1: RESUMO EXECUTIVO ============
     
-    visualY += 15;
+    // SEÇÃO 1: AÇÕES PRIORITÁRIAS (NOVO - topo da página)
+    let currentY = 90;
     
-    // Função para desenhar barra - corrigida com cores sempre visíveis
-    const drawProgressBar = (label: string, value: number, status: string, posX: number, posY: number) => {
-      const barWidth = 40; // Reduzido para caber na página
-      const barHeight = 4; // Altura adequada
-      
-      // Background cinza sempre visível
-      pdf.setFillColor(189, 189, 189); // #BDBDBD
-      pdf.rect(posX + 35, posY - 2, barWidth, barHeight, 'F');
-      
-      // Determinar cor e comprimento da barra - sempre com cor
-      let fillColor, fillWidth;
-      if (status === "Adequado") {
-        fillColor = [76, 175, 80]; // Verde #4CAF50 - apenas para adequado
-        fillWidth = barWidth * 0.85; // 80-100%
-      } else if (status === "Alto") {
-        fillColor = [255, 152, 0]; // Laranja #FF9800 - para excesso
-        fillWidth = barWidth * 0.90; // 90-100%
-      } else if (status === "Médio") {
-        fillColor = [255, 193, 7]; // Amarelo #FFC107
-        fillWidth = barWidth * 0.6; // 50-70%
-      } else if (status === "Baixo") {
-        fillColor = [244, 67, 54]; // Vermelho #F44336 - para baixo
-        fillWidth = barWidth * 0.3; // 20-40%
-      } else { // Muito Baixo
-        fillColor = [198, 40, 40]; // Vermelho escuro
-        fillWidth = barWidth * 0.15; // 10-20%
-      }
-      
-      // Sempre desenhar barra colorida, mesmo que pequena
-      if (fillWidth < 2) fillWidth = 2; // Mínimo visível
-      pdf.setFillColor(fillColor[0], fillColor[1], fillColor[2]);
-      pdf.rect(posX + 35, posY - 2, fillWidth, barHeight, 'F');
-      
-      // Label
-      pdf.setFontSize(9); // Reduzido
-      pdf.setTextColor(51, 51, 51);
-      pdf.text(label, posX, posY);
-      
-      // Status - posicionado corretamente
-      pdf.setTextColor(102, 102, 102);
-      pdf.text(status, posX + 78, posY);
-    };
-
-    // Sub-seção Macronutrientes (lado esquerdo) - espaçamento corrigido
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Macronutrientes', marginX, visualY);
+    // Card de Ações Prioritárias
+    pdf.setFillColor(colors.warningBg[0], colors.warningBg[1], colors.warningBg[2]);
+    pdf.roundedRect(marginX, currentY, contentWidth, 35, 3, 3, 'F');
+    pdf.setFillColor(colors.warning[0], colors.warning[1], colors.warning[2]);
+    pdf.roundedRect(marginX, currentY, 2, 35, 3, 3, 'F'); // Borda esquerda
     
-    let macroY = visualY + 10;
-    drawProgressBar('Fósforo (P)', soilData.P || 0, getNutrientLevel(soilData.P, 10, 20), marginX, macroY);
-    macroY += 12;
-    drawProgressBar('Potássio (K)', (soilData.K || 0) / 390, getNutrientLevel((soilData.K || 0) / 390, 0.15, 0.3), marginX, macroY);
-    macroY += 12;
-    drawProgressBar('Cálcio (Ca)', soilData.Ca || 0, getNutrientLevel(soilData.Ca, 2.0, 4.0), marginX, macroY);
-    macroY += 12;
-    drawProgressBar('Magnésio (Mg)', soilData.Mg || 0, getNutrientLevel(soilData.Mg, 0.8, 1.5), marginX, macroY);
-
-    // Sub-seção Micronutrientes (lado direito) - posicionado corretamente
-    const microX = 110; // Posição ajustada para não estrapolar
-    pdf.setFontSize(12);
+    pdf.setFontSize(13);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('Micronutrientes', microX, visualY);
+    pdf.setTextColor(colors.navyDark[0], colors.navyDark[1], colors.navyDark[2]);
+    pdf.text('🎯 Ações Prioritárias', marginX + 4, currentY + 8);
     
-    let microY = visualY + 10;
-    drawProgressBar('Boro (B)', soilData.B || 0, getNutrientLevel(soilData.B, 0.3, 0.6), microX, microY);
-    microY += 12;
-    drawProgressBar('Zinco (Zn)', soilData.Zn || 0, getNutrientLevel(soilData.Zn, 1.5, 2.2), microX, microY);
-    microY += 12;
-    drawProgressBar('Cobre (Cu)', soilData.Cu || 0, getNutrientLevel(soilData.Cu, 0.8, 1.2), microX, microY);
-    microY += 12;
-    drawProgressBar('Manganês (Mn)', soilData.Mn || 0, getNutrientLevel(soilData.Mn, 5, 12), microX, microY);
-
-    // Seção 3: Recomendações de Fertilizantes (Y = 180)
-    let recY = 180;
-    pdf.setFontSize(14);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(51, 51, 51);
-    pdf.text('Recomendações de Fertilizantes', marginX, recY);
-
-    const fertilizerColumns = ['Fonte de Fertilizante', 'Quantidade', 'Método', 'Época'];
-    const fertilizerRows = [];
-
-    if ((soilData.Ca || 0) < 3) {
-      fertilizerRows.push(['Calcário Dolomítico', '2.5 t/ha', 'A lanço', '60-90 dias antes do plantio']);
-    }
-    if ((soilData.P || 0) < 12) {
-      fertilizerRows.push(['Superfosfato Simples', '400 kg/ha', 'Sulco', 'Plantio']);
-    }
-    if ((soilData.K || 0) < 80) {
-      fertilizerRows.push(['Cloreto de Potássio', '150 kg/ha', 'Incorporado', 'Plantio/Cobertura']);
-    }
-
-    let tableEndY = recY + 5;
-    if (fertilizerRows.length > 0) {
-      autoTable(pdf, {
-        head: [fertilizerColumns],
-        body: fertilizerRows,
-        startY: recY + 5,
-        theme: 'grid',
-        headStyles: { 
-          fillColor: colors.grayTableStart, // Cinza claro gradiente como no modelo HTML
-          textColor: colors.textPrimary,    // Texto escuro, não branco
-          fontSize: 10,
-          fontStyle: 'bold',
-          halign: 'left'                    // Alinhado à esquerda como no modelo
-        },
-        alternateRowStyles: { fillColor: [255, 255, 255] }, // Branco puro para zebra
-        styles: { 
-          fontSize: 10, 
-          cellPadding: 4,
-          textColor: colors.textPrimary,
-          lineColor: [94, 82, 64],          // Brown-600 para bordas
-          lineWidth: 0.1
-        },
-        columnStyles: {
-          1: { halign: 'right', fontStyle: 'bold', textColor: colors.success }
-        },
-        margin: { left: marginX, right: marginX }
-      });
-      tableEndY = (pdf as any).lastAutoTable?.finalY + 10;
-    }
-
-    // Seção 4: Notas e Recomendações Especiais
-    let notesY = Math.max(tableEndY, 220);
-    pdf.setFontSize(14);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(51, 51, 51);
-    pdf.text('Notas e Recomendações Especiais', marginX, notesY);
-
-    const specialNotes = [
-      '• Aplicar os micronutrientes em deficiência via foliar nos estágios iniciais',
-      '• Considerar o parcelamento da adubação potássica em solos arenosos',
-      '• Monitorar os níveis de pH após a calagem para verificar a efetividade',
-      '• Para essa cultura, atenção especial aos níveis de zinco',
-      '• As recomendações são baseadas no método de Saturação por Bases',
-      '• Consulte um engenheiro agrônomo para validação das recomendações'
-    ];
-
-    pdf.setFontSize(10);
+    // Determinar ações prioritárias baseadas nos dados
+    const actions: string[] = [];
+    if ((soilData.Ca || 0) < 3) actions.push('1. Corrigir acidez com Calcário (Pré-plantio)');
+    if ((soilData.P || 0) < 12 || (soilData.K || 0) < 80) actions.push('2. Aplicar Fósforo e Potássio (Base no plantio)');
+    if ((soilData.Zn || 0) < 1.5 || (soilData.Mn || 0) < 5) actions.push('3. Suplementar Zinco e Manganês (Via foliar)');
+    if (actions.length === 0) actions.push('✓ Solo em boas condições - manter adubação de manutenção');
+    
+    pdf.setFontSize(9);
     pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(51, 51, 51);
-    
-    let noteItemY = notesY + 12;
-    specialNotes.forEach(note => {
-      if (noteItemY < 270) { // Espaço para footer
-        pdf.text(note, marginX, noteItemY);
-        noteItemY += 6;
-      }
+    pdf.setTextColor(colors.warningText[0], colors.warningText[1], colors.warningText[2]);
+    let actionY = currentY + 15;
+    actions.forEach(action => {
+      pdf.text(action, marginX + 4, actionY);
+      actionY += 6;
     });
+    
+    currentY += 45;
+    
+    // SEÇÃO 2: ANÁLISE COMPLETA (combinar visual + dados detalhados)
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(colors.navyDark[0], colors.navyDark[1], colors.navyDark[2]);
+    pdf.text('📊 Análise Completa de Nutrientes', marginX, currentY);
+    
+    currentY += 8;
+    
+    // Criar tabela consolidada combinando TODOS os dados
+    const kCmolcValue = (soilData.K || 0) / 390;
+    const nutrientData = [
+      // Macronutrientes
+      ['🟢 Macronutrientes', '', '', '', ''],
+      ['Fósforo (P)', `${formatNumber(soilData.P)} mg/dm³`, getNutrientLevel(soilData.P, 10, 20), getStatusIcon(getNutrientLevel(soilData.P, 10, 20)), calcularRecomendacaoP(soilData.argila || 0, soilData.P || 0)],
+      ['Potássio (K)', `${formatNumber(kCmolcValue)} cmolc/dm³`, getNutrientLevel(kCmolcValue, 0.15, 0.3), getStatusIcon(getNutrientLevel(kCmolcValue, 0.15, 0.3)), 'Aplicação de fontes de potássio'],
+      ['Cálcio (Ca)', `${formatNumber(soilData.Ca)} cmolc/dm³`, getNutrientLevel(soilData.Ca, 2.0, 4.0), getStatusIcon(getNutrientLevel(soilData.Ca, 2.0, 4.0)), 'Aplicação de calcário'],
+      ['Magnésio (Mg)', `${formatNumber(soilData.Mg)} cmolc/dm³`, getNutrientLevel(soilData.Mg, 0.8, 1.5), getStatusIcon(getNutrientLevel(soilData.Mg, 0.8, 1.5)), 'Calcário dolomítico'],
+      
+      // Micronutrientes
+      ['🔵 Micronutrientes', '', '', '', ''],
+      ['Zinco (Zn)', `${formatNumber(soilData.Zn)} mg/dm³`, getNutrientLevel(soilData.Zn, 1.5, 2.2), getStatusIcon(getNutrientLevel(soilData.Zn, 1.5, 2.2)), getMicroRecommendation('Zn', getNutrientLevel(soilData.Zn, 1.5, 2.2))],
+      ['Boro (B)', `${formatNumber(soilData.B)} mg/dm³`, getNutrientLevel(soilData.B, 0.3, 0.6), getStatusIcon(getNutrientLevel(soilData.B, 0.3, 0.6)), getMicroRecommendation('B', getNutrientLevel(soilData.B, 0.3, 0.6))],
+      ['Cobre (Cu)', `${formatNumber(soilData.Cu)} mg/dm³`, getNutrientLevel(soilData.Cu, 0.8, 1.2), getStatusIcon(getNutrientLevel(soilData.Cu, 0.8, 1.2)), getMicroRecommendation('Cu', getNutrientLevel(soilData.Cu, 0.8, 1.2))],
+      ['Manganês (Mn)', `${formatNumber(soilData.Mn)} mg/dm³`, getNutrientLevel(soilData.Mn, 5, 12), getStatusIcon(getNutrientLevel(soilData.Mn, 5, 12)), getMicroRecommendation('Mn', getNutrientLevel(soilData.Mn, 5, 12))],
+    ];
+    
+    // Função auxiliar para ícones de status
+    function getStatusIcon(status: string): string {
+      if (status === 'Baixo' || status === 'Muito Baixo') return '⚠️ ' + status;
+      if (status === 'Adequado' || status === 'Alto') return '✓ ' + status;
+      return status;
+    }
+    
+    autoTable(pdf, {
+      head: [['Nutriente', 'Valor Encontrado', 'Status', '', 'Recomendação']],
+      body: nutrientData,
+      startY: currentY,
+      theme: 'grid',
+      headStyles: { 
+        fillColor: colors.grayTableStart,
+        textColor: colors.textPrimary,
+        fontSize: 10,
+        fontStyle: 'bold',
+        halign: 'left'
+      },
+      styles: { 
+        fontSize: 9, 
+        cellPadding: 4,
+        textColor: colors.textPrimary,
+        lineColor: [94, 82, 64],
+        lineWidth: 0.1
+      },
+      columnStyles: {
+        0: { fontStyle: 'bold', cellWidth: 35 },
+        1: { halign: 'right', fontStyle: 'bold', cellWidth: 35 },
+        2: { halign: 'center', cellWidth: 25 },
+        3: { halign: 'center', cellWidth: 15 },
+        4: { fontSize: 8, cellWidth: 70 }
+      },
+      didParseCell: function(data) {
+        // Destacar linhas de cabeçalho de seção
+        if (data.cell.raw && typeof data.cell.raw === 'string' && 
+            (data.cell.raw.includes('Macronutrientes') || data.cell.raw.includes('Micronutrientes'))) {
+          data.cell.styles.fillColor = colors.grayTableEnd;
+          data.cell.styles.fontStyle = 'bold';
+          data.cell.styles.fontSize = 10;
+        }
+        // Colorir células de status
+        if (data.column.index === 2 && data.cell.raw) {
+          const status = data.cell.raw.toString();
+          if (status.includes('Baixo')) {
+            data.cell.styles.textColor = [244, 67, 54]; // Vermelho
+            data.cell.styles.fontStyle = 'bold';
+          } else if (status.includes('Adequado') || status.includes('Alto')) {
+            data.cell.styles.textColor = colors.success;
+            data.cell.styles.fontStyle = 'bold';
+          }
+        }
+      },
+      margin: { left: marginX, right: marginX }
+    });
+    
+    // ============ PÁGINA 1 COMPLETA - RESUMO EXECUTIVO ============
 
     // Footer da Página conforme modelo
     pdf.setFontSize(8);
