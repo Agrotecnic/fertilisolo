@@ -80,6 +80,14 @@ export interface CalculationResult {
     Zn: boolean;
     Mo: boolean;
   };
+  nutrientLevels?: {
+    Cu: 'Baixo' | 'Adequado' | 'Alto';
+    Mo: 'Baixo' | 'Adequado' | 'Alto';
+    Fe: 'Baixo' | 'Adequado' | 'Alto';
+    Mn: 'Baixo' | 'Adequado' | 'Alto';
+    Zn: 'Baixo' | 'Adequado' | 'Alto';
+    B: 'Baixo' | 'Adequado' | 'Alto';
+  };
   recommendations?: {
     macronutrientes: {
       P: string;

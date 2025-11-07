@@ -370,7 +370,7 @@ const renderReportTemplate = (soilData: SoilData, results: CalculationResult, cu
             <div class="flex justify-between mb-1">
               <span class="text-xs font-medium text-gray-700">Manganês (Mn)</span>
               <span class="text-xs font-medium text-gray-700">
-                ${getNutrientLevel(soilData.Mn, 5, 30)}
+                ${getNutrientLevel(soilData.Mn, 5, 12)}
               </span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2">
@@ -700,17 +700,20 @@ export const generatePDF = async (
       
       // Determinar cor e comprimento da barra - sempre com cor
       let fillColor, fillWidth;
-      if (status === "Adequado" || status === "Alto") {
-        fillColor = [76, 175, 80]; // Verde #4CAF50
+      if (status === "Adequado") {
+        fillColor = [76, 175, 80]; // Verde #4CAF50 - apenas para adequado
         fillWidth = barWidth * 0.85; // 80-100%
+      } else if (status === "Alto") {
+        fillColor = [255, 152, 0]; // Laranja #FF9800 - para excesso
+        fillWidth = barWidth * 0.90; // 90-100%
       } else if (status === "Médio") {
-        fillColor = [255, 193, 7]; // Amarelo
+        fillColor = [255, 193, 7]; // Amarelo #FFC107
         fillWidth = barWidth * 0.6; // 50-70%
       } else if (status === "Baixo") {
-        fillColor = [255, 152, 0]; // Laranja para baixo
+        fillColor = [244, 67, 54]; // Vermelho #F44336 - para baixo
         fillWidth = barWidth * 0.3; // 20-40%
       } else { // Muito Baixo
-        fillColor = [244, 67, 54]; // Vermelho
+        fillColor = [198, 40, 40]; // Vermelho escuro
         fillWidth = barWidth * 0.15; // 10-20%
       }
       
@@ -756,7 +759,7 @@ export const generatePDF = async (
     microY += 12;
     drawProgressBar('Cobre (Cu)', soilData.Cu || 0, getNutrientLevel(soilData.Cu, 0.8, 1.2), microX, microY);
     microY += 12;
-    drawProgressBar('Manganês (Mn)', soilData.Mn || 0, getNutrientLevel(soilData.Mn, 15, 30), microX, microY);
+    drawProgressBar('Manganês (Mn)', soilData.Mn || 0, getNutrientLevel(soilData.Mn, 5, 12), microX, microY);
 
     // Seção 3: Recomendações de Fertilizantes (Y = 180)
     let recY = 180;
@@ -942,8 +945,8 @@ export const generatePDF = async (
       ['Enxofre (S)', formatNumber(soilData.S), 'mg/dm³', getNutrientLevel(soilData.S, 5, 10), 'Adequado'],
       ['Boro (B)', formatNumber(soilData.B), 'mg/dm³', getNutrientLevel(soilData.B, 0.3, 0.6), getMicroRecommendation('B', getNutrientLevel(soilData.B, 0.3, 0.6))],
       ['Cobre (Cu)', formatNumber(soilData.Cu), 'mg/dm³', getNutrientLevel(soilData.Cu, 0.8, 1.2), getMicroRecommendation('Cu', getNutrientLevel(soilData.Cu, 0.8, 1.2))],
-      ['Ferro (Fe)', formatNumber(soilData.Fe), 'mg/dm³', getNutrientLevel(soilData.Fe, 18, 45), getMicroRecommendation('Fe', getNutrientLevel(soilData.Fe, 18, 45))],
-      ['Manganês (Mn)', formatNumber(soilData.Mn), 'mg/dm³', getNutrientLevel(soilData.Mn, 15, 30), getMicroRecommendation('Mn', getNutrientLevel(soilData.Mn, 15, 30))],
+      ['Ferro (Fe)', formatNumber(soilData.Fe), 'mg/dm³', getNutrientLevel(soilData.Fe, 12, 30), getMicroRecommendation('Fe', getNutrientLevel(soilData.Fe, 12, 30))],
+      ['Manganês (Mn)', formatNumber(soilData.Mn), 'mg/dm³', getNutrientLevel(soilData.Mn, 5, 12), getMicroRecommendation('Mn', getNutrientLevel(soilData.Mn, 5, 12))],
       ['Zinco (Zn)', formatNumber(soilData.Zn), 'mg/dm³', getNutrientLevel(soilData.Zn, 1.5, 2.2), getMicroRecommendation('Zn', getNutrientLevel(soilData.Zn, 1.5, 2.2))],
       ['Molibdênio (Mo)', '-', 'mg/dm³', 'Não analisado', 'Aplicação preventiva recomendada']
     ];

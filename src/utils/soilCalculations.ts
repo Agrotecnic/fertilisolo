@@ -14,6 +14,19 @@ export { fertilizerSources } from './fertilizerSources';
 export { calculateFertilizerRecommendations } from './fertilizerCalculations';
 export type { FertilizerSource } from '@/types/soil';
 
+/**
+ * Classifica o nível de um nutriente em 3 categorias
+ * @param value Valor do nutriente
+ * @param min Limite mínimo ideal
+ * @param max Limite máximo ideal
+ * @returns Classificação: 'Baixo', 'Adequado' ou 'Alto'
+ */
+export const classifyNutrientLevel = (value: number, min: number, max: number): 'Baixo' | 'Adequado' | 'Alto' => {
+  if (value < min) return 'Baixo';
+  if (value > max) return 'Alto';
+  return 'Adequado';
+};
+
 export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): CalculationResult => {
   const { T, Ca, Mg, K, P, S, B, Cu, Fe, Mn, Zn, Mo } = data;
 
@@ -30,20 +43,30 @@ export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): Calc
   // Calcular relação Ca/Mg
   const caeMgRatio = Mg > 0 ? Ca / Mg : 0;
 
-  // Verificar se os níveis estão adequados
+  // Verificar se os níveis estão adequados (com tolerância ajustada para Mg)
   const isAdequate = {
     Ca: saturations.Ca >= 50 && saturations.Ca <= 60,
-    Mg: saturations.Mg >= 15 && saturations.Mg <= 20,
+    Mg: saturations.Mg >= 14.5 && saturations.Mg <= 20.5, // Tolerância de 0.5% para evitar problemas de arredondamento
     K: saturations.K >= 3 && saturations.K <= 5,
     P: P >= 15,
     CaMgRatio: caeMgRatio >= 3 && caeMgRatio <= 5,
     S: S >= 10,
     B: B >= 0.2 && B <= 0.6,
     Cu: Cu >= 0.8 && Cu <= 1.2,
-    Fe: Fe >= 12 && Fe <= 30, // Faixa Média (Mehlich-1/DTPA): 12-30 mg/dm³
-    Mn: Mn >= 5 && Mn <= 12, // Faixa Média (Mehlich-1/DTPA): 5-12 mg/dm³
+    Fe: Fe >= 12 && Fe <= 30, // Faixa Ideal (Mehlich-1/DTPA): 12-30 mg/dm³
+    Mn: Mn >= 5 && Mn <= 12, // Faixa Ideal (Mehlich-1/DTPA): 5-12 mg/dm³
     Zn: Zn >= 0.5 && Zn <= 1.2,
     Mo: Mo >= 0.1 && Mo <= 0.2,
+  };
+
+  // Classificar níveis de micronutrientes em 3 categorias (Baixo, Adequado, Alto)
+  const nutrientLevels = {
+    Cu: classifyNutrientLevel(Cu, 0.8, 1.2),
+    Mo: classifyNutrientLevel(Mo, 0.1, 0.2),
+    Fe: classifyNutrientLevel(Fe, 12, 30),
+    Mn: classifyNutrientLevel(Mn, 5, 12),
+    Zn: classifyNutrientLevel(Zn, 0.5, 1.2),
+    B: classifyNutrientLevel(B, 0.2, 0.6),
   };
 
   // Calcular necessidades de nutrientes
@@ -70,6 +93,7 @@ export const calculateSoilAnalysis = (data: Omit<SoilData, 'id' | 'date'>): Calc
     caeMgRatio,
     needs,
     isAdequate,
+    nutrientLevels,
   };
 };
 

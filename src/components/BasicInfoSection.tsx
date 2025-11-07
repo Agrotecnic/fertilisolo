@@ -137,9 +137,9 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
                 type="number"
                 step="0.1"
                 min="0"
-                value={targetYield || 4}
-                onChange={(e) => onTargetYieldChange(Number(e.target.value))}
-                placeholder="Ex: 4.0"
+                value={targetYield !== undefined && targetYield !== null ? targetYield : ''}
+                onChange={(e) => onTargetYieldChange(e.target.value === '' ? 0 : Number(e.target.value))}
+                placeholder="4.0"
                 className="h-7 text-xs text-gray-800"
               />
               <p className="text-xs text-gray-500 mt-1">Produtividade esperada em toneladas por hectare</p>

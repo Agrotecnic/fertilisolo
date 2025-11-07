@@ -27,7 +27,7 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
   const formatValue = (val: number | string): string => {
     if (isEditing) return displayValue;
     if (type === 'text') return val.toString();
-    if (val === 0 || val === '' || val === null || val === undefined) return '';
+    if (val === 0 || val === '' || val === '0' || val === null || val === undefined) return '';
     return val.toString().replace('.', ',');
   };
 
@@ -94,7 +94,7 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
     if (typeof value === 'number') {
       setDisplayValue(value === 0 ? '' : value.toString().replace('.', ','));
     } else if (typeof value === 'string') {
-      setDisplayValue(value);
+      setDisplayValue(value === '0' || value === '' ? '' : value);
     }
   };
 
