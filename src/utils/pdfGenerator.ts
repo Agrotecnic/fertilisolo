@@ -530,6 +530,31 @@ function getCTCLevel(value: number | undefined): string {
   return "Alta";
 }
 
+function getPhLevel(value: number | undefined): string {
+  if (value === undefined) return "Não analisado";
+  if (value < 5.0) return "Muito Ácido";
+  if (value < 5.5) return "Ácido";
+  if (value < 6.5) return "Adequado";
+  if (value < 7.0) return "Levemente Alcalino";
+  return "Alcalino";
+}
+
+function getOrganicMatterLevel(value: number | undefined): string {
+  if (value === undefined) return "Não analisado";
+  if (value < 1.5) return "Baixo";
+  if (value < 2.5) return "Médio";
+  if (value < 5.0) return "Alto";
+  return "Muito Alto";
+}
+
+function getTextureClass(value: number | undefined): string {
+  if (value === undefined) return "Não analisado";
+  if (value < 15) return "Arenoso";
+  if (value < 35) return "Médio";
+  if (value < 60) return "Argiloso";
+  return "Muito Argiloso";
+}
+
 export const generatePDF = async (
   soilData: SoilData, 
   farmName?: string, 
@@ -914,178 +939,445 @@ export const generatePDF = async (
     });
     
     // ============ PÁGINA 1 COMPLETA - RESUMO EXECUTIVO ============
-
-    // Footer da Página conforme modelo
-    pdf.setFontSize(8);
-    pdf.setTextColor(102, 102, 102); // #666666
     
-    // Linha superior do footer
-    pdf.text('Fertilisolo - Análise e recomendação de fertilizantes', marginX, 280);
-    pdf.text('Página 1/3', 95, 280);
-    pdf.text('Contato: suporte@fertilisolo.com.br', 140, 280);
-    
-    // Linha inferior do footer  
-    pdf.text('Relatório gerado por sistema especialista', marginX, 285);
-    pdf.text(`Relatório gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 140, 285);
-
-    // ======================= PÁGINA 2 - DETALHES DA RECOMENDAÇÃO =======================
+    // ============================================================================
+    // PÁGINA 2: PLANO DE AÇÃO (Cards Separados por Etapa)
+    // ============================================================================
     
     pdf.addPage();
+    currentY = 0;
     
-    // Header da Página 2 com cor primária (ANTES do logo para ficar atrás)
-    pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 20, 'F');
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(16);
-    pdf.text('Detalhes da Recomendação de Fertilizantes', 15, 13);
+    // Função auxiliar para adicionar header em todas as páginas
+    const addPageHeaderWithLogo = async (title: string, subtitle?: string) => {
+      const headerHeight = 25;
+      
+      // Gradiente header
+      pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      pdf.rect(0, 0, pageWidth, headerHeight, 'F');
+      
+      for (let i = 0; i < 10; i++) {
+        const alpha = i / 10;
+        const r = primaryColor[0] + (colors.navyMedium[0] - primaryColor[0]) * alpha;
+        const g = primaryColor[1] + (colors.navyMedium[1] - primaryColor[1]) * alpha;
+        const b = primaryColor[2] + (colors.navyMedium[2] - primaryColor[2]) * alpha;
+        
+        pdf.setFillColor(r, g, b);
+        pdf.rect(0, i * (headerHeight / 10), pageWidth, headerHeight / 10, 'F');
+      }
+      
+      // Barra azul accent
+      pdf.setFillColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+      pdf.rect(0, headerHeight, pageWidth, 4, 'F');
+      
+      // Logo
+      if (themeOptions?.logo) {
+        await addLogoToPage(pdf, themeOptions.logo, pageWidth, marginY, true);
+      }
+      
+      // Título
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(title, marginX, 15);
+      
+      // Subtítulo com info da cultura
+      if (subtitle) {
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(subtitle, marginX, 21);
+      } else {
+        pdf.text(`🌱 Cultura: ${cultureName || 'Não especificada'}     📋 Amostra: ${farmName || soilData.location || 'Não especificado'}`, marginX, 21);
+      }
+    };
     
-    // Logo personalizado DENTRO da faixa do topo (PÁGINA 2) - adicionado DEPOIS para ficar na frente
-    if (themeOptions?.logo) {
-      await addLogoToPage(pdf, themeOptions.logo, pageWidth, marginY, true);
+    // Header Página 2
+    await addPageHeaderWithLogo('Plano de Ação de Fertilização');
+    currentY = 35;
+    
+    // Alert box no topo
+    pdf.setFillColor(colors.warningBg[0], colors.warningBg[1], colors.warningBg[2]);
+    pdf.roundedRect(marginX, currentY, contentWidth, 15, 3, 3, 'F');
+    pdf.setFillColor(colors.warning[0], colors.warning[1], colors.warning[2]);
+    pdf.roundedRect(marginX, currentY, 2, 15, 3, 3, 'F');
+    
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(colors.warningText[0], colors.warningText[1], colors.warningText[2]);
+    pdf.text('⚠️ Importante', marginX + 4, currentY + 6);
+    
+    pdf.setFontSize(8);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('As fontes listadas em cada tabela são alternativas. Escolha APENAS UMA fonte para cada tipo de nutriente.', marginX + 4, currentY + 11);
+    
+    currentY += 22;
+    
+    // Função para desenhar badges coloridos
+    const drawBadge = (text: string, x: number, y: number, type: 'sulco' | 'foliar' | 'lanco' | 'incorporado' | 'sementes' | 'cobertura') => {
+      const badgeColors = {
+        sulco: { bg: [254, 243, 199], text: [146, 64, 14] },
+        foliar: { bg: [220, 252, 231], text: [21, 128, 61] },
+        lanco: { bg: [243, 232, 255], text: [107, 33, 168] },
+        incorporado: { bg: [243, 232, 255], text: [107, 33, 168] },
+        sementes: { bg: [224, 242, 254], text: [3, 105, 161] },
+        cobertura: { bg: [224, 242, 254], text: [3, 105, 161] }
+      };
+      
+      const color = badgeColors[type];
+      const textWidth = pdf.getTextWidth(text);
+      const badgeWidth = textWidth + 6;
+      const badgeHeight = 5;
+      
+      pdf.setFillColor(color.bg[0], color.bg[1], color.bg[2]);
+      pdf.roundedRect(x, y - 3.5, badgeWidth, badgeHeight, 2, 2, 'F');
+      
+      pdf.setTextColor(color.text[0], color.text[1], color.text[2]);
+      pdf.setFontSize(8);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(text, x + 3, y);
+    };
+    
+    // CARD 1: Correção de Solo (Pré-Plantio)
+    if ((soilData.Ca || 0) < 3 || (soilData.Mg || 0) < 0.8) {
+      drawCard(marginX, currentY, contentWidth, 50);
+      
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(colors.navyDark[0], colors.navyDark[1], colors.navyDark[2]);
+      pdf.text('1. Correção de Solo (Pré-Plantio)', marginX + 5, currentY + 8);
+      
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+      pdf.text('Correção da acidez do solo e fornecimento de Ca e Mg. Aplicar 60-90 dias antes do plantio.', marginX + 5, currentY + 14);
+      
+      const calcarioData = [
+        ['Calcário Dolomítico', '2.000', 'kg/ha', 'lanco', 'Pré-plantio'],
+        ['Calcário Calcítico', '1.800', 'kg/ha', 'lanco', 'Pré-plantio']
+      ];
+      
+      autoTable(pdf, {
+        head: [['FONTE DE FERTILIZANTE', 'QUANTIDADE', 'UNIDADE', 'MÉTODO', 'ESTÁGIO']],
+        body: calcarioData,
+        startY: currentY + 18,
+        theme: 'plain',
+        headStyles: { 
+          fillColor: [245, 245, 245],
+          textColor: colors.textPrimary,
+          fontSize: 9,
+          fontStyle: 'bold',
+          halign: 'left'
+        },
+        styles: { 
+          fontSize: 9,
+          cellPadding: 4,
+          lineColor: [222, 226, 230],
+          lineWidth: 0.1
+        },
+        columnStyles: {
+          1: { halign: 'right', fontStyle: 'bold', textColor: colors.success, fontSize: 11 },
+          3: { cellWidth: 25 }
+        },
+        didDrawCell: function(data) {
+          if (data.column.index === 3 && data.section === 'body') {
+            drawBadge('A lanço', data.cell.x + 2, data.cell.y + 6, 'lanco');
+          }
+        },
+        margin: { left: marginX + 5, right: marginX + 5 }
+      });
+      
+      currentY = (pdf as any).lastAutoTable.finalY + 10;
     }
-
-    // Tabela Completa de Fertilizantes
-    const allFertilizerColumns = ['Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio'];
-    const allFertilizerRows = [
-      // Calcários
-      ['Calcário Dolomítico', '2000', 'kg/ha', 'A lanço', 'Pré-plantio'],
-      ['Calcário Calcítico', '1800', 'kg/ha', 'A lanço', 'Pré-plantio'],
-      
-      // Fontes de Nitrogênio
-      ['Ureia (45% N)', '100', 'kg/ha', 'Cobertura', 'V4-V6'],
-      ['Sulfato de Amônio (21% N)', '200', 'kg/ha', 'Cobertura', 'V6-V8'],
-      
-      // Fontes de Fósforo
-      ['Superfosfato Simples', '400', 'kg/ha', 'Sulco', 'Plantio'],
-      ['Superfosfato Triplo', '180', 'kg/ha', 'Sulco', 'Plantio'],
-      ['MAP', '150', 'kg/ha', 'Sulco', 'Plantio'],
-      
-      // Fontes de Potássio
-      ['Cloreto de Potássio', '150', 'kg/ha', 'Sulco', 'Plantio'],
-      ['Sulfato de Potássio', '180', 'kg/ha', 'Sulco', 'Plantio'],
-      
-      // NPKs
-      ['NPK 04-14-08', '350', 'kg/ha', 'Sulco', 'Plantio'],
-      ['NPK 10-10-10', '300', 'kg/ha', 'Sulco', 'Plantio'],
-      
-      // Micronutrientes
-      ['Ácido Bórico', '2', 'kg/ha', 'Foliar', 'Desenvolvimento inicial'],
-      ['Borax', '3', 'kg/ha', 'Foliar', 'Desenvolvimento inicial'],
-      ['Sulfato de Zinco', '4', 'kg/ha', 'Foliar', 'Desenvolvimento inicial'],
-      ['Óxido de Zinco', '3', 'kg/ha', 'Foliar', 'Desenvolvimento inicial'],
-      ['Sulfato de Cobre', '2', 'kg/ha', 'Foliar', 'Desenvolvimento inicial'],
-      ['Óxido de Cobre', '1.5', 'kg/ha', 'Foliar', 'Desenvolvimento inicial'],
-      ['Sulfato de Manganês', '3', 'kg/ha', 'Foliar', 'Desenvolvimento inicial'],
-      ['Óxido de Manganês', '2.5', 'kg/ha', 'Foliar', 'Desenvolvimento inicial'],
-      ['Molibdato de Sódio', '0.1', 'kg/ha', 'Tratamento de sementes', 'Plantio'],
-      
-      // Orgânicos
-      ['Esterco Bovino Curtido', '10000', 'kg/ha', 'Incorporado', 'Pré-plantio'],
-      ['Composto Orgânico', '5000', 'kg/ha', 'Incorporado', 'Pré-plantio']
+    
+    // CARD 2: Adubação de Base (Plantio)
+    drawCard(marginX, currentY, contentWidth, 90);
+    
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(colors.navyDark[0], colors.navyDark[1], colors.navyDark[2]);
+    pdf.text('2. Adubação de Base (Plantio)', marginX + 5, currentY + 8);
+    
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+    pdf.text('Fontes de Fósforo (P), Potássio (K) e Fórmulas NPK. Escolha uma opção de P e uma de K, ou uma formulação NPK completa.', marginX + 5, currentY + 14);
+    
+    const npkData = [
+      ['Superfosfato Simples', '400', 'kg/ha', 'sulco', 'Plantio'],
+      ['Superfosfato Triplo', '180', 'kg/ha', 'sulco', 'Plantio'],
+      ['MAP (Fosfato Monoamônico)', '150', 'kg/ha', 'sulco', 'Plantio'],
+      ['Cloreto de Potássio (KCl)', '150', 'kg/ha', 'sulco', 'Plantio'],
+      ['Sulfato de Potássio', '180', 'kg/ha', 'sulco', 'Plantio'],
+      ['NPK 04-14-08', '350', 'kg/ha', 'sulco', 'Plantio'],
+      ['NPK 10-10-10', '300', 'kg/ha', 'sulco', 'Plantio']
     ];
-
+    
     autoTable(pdf, {
-      head: [allFertilizerColumns],
-      body: allFertilizerRows,
-      startY: 25,
-      theme: 'grid',
+      head: [['FONTE DE FERTILIZANTE', 'QUANTIDADE', 'UNIDADE', 'MÉTODO', 'ESTÁGIO']],
+      body: npkData,
+      startY: currentY + 18,
+      theme: 'plain',
       headStyles: { 
-        fillColor: colors.grayTableStart, // Cinza claro como no modelo HTML
-        textColor: colors.textPrimary,    // Texto escuro
-        fontSize: 10,
+        fillColor: [245, 245, 245],
+        textColor: colors.textPrimary,
+        fontSize: 9,
         fontStyle: 'bold',
         halign: 'left'
       },
-      alternateRowStyles: { fillColor: [255, 255, 255] }, // Branco puro
       styles: { 
-        fontSize: 9, 
-        cellPadding: 3,
-        textColor: colors.textPrimary,
-        lineColor: [94, 82, 64],
+        fontSize: 9,
+        cellPadding: 4,
+        lineColor: [222, 226, 230],
         lineWidth: 0.1
       },
       columnStyles: {
-        1: { halign: 'right', fontStyle: 'bold', textColor: colors.success }
+        1: { halign: 'right', fontStyle: 'bold', textColor: colors.success, fontSize: 11 },
+        3: { cellWidth: 25 }
       },
-      margin: { left: 15, right: 15 }
+      didDrawCell: function(data) {
+        if (data.column.index === 3 && data.section === 'body') {
+          drawBadge('Sulco', data.cell.x + 2, data.cell.y + 6, 'sulco');
+        }
+      },
+      margin: { left: marginX + 5, right: marginX + 5 }
+    });
+    
+    currentY = (pdf as any).lastAutoTable.finalY + 10;
+    
+    // Verificar se precisa nova página
+    if (currentY > 220) {
+      pdf.addPage();
+      await addPageHeaderWithLogo('Plano de Ação de Fertilização (cont.)');
+      currentY = 35;
+    }
+    
+    // CARD 4: Micronutrientes (Via Foliar)
+    drawCard(marginX, currentY, contentWidth, 95);
+    
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(colors.navyDark[0], colors.navyDark[1], colors.navyDark[2]);
+    pdf.text('4. Suplementação de Micronutrientes', marginX + 5, currentY + 8);
+    
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+    pdf.text('Correção de deficiências de B, Zn, Cu, Mn e Mo. Aplicação foliar ou tratamento de sementes conforme indicado.', marginX + 5, currentY + 14);
+    
+    const microData = [
+      ['Ácido Bórico', '2.0', 'kg/ha', 'foliar', 'V3-V5'],
+      ['Bórax', '3.0', 'kg/ha', 'foliar', 'V3-V5'],
+      ['Sulfato de Zinco', '3.0', 'kg/ha', 'foliar', 'V4-V6'],
+      ['Óxido de Zinco', '2.0', 'kg/ha', 'foliar', 'V4-V6'],
+      ['Sulfato de Cobre', '1.5', 'kg/ha', 'foliar', 'V4-V6'],
+      ['Óxido de Cobre', '4.0', 'kg/ha', 'foliar', 'V4-V6'],
+      ['Sulfato de Manganês', '3.0', 'kg/ha', 'foliar', 'V4-V6'],
+      ['Óxido de Manganês', '2.5', 'kg/ha', 'foliar', 'V4-V6'],
+      ['Molibdato de Sódio', '0.1', 'kg/ha', 'sementes', 'Plantio']
+    ];
+    
+    autoTable(pdf, {
+      head: [['FONTE DE FERTILIZANTE', 'QUANTIDADE', 'UNIDADE', 'MÉTODO', 'ESTÁGIO']],
+      body: microData,
+      startY: currentY + 18,
+      theme: 'plain',
+      headStyles: { 
+        fillColor: [245, 245, 245],
+        textColor: colors.textPrimary,
+        fontSize: 9,
+        fontStyle: 'bold',
+        halign: 'left'
+      },
+      styles: { 
+        fontSize: 9,
+        cellPadding: 4,
+        lineColor: [222, 226, 230],
+        lineWidth: 0.1
+      },
+      columnStyles: {
+        1: { halign: 'right', fontStyle: 'bold', textColor: colors.success, fontSize: 11 },
+        3: { cellWidth: 30 }
+      },
+      didDrawCell: function(data) {
+        if (data.column.index === 3 && data.section === 'body') {
+          const metodo = data.cell.raw;
+          if (metodo === 'sementes') {
+            drawBadge('Trat. sementes', data.cell.x + 2, data.cell.y + 6, 'sementes');
+          } else {
+            drawBadge('Foliar', data.cell.x + 2, data.cell.y + 6, 'foliar');
+          }
+        }
+      },
+      margin: { left: marginX + 5, right: marginX + 5 }
+    });
+    
+    currentY = (pdf as any).lastAutoTable.finalY + 10;
+    
+    // CARD 5: Manejo Orgânico (Opcional)
+    if (currentY > 180) {
+      pdf.addPage();
+      await addPageHeaderWithLogo('Plano de Ação de Fertilização (cont.)');
+      currentY = 35;
+    }
+    
+    drawCard(marginX, currentY, contentWidth, 50);
+    
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(colors.navyDark[0], colors.navyDark[1], colors.navyDark[2]);
+    pdf.text('5. Manejo Orgânico (Opcional)', marginX + 5, currentY + 8);
+    
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+    pdf.text('Melhoria da estrutura do solo e fornecimento gradual de nutrientes. Aplicar 30-45 dias antes do plantio.', marginX + 5, currentY + 14);
+    
+    const organicoData = [
+      ['Esterco Bovino Curtido', '10.000', 'kg/ha', 'incorporado', 'Pré-plantio'],
+      ['Composto Orgânico', '5.000', 'kg/ha', 'incorporado', 'Pré-plantio']
+    ];
+    
+    autoTable(pdf, {
+      head: [['FONTE DE FERTILIZANTE', 'QUANTIDADE', 'UNIDADE', 'MÉTODO', 'ESTÁGIO']],
+      body: organicoData,
+      startY: currentY + 18,
+      theme: 'plain',
+      headStyles: { 
+        fillColor: [245, 245, 245],
+        textColor: colors.textPrimary,
+        fontSize: 9,
+        fontStyle: 'bold',
+        halign: 'left'
+      },
+      styles: { 
+        fontSize: 9,
+        cellPadding: 4,
+        lineColor: [222, 226, 230],
+        lineWidth: 0.1
+      },
+      columnStyles: {
+        1: { halign: 'right', fontStyle: 'bold', textColor: colors.success, fontSize: 11 },
+        3: { cellWidth: 30 }
+      },
+      didDrawCell: function(data) {
+        if (data.column.index === 3 && data.section === 'body') {
+          drawBadge('Incorporado', data.cell.x + 2, data.cell.y + 6, 'incorporado');
+        }
+      },
+      margin: { left: marginX + 5, right: marginX + 5 }
     });
 
-    // Footer da Página 2
+    // Footer Página 2 com modelo completo
+    pdf.setDrawColor(220, 220, 220);
+    pdf.setLineWidth(0.3);
+    pdf.line(marginX, 275, pageWidth - marginX, 275);
+    
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(colors.navyDark[0], colors.navyDark[1], colors.navyDark[2]);
+    pdf.text('Fertilisolo - Sistema de Interpretação e Recomendação de Análise de Solos', marginX, 280);
+    
     pdf.setFontSize(8);
+    pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(100, 100, 100);
-    pdf.text('Fertilisolo - Análise e recomendação de fertilizantes - Página 2/3', 15, 285);
-    pdf.text(`Relatório gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 140, 285);
-
-    // ======================= PÁGINA 3 - ANÁLISE DETALHADA =======================
+    const dataCompleta = new Date().toLocaleDateString('pt-BR', {
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit'
+    });
+    pdf.text(`Gerado em: ${dataCompleta}`, marginX, 285);
+    
+    pdf.setFont('helvetica', 'italic');
+    const disclaimer = 'Este relatório é uma recomendação técnica baseada na análise de solo. Consulte sempre um engenheiro agrônomo para ajustes específicos da sua propriedade.';
+    const splitText = pdf.splitTextToSize(disclaimer, pageWidth - 30);
+    pdf.text(splitText, marginX, 289);
+    
+    // ============================================================================
+    // PÁGINA 3: APÊNDICE - DADOS TÉCNICOS DETALHADOS
+    // ============================================================================
     
     pdf.addPage();
     
-    // Header da Página 3 com cor primária (ANTES do logo para ficar atrás)
-    pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 20, 'F');
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(16);
-    pdf.text('Análise Detalhada de Nutrientes', 15, 13);
+    // Header Página 3 (Apêndice)
+    await addPageHeaderWithLogo('Apêndice - Dados Técnicos Detalhados');
+    currentY = 35;
     
-    // Logo personalizado DENTRO da faixa do topo (PÁGINA 3) - adicionado DEPOIS para ficar na frente
-    if (themeOptions?.logo) {
-      await addLogoToPage(pdf, themeOptions.logo, pageWidth, marginY, true);
-    }
+    // Título da seção
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(colors.navyDark[0], colors.navyDark[1], colors.navyDark[2]);
+    pdf.text('📊 Dados Completos de Análise do Solo', marginX, currentY);
+    
+    currentY += 8;
 
     // Tabela de Análise Completa
     const detailedColumns = ['Nutriente', 'Valor Encontrado', 'Unidade', 'Nível', 'Recomendação'];
     const detailedRows = [
       ['CTC (T)', formatNumber(soilData.T), 'cmolc/dm³', getCTCLevel(soilData.T), 'CTC ideal: 8-12 cmolc/dm³'],
-      ['Fósforo (P)', formatNumber(soilData.P), 'mg/dm³', getNutrientLevel(soilData.P, 10, 20), 'Aplicação de fontes de fósforo'],
+      ['Fósforo (P)', formatNumber(soilData.P), 'mg/dm³', getNutrientLevel(soilData.P, 10, 20), calcularRecomendacaoP(soilData.argila || 0, soilData.P || 0)],
       ['Potássio (K)', formatNumber((soilData.K || 0) / 390), 'cmolc/dm³', getNutrientLevel((soilData.K || 0) / 390, 0.15, 0.3), 'Aplicação de fontes de potássio'],
       ['Cálcio (Ca)', formatNumber(soilData.Ca), 'cmolc/dm³', getNutrientLevel(soilData.Ca, 2.0, 4.0), 'Aplicação de calcário'],
-      ['Magnésio (Mg)', formatNumber(soilData.Mg), 'cmolc/dm³', getNutrientLevel(soilData.Mg, 0.8, 1.5), 'Manutenção'],
+      ['Magnésio (Mg)', formatNumber(soilData.Mg), 'cmolc/dm³', getNutrientLevel(soilData.Mg, 0.8, 1.5), 'Calcário dolomítico'],
       ['Enxofre (S)', formatNumber(soilData.S), 'mg/dm³', getNutrientLevel(soilData.S, 5, 10), 'Adequado'],
       ['Boro (B)', formatNumber(soilData.B), 'mg/dm³', getNutrientLevel(soilData.B, 0.3, 0.6), getMicroRecommendation('B', getNutrientLevel(soilData.B, 0.3, 0.6))],
       ['Cobre (Cu)', formatNumber(soilData.Cu), 'mg/dm³', getNutrientLevel(soilData.Cu, 0.8, 1.2), getMicroRecommendation('Cu', getNutrientLevel(soilData.Cu, 0.8, 1.2))],
       ['Ferro (Fe)', formatNumber(soilData.Fe), 'mg/dm³', getNutrientLevel(soilData.Fe, 12, 30), getMicroRecommendation('Fe', getNutrientLevel(soilData.Fe, 12, 30))],
       ['Manganês (Mn)', formatNumber(soilData.Mn), 'mg/dm³', getNutrientLevel(soilData.Mn, 5, 12), getMicroRecommendation('Mn', getNutrientLevel(soilData.Mn, 5, 12))],
       ['Zinco (Zn)', formatNumber(soilData.Zn), 'mg/dm³', getNutrientLevel(soilData.Zn, 1.5, 2.2), getMicroRecommendation('Zn', getNutrientLevel(soilData.Zn, 1.5, 2.2))],
-      ['Molibdênio (Mo)', '-', 'mg/dm³', 'Não analisado', 'Aplicação preventiva recomendada']
+      ['Molibdênio (Mo)', '-', 'mg/dm³', 'Não analisado', 'Aplicação preventiva recomendada'],
+      ['pH em H₂O', formatNumber(soilData.pH), '-', getPhLevel(soilData.pH), 'Ideal: 5.5-6.5'],
+      ['Mat. Orgânica', formatNumber(soilData.MO), '%', getOrganicMatterLevel(soilData.MO), 'Ideal: 2.5-5.0%'],
+      ['Argila', formatNumber(soilData.argila), '%', getTextureClass(soilData.argila), 'Textura do solo']
     ];
 
     autoTable(pdf, {
       head: [detailedColumns],
       body: detailedRows,
-      startY: 25,
+      startY: currentY,
       theme: 'grid',
       headStyles: { 
-        fillColor: colors.grayTableStart, // Cinza claro como no modelo HTML
-        textColor: colors.textPrimary,    // Texto escuro
+        fillColor: colors.grayTableStart,
+        textColor: colors.textPrimary,
         fontSize: 10,
         fontStyle: 'bold',
         halign: 'left'
       },
-      alternateRowStyles: { fillColor: [255, 255, 255] }, // Branco puro
+      alternateRowStyles: { fillColor: [255, 255, 255] },
       styles: { 
         fontSize: 8, 
-        cellPadding: 3,
+        cellPadding: 4,
         textColor: colors.textPrimary,
         lineColor: [94, 82, 64],
         lineWidth: 0.1
       },
       columnStyles: {
-        1: { halign: 'right', fontStyle: 'bold' }
+        1: { halign: 'right', fontStyle: 'bold' },
+        3: { fontStyle: 'bold' }
       },
-      margin: { left: 15, right: 15 }
+      didParseCell: function(data) {
+        if (data.column.index === 3 && data.section === 'body' && data.cell.raw) {
+          const nivel = data.cell.raw.toString();
+          if (nivel.includes('Baixo') || nivel.includes('Muito Baixo')) {
+            data.cell.styles.textColor = [244, 67, 54]; // Vermelho
+          } else if (nivel.includes('Adequado') || nivel.includes('Alto')) {
+            data.cell.styles.textColor = colors.success;
+          }
+        }
+      },
+      margin: { left: marginX, right: marginX }
     });
 
     // Observações Importantes sobre Manejo de Nutrientes
-    const finalY = (pdf as any).lastAutoTable?.finalY + 10;
+    currentY = (pdf as any).lastAutoTable?.finalY + 10;
     
-    pdf.setFillColor(240, 248, 240);
-    pdf.rect(15, finalY, 180, 45, 'F');
-    pdf.setDrawColor(76, 175, 80);
-    pdf.rect(15, finalY, 180, 45, 'S');
+    drawCard(marginX, currentY, contentWidth, 48);
 
     pdf.setFontSize(12);
-    pdf.setTextColor(76, 175, 80);
-    pdf.text('Observações Importantes sobre Manejo de Nutrientes', 17, finalY + 8);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(colors.navyDark[0], colors.navyDark[1], colors.navyDark[2]);
+    pdf.text('📝 Observações Importantes sobre Manejo de Nutrientes', marginX + 5, currentY + 8);
 
     const managementNotes = [
       '• Aplicar calcário de 60 a 90 dias antes do plantio para correção do solo',
@@ -1098,18 +1390,31 @@ export const generatePDF = async (
     ];
 
     pdf.setFontSize(8);
-    pdf.setTextColor(0, 0, 0);
-    let managementY = finalY + 15;
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(colors.textPrimary[0], colors.textPrimary[1], colors.textPrimary[2]);
+    let managementY = currentY + 15;
     managementNotes.forEach(note => {
-      pdf.text(note, 17, managementY);
+      pdf.text(note, marginX + 5, managementY);
       managementY += 5;
     });
 
-    // Footer da Página 3
+    // Footer Página 3 com modelo completo
+    pdf.setDrawColor(220, 220, 220);
+    pdf.setLineWidth(0.3);
+    pdf.line(marginX, 275, pageWidth - marginX, 275);
+    
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(colors.navyDark[0], colors.navyDark[1], colors.navyDark[2]);
+    pdf.text('Fertilisolo - Sistema de Interpretação e Recomendação de Análise de Solos', marginX, 280);
+    
     pdf.setFontSize(8);
+    pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(100, 100, 100);
-    pdf.text('Fertilisolo - Análise e recomendação de fertilizantes - Página 3/3', 15, 285);
-    pdf.text(`Relatório gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 140, 285);
+    pdf.text(`Gerado em: ${dataCompleta}`, marginX, 285);
+    
+    pdf.setFont('helvetica', 'italic');
+    pdf.text(splitText, marginX, 289);
 
     // Nome do arquivo para download
     const filename = `Fertilisolo_Relatorio_${soilData.location || farmName || "Analise"}_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`;
