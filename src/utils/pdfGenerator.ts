@@ -694,7 +694,7 @@ export const generatePDF = async (
     
     // ========== ANÁLISE VISUAL DOS NUTRIENTES (BARRAS COLORIDAS) ==========
     
-    // Função para desenhar barra visual de nível
+    // Função para desenhar barra visual de nível (OTIMIZADO)
     const drawNutrientBar = (
       label: string,
       value: number,
@@ -702,22 +702,23 @@ export const generatePDF = async (
       yPos: number,
       isLeft: boolean = true
     ) => {
-      const xStart = isLeft ? marginX : pageWidth / 2 + 5;
-      const barWidth = (pageWidth / 2) - marginX - 10;
-      const labelWidth = 35;
-      const valueWidth = 20;
-      const barAreaWidth = barWidth - labelWidth - valueWidth - 10;
+      const xStart = isLeft ? marginX + 6 : pageWidth / 2 + 2;
+      const labelWidth = 10; // Reduzido de 35 para 10
+      const valueWidth = 15; // Reduzido de 20 para 15
+      const nivelWidth = 18; // Espaço para o texto do nível
+      const availableWidth = isLeft ? (pageWidth / 2 - marginX - 14) : (pageWidth / 2 - marginX - 8);
+      const barAreaWidth = availableWidth - labelWidth - valueWidth - nivelWidth;
       
-      // Label do nutriente
-      pdf.setFontSize(9);
+      // Label do nutriente (mais compacto)
+      pdf.setFontSize(8);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(55, 65, 81);
       pdf.text(label, xStart, yPos + 3);
       
-      // Valor - garantir que é string
+      // Valor - garantir que é string (mais próximo)
       pdf.setFont('helvetica', 'normal');
       const valueStr = String(value.toFixed(1));
-      pdf.text(valueStr, xStart + labelWidth, yPos + 3);
+      pdf.text(valueStr, xStart + labelWidth + 2, yPos + 3);
       
       // Determinar cor da barra baseado no nível
       let barColor: number[];
@@ -734,16 +735,18 @@ export const generatePDF = async (
         barPercent = 0.7;
       }
       
+      const barStartX = xStart + labelWidth + valueWidth + 2;
+      
       // Fundo da barra (cinza claro)
       pdf.setFillColor(229, 231, 235);
-      pdf.roundedRect(xStart + labelWidth + valueWidth, yPos - 2, barAreaWidth, 5, 2, 2, 'F');
+      pdf.roundedRect(barStartX, yPos - 2, barAreaWidth, 5, 2, 2, 'F');
       
       // Barra colorida
       pdf.setFillColor(...barColor);
       const barFilledWidth = barAreaWidth * barPercent;
       if (barFilledWidth > 0) {
         pdf.roundedRect(
-          xStart + labelWidth + valueWidth,
+          barStartX,
           yPos - 2,
           barFilledWidth,
           5,
@@ -753,76 +756,76 @@ export const generatePDF = async (
         );
       }
       
-      // Label do nível - garantir que é string
+      // Label do nível - garantir que é string (mais próximo)
       pdf.setFontSize(7);
       pdf.setTextColor(...barColor);
       pdf.setFont('helvetica', 'bold');
       const nivelStr = String(nivel);
-      const nivelX = xStart + labelWidth + valueWidth + barAreaWidth + 2;
+      const nivelX = barStartX + barAreaWidth + 2;
       pdf.text(nivelStr, nivelX, yPos + 3);
     };
     
-    // Card com análise visual
+    // Card com análise visual (OTIMIZADO - mais compacto)
     pdf.setFillColor(252, 251, 245);
-    pdf.roundedRect(marginX, currentY, contentWidth, 75, 8, 8, 'F');
+    pdf.roundedRect(marginX, currentY, contentWidth, 55, 8, 8, 'F');
     pdf.setDrawColor(94, 82, 64);
     pdf.setLineWidth(0.3);
-    pdf.roundedRect(marginX, currentY, contentWidth, 75, 8, 8, 'S');
+    pdf.roundedRect(marginX, currentY, contentWidth, 55, 8, 8, 'S');
     
     // Título
-    pdf.setFontSize(14);
+    pdf.setFontSize(13);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(26, 43, 74);
-    pdf.text('Analise Visual de Necessidades', marginX + 6, currentY + 8);
+    pdf.text('Analise Visual de Necessidades', marginX + 6, currentY + 7);
     
-    let barY = currentY + 16;
+    let barY = currentY + 14;
     
     // Macronutrientes (coluna esquerda)
-    pdf.setFontSize(10);
+    pdf.setFontSize(9);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(107, 114, 128);
     pdf.text('Macronutrientes', marginX + 6, barY);
-    barY += 6;
+    barY += 5;
     
-    // P, K, Ca, Mg, S (exemplo - você vai substituir pelos valores reais)
+    // P, K, Ca, Mg, S (espaçamento reduzido)
     const pNivel = interpretarFosforo(soilData.p || 0, soilData.argila || 0);
     drawNutrientBar('P', soilData.p || 0, pNivel.nivel, barY, true);
-    barY += 8;
+    barY += 6;
     
     drawNutrientBar('K', soilData.k || 0, soilData.k >= 0.15 ? 'Adequado' : 'Baixo', barY, true);
-    barY += 8;
+    barY += 6;
     
     drawNutrientBar('Ca', soilData.ca || 0, soilData.ca >= 4.0 ? 'Adequado' : 'Baixo', barY, true);
-    barY += 8;
+    barY += 6;
     
     drawNutrientBar('Mg', soilData.mg || 0, soilData.mg >= 1.0 ? 'Adequado' : 'Baixo', barY, true);
-    barY += 8;
+    barY += 6;
     
     drawNutrientBar('S', soilData.s || 0, soilData.s >= 10 ? 'Adequado' : 'Baixo', barY, true);
     
     // Micronutrientes (coluna direita)
-    barY = currentY + 16;
-    pdf.setFontSize(10);
+    barY = currentY + 14;
+    pdf.setFontSize(9);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(107, 114, 128);
-    pdf.text('Micronutrientes', pageWidth / 2 + 5, barY);
-    barY += 6;
+    pdf.text('Micronutrientes', pageWidth / 2 + 2, barY);
+    barY += 5;
     
     drawNutrientBar('B', soilData.b || 0, soilData.b >= 0.5 ? 'Adequado' : 'Baixo', barY, false);
-    barY += 8;
+    barY += 6;
     
     drawNutrientBar('Zn', soilData.zn || 0, soilData.zn >= 1.2 ? 'Adequado' : 'Baixo', barY, false);
-    barY += 8;
+    barY += 6;
     
     drawNutrientBar('Cu', soilData.cu || 0, soilData.cu >= 0.8 ? 'Adequado' : 'Baixo', barY, false);
-    barY += 8;
+    barY += 6;
     
     drawNutrientBar('Mn', soilData.mn || 0, soilData.mn >= 5.0 ? 'Adequado' : 'Baixo', barY, false);
-    barY += 8;
+    barY += 6;
     
     drawNutrientBar('Fe', soilData.fe || 0, soilData.fe >= 5.0 ? 'Adequado' : 'Baixo', barY, false);
     
-    currentY += 85;
+    currentY += 63;
     
     // ========== FUNÇÃO HELPER: Desenhar Badge Colorido ==========
     const drawBadge = (text: string, x: number, y: number, type: string) => {
@@ -903,6 +906,11 @@ export const generatePDF = async (
       },
       margin: { left: marginX + 6, right: marginX + 6 },
       tableWidth: contentWidth - 12,
+      willDrawCell: (data: any) => {
+        if (data.column.index === 3 && data.section === 'body') {
+          data.cell.text = [''];
+        }
+      },
       didDrawCell: (data: any) => {
         if (data.column.index === 3 && data.section === 'body') {
           const cellX = data.cell.x + 5;
@@ -912,7 +920,7 @@ export const generatePDF = async (
       }
     });
     
-    currentY = (pdf as any).lastAutoTable.finalY + 10;
+    currentY = (pdf as any).lastAutoTable.finalY + 8;
     
     // ========== CARD 2: ADUBAÇÃO DE BASE ==========
     if (currentY > 200) { pdf.addPage(); currentY = 45; }
@@ -976,6 +984,11 @@ export const generatePDF = async (
       },
       margin: { left: marginX + 6, right: marginX + 6 },
       tableWidth: contentWidth - 12,
+      willDrawCell: (data: any) => {
+        if (data.column.index === 3 && data.section === 'body') {
+          data.cell.text = [''];
+        }
+      },
       didDrawCell: (data: any) => {
         if (data.column.index === 3 && data.section === 'body') {
           const cellX = data.cell.x + 5;
@@ -985,7 +998,7 @@ export const generatePDF = async (
       }
     });
     
-    currentY = (pdf as any).lastAutoTable.finalY + 10;
+    currentY = (pdf as any).lastAutoTable.finalY + 8;
     
     // ========== CARD 3: ADUBAÇÃO DE COBERTURA ==========
     if (currentY > 220) { pdf.addPage(); currentY = 45; }
@@ -1042,6 +1055,11 @@ export const generatePDF = async (
       },
       margin: { left: marginX + 6, right: marginX + 6 },
       tableWidth: contentWidth - 12,
+      willDrawCell: (data: any) => {
+        if (data.column.index === 3 && data.section === 'body') {
+          data.cell.text = [''];
+        }
+      },
       didDrawCell: (data: any) => {
         if (data.column.index === 3 && data.section === 'body') {
           const cellX = data.cell.x + 5;
@@ -1051,7 +1069,7 @@ export const generatePDF = async (
       }
     });
     
-    currentY = (pdf as any).lastAutoTable.finalY + 10;
+    currentY = (pdf as any).lastAutoTable.finalY + 8;
     
     // ========== CARD 4: MICRONUTRIENTES ==========
     pdf.addPage();
@@ -1118,6 +1136,12 @@ export const generatePDF = async (
       },
       margin: { left: marginX + 6, right: marginX + 6 },
       tableWidth: contentWidth - 12,
+      willDrawCell: (data: any) => {
+        // Limpar o texto da coluna Método antes de desenhar
+        if (data.column.index === 3 && data.section === 'body') {
+          data.cell.text = [''];
+        }
+      },
       didDrawCell: (data: any) => {
         if (data.column.index === 3 && data.section === 'body') {
           const cellX = data.cell.x + 5;
@@ -1129,7 +1153,7 @@ export const generatePDF = async (
       }
     });
     
-    currentY = (pdf as any).lastAutoTable.finalY + 10;
+    currentY = (pdf as any).lastAutoTable.finalY + 8;
     
     // ========== CARD 5: MANEJO ORGÂNICO ==========
     if (currentY > 220) { pdf.addPage(); currentY = 45; }
@@ -1188,6 +1212,11 @@ export const generatePDF = async (
       },
       margin: { left: marginX + 6, right: marginX + 6 },
       tableWidth: contentWidth - 12,
+      willDrawCell: (data: any) => {
+        if (data.column.index === 3 && data.section === 'body') {
+          data.cell.text = [''];
+        }
+      },
       didDrawCell: (data: any) => {
         if (data.column.index === 3 && data.section === 'body') {
           const cellX = data.cell.x + 5;
@@ -1197,7 +1226,7 @@ export const generatePDF = async (
       }
     });
     
-    currentY = (pdf as any).lastAutoTable.finalY + 10;
+    currentY = (pdf as any).lastAutoTable.finalY + 8;
     
     // Footer simples
     pdf.setFontSize(10);
