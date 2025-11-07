@@ -547,19 +547,34 @@ export const generatePDF = async (
     
     const pdf = new jsPDF();
     
-    // Paleta de cores moderna baseada no modelo HTML
+    // Paleta de cores moderna EXATAMENTE DO MODELO HTML
     const colors = {
-      navyDark: [26, 43, 74] as [number, number, number],
-      navyMedium: [45, 74, 115] as [number, number, number],
-      blueAccent: [0, 123, 255] as [number, number, number],
-      blueLight: [0, 212, 255] as [number, number, number],
-      grayBg: [248, 249, 250] as [number, number, number],
-      grayAlt: [233, 236, 239] as [number, number, number],
-      grayBorder: [222, 226, 230] as [number, number, number],
-      grayText: [73, 80, 87] as [number, number, number],
-      success: [25, 135, 84] as [number, number, number],
-      warning: [255, 193, 7] as [number, number, number],
-      info: [13, 202, 240] as [number, number, number],
+      // Header gradient
+      navyDark: [26, 43, 74] as [number, number, number],    // #1a2b4a
+      navyMedium: [45, 74, 115] as [number, number, number], // #2d4a73
+      
+      // Accent bar
+      blueAccent: [0, 123, 255] as [number, number, number], // #007bff
+      blueLight: [0, 212, 255] as [number, number, number],  // #00d4ff
+      
+      // Surface/Cards (cream/bege suave)
+      creamBg: [252, 252, 249] as [number, number, number],  // #fcfcf9
+      creamSurface: [255, 255, 253] as [number, number, number], // #fffffd
+      
+      // Table header (cinza gradiente)
+      grayTableStart: [248, 249, 250] as [number, number, number], // #f8f9fa
+      grayTableEnd: [233, 236, 239] as [number, number, number],   // #e9ecef
+      
+      // Borders & text
+      grayBorder: [94, 82, 64] as [number, number, number],  // brown-600 com opacity
+      grayText: [98, 108, 113] as [number, number, number],  // slate-500
+      textPrimary: [19, 52, 59] as [number, number, number], // slate-900
+      
+      // Status colors
+      success: [5, 150, 105] as [number, number, number],    // #059669
+      warning: [245, 158, 11] as [number, number, number],   // #f59e0b
+      warningBg: [255, 249, 230] as [number, number, number], // #fff9e6
+      warningText: [146, 64, 14] as [number, number, number], // #92400e
     };
     
     // Cor primária do tema ou padrão azul navy
@@ -642,18 +657,20 @@ export const generatePDF = async (
     pdf.setFont('helvetica', 'normal');
     pdf.text(dateText, pageWidth - pdf.getTextWidth(dateText) - marginX, 21);
 
-    // Função auxiliar para desenhar card com sombra
+    // Função auxiliar para desenhar card com sombra estilo modelo HTML
     const drawCard = (x: number, y: number, width: number, height: number, withShadow: boolean = true) => {
       if (withShadow) {
-        // Sombra (simulada com retângulo cinza deslocado)
-        pdf.setFillColor(200, 200, 200);
-        pdf.roundedRect(x + 1, y + 1, width, height, 3, 3, 'F');
+        // Sombra suave (simulada com múltiplas camadas)
+        pdf.setFillColor(230, 230, 230);
+        pdf.roundedRect(x + 0.5, y + 0.5, width, height, 3, 3, 'F');
+        pdf.setFillColor(235, 235, 235);
+        pdf.roundedRect(x + 0.3, y + 0.3, width, height, 3, 3, 'F');
       }
       
-      // Card branco
-      pdf.setFillColor(255, 255, 255);
-      pdf.setDrawColor(colors.grayBorder[0], colors.grayBorder[1], colors.grayBorder[2]);
-      pdf.setLineWidth(0.5);
+      // Card com fundo cream suave (como no modelo HTML)
+      pdf.setFillColor(colors.creamSurface[0], colors.creamSurface[1], colors.creamSurface[2]);
+      pdf.setDrawColor(94, 82, 64); // brown-600 com opacity
+      pdf.setLineWidth(0.3);
       pdf.roundedRect(x, y, width, height, 3, 3, 'FD');
     };
     
@@ -665,11 +682,11 @@ export const generatePDF = async (
     const col3Width = 52;
     const gap = 3;
     
-    // Coluna 1 - Detalhes da Análise (Card branco)
+    // Coluna 1 - Detalhes da Análise (Card cream)
     drawCard(marginX, colY, col1Width, colHeight);
     
-    // Título da coluna 1
-    pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    // Título da coluna 1 - Navy dark como no modelo HTML
+    pdf.setTextColor(colors.navyDark[0], colors.navyDark[1], colors.navyDark[2]);
     pdf.setFontSize(11);
     pdf.setFont('helvetica', 'bold');
     pdf.text('Detalhes da Análise', marginX + 3, colY + 8);
@@ -702,13 +719,13 @@ export const generatePDF = async (
     pdf.setTextColor(0, 0, 0);
     pdf.text(`${(soilData.argila || 0).toFixed(0)}%`, marginX + 2, colY + 48);
     
-    // Coluna 2 - Macronutrientes (Card branco)
+    // Coluna 2 - Macronutrientes (Card cream)
     const col2X = marginX + col1Width + gap;
     drawCard(col2X, colY, col2Width, colHeight);
     
     pdf.setFontSize(11);
     pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    pdf.setTextColor(colors.navyDark[0], colors.navyDark[1], colors.navyDark[2]);
     pdf.text('Macronutrientes', col2X + 3, colY + 8);
     
     pdf.setFontSize(7.5);
@@ -750,31 +767,35 @@ export const generatePDF = async (
     pdf.setTextColor(0, 0, 0);
     pdf.text(`${formatNumber(soilData.Mg)} cmolc/dm³`, col2X + 32, colY + 45);
 
-    // Coluna 3 - Informação Importante (Box amarelo com ⚠️)
+    // Coluna 3 - Informação Importante (Box amarelo ESTILO MODELO HTML)
     const col3X = col2X + col2Width + gap;
     
-    // Fundo amarelo claro
-    pdf.setFillColor(255, 249, 230);
-    pdf.setDrawColor(colors.warning[0], colors.warning[1], colors.warning[2]);
-    pdf.setLineWidth(3);
-    pdf.roundedRect(col3X, colY, col3Width, colHeight, 3, 3, 'FD');
+    // Fundo amarelo claro com gradiente simulado
+    pdf.setFillColor(colors.warningBg[0], colors.warningBg[1], colors.warningBg[2]);
+    pdf.roundedRect(col3X, colY, col3Width, colHeight, 3, 3, 'F');
     
+    // Borda esquerda grossa (4px) laranja - característica do modelo HTML
+    pdf.setFillColor(colors.warning[0], colors.warning[1], colors.warning[2]);
+    pdf.roundedRect(col3X, colY, 1.5, colHeight, 3, 3, 'F');
+    
+    // Título do alert
     pdf.setFontSize(10);
     pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(colors.warning[0] - 50, colors.warning[1] - 50, 0);
-    pdf.text('⚠️ Importante', col3X + 3, colY + 9);
+    pdf.setTextColor(colors.warningText[0], colors.warningText[1], colors.warningText[2]);
+    pdf.text('⚠️ Importante', col3X + 4, colY + 9);
     
+    // Conteúdo do alert - exatamente como no modelo HTML
     pdf.setFontSize(7.5);
     pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(146, 64, 14); // Marrom escuro
-    pdf.text('As fontes listadas em cada', col3X + 2, colY + 18);
-    pdf.text('tabela são alternativas.', col3X + 2, colY + 24);
+    pdf.setTextColor(colors.warningText[0], colors.warningText[1], colors.warningText[2]); // #92400e
+    pdf.text('As fontes listadas em cada', col3X + 3, colY + 18);
+    pdf.text('tabela são alternativas.', col3X + 3, colY + 24);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('Escolha APENAS UMA fonte', col3X + 2, colY + 32);
+    pdf.text('Escolha APENAS UMA fonte', col3X + 3, colY + 32);
     pdf.setFont('helvetica', 'normal');
-    pdf.text('para cada tipo de nutriente,', col3X + 2, colY + 38);
-    pdf.text('de acordo com disponibilidade', col3X + 2, colY + 44);
-    pdf.text('e custo no mercado local.', col3X + 2, colY + 50);
+    pdf.text('para cada tipo de nutriente,', col3X + 3, colY + 38);
+    pdf.text('de acordo com disponibilidade', col3X + 3, colY + 44);
+    pdf.text('e custo no mercado local.', col3X + 3, colY + 50);
 
     // Seção 2: Análise Visual de Necessidades (Y = 100) - espaçamento corrigido
     let visualY = 100;
@@ -885,18 +906,18 @@ export const generatePDF = async (
         startY: recY + 5,
         theme: 'grid',
         headStyles: { 
-          fillColor: primaryColor,
-          textColor: [255, 255, 255], 
+          fillColor: colors.grayTableStart, // Cinza claro gradiente como no modelo HTML
+          textColor: colors.textPrimary,    // Texto escuro, não branco
           fontSize: 10,
           fontStyle: 'bold',
-          halign: 'center'
+          halign: 'left'                    // Alinhado à esquerda como no modelo
         },
-        alternateRowStyles: { fillColor: colors.grayBg },
+        alternateRowStyles: { fillColor: [255, 255, 255] }, // Branco puro para zebra
         styles: { 
           fontSize: 10, 
-          cellPadding: 3,
-          textColor: [51, 51, 51],
-          lineColor: colors.grayBorder,
+          cellPadding: 4,
+          textColor: colors.textPrimary,
+          lineColor: [94, 82, 64],          // Brown-600 para bordas
           lineWidth: 0.1
         },
         columnStyles: {
@@ -1010,17 +1031,18 @@ export const generatePDF = async (
       startY: 25,
       theme: 'grid',
       headStyles: { 
-        fillColor: primaryColor, 
-        textColor: [255, 255, 255], 
+        fillColor: colors.grayTableStart, // Cinza claro como no modelo HTML
+        textColor: colors.textPrimary,    // Texto escuro
         fontSize: 10,
         fontStyle: 'bold',
-        halign: 'center'
+        halign: 'left'
       },
-      alternateRowStyles: { fillColor: colors.grayBg },
+      alternateRowStyles: { fillColor: [255, 255, 255] }, // Branco puro
       styles: { 
         fontSize: 9, 
-        cellPadding: 2,
-        lineColor: colors.grayBorder,
+        cellPadding: 3,
+        textColor: colors.textPrimary,
+        lineColor: [94, 82, 64],
         lineWidth: 0.1
       },
       columnStyles: {
@@ -1074,17 +1096,18 @@ export const generatePDF = async (
       startY: 25,
       theme: 'grid',
       headStyles: { 
-        fillColor: primaryColor, 
-        textColor: [255, 255, 255], 
+        fillColor: colors.grayTableStart, // Cinza claro como no modelo HTML
+        textColor: colors.textPrimary,    // Texto escuro
         fontSize: 10,
         fontStyle: 'bold',
-        halign: 'center'
+        halign: 'left'
       },
-      alternateRowStyles: { fillColor: colors.grayBg },
+      alternateRowStyles: { fillColor: [255, 255, 255] }, // Branco puro
       styles: { 
         fontSize: 8, 
-        cellPadding: 2,
-        lineColor: colors.grayBorder,
+        cellPadding: 3,
+        textColor: colors.textPrimary,
+        lineColor: [94, 82, 64],
         lineWidth: 0.1
       },
       columnStyles: {
