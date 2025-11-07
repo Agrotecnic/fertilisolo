@@ -663,9 +663,9 @@ export const generatePDF = async (
     // Subtítulo: Cultura e Amostra
     pdf.setFontSize(13);
     pdf.setFont('helvetica', 'normal');
-    const culturaLabel = `🌱  Cultura: ${cultureName || 'Soja'}`;
-    const amostraLabel = `    📋  Amostra: ${farmName || soilData.location || 'Não especificado'}`;
-    pdf.text(culturaLabel + amostraLabel, marginX, 28);
+    const culturaText = `Cultura: ${cultureName || 'Soja'}`;
+    const amostraText = `Amostra: ${farmName || soilData.location || 'Não especificado'}`;
+    pdf.text(`${culturaText}     ${amostraText}`, marginX, 28);
 
     // ========== ALERT BOX AMARELO (igual ao HTML) ==========
     let currentY = 45;
@@ -682,7 +682,7 @@ export const generatePDF = async (
     pdf.setFontSize(11);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(146, 64, 14); // #92400e
-    pdf.text('⚠️  Importante', marginX + 8, currentY + 6);
+    pdf.text('Importante', marginX + 8, currentY + 6);
     
     pdf.setFontSize(9);
     pdf.setFont('helvetica', 'normal');
@@ -691,6 +691,132 @@ export const generatePDF = async (
     pdf.text(splitAlert, marginX + 8, currentY + 11);
     
     currentY += 24;
+    
+    // ========== ANÁLISE VISUAL DOS NUTRIENTES (BARRAS COLORIDAS) ==========
+    
+    // Função para desenhar barra visual de nível
+    const drawNutrientBar = (
+      label: string,
+      value: number,
+      nivel: string,
+      yPos: number,
+      isLeft: boolean = true
+    ) => {
+      const xStart = isLeft ? marginX : pageWidth / 2 + 5;
+      const barWidth = (pageWidth / 2) - marginX - 10;
+      const labelWidth = 35;
+      const valueWidth = 20;
+      const barAreaWidth = barWidth - labelWidth - valueWidth - 10;
+      
+      // Label do nutriente
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(55, 65, 81);
+      pdf.text(label, xStart, yPos + 3);
+      
+      // Valor
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(value.toFixed(1), xStart + labelWidth, yPos + 3);
+      
+      // Determinar cor da barra baseado no nível
+      let barColor: number[];
+      let barPercent: number;
+      
+      if (nivel === 'Baixo') {
+        barColor = [239, 68, 68]; // vermelho
+        barPercent = 0.3;
+      } else if (nivel === 'Alto') {
+        barColor = [34, 197, 94]; // verde
+        barPercent = 1.0;
+      } else {
+        barColor = [34, 197, 94]; // verde (Adequado)
+        barPercent = 0.7;
+      }
+      
+      // Fundo da barra (cinza claro)
+      pdf.setFillColor(229, 231, 235);
+      pdf.roundedRect(xStart + labelWidth + valueWidth, yPos - 2, barAreaWidth, 5, 2, 2, 'F');
+      
+      // Barra colorida
+      pdf.setFillColor(...barColor);
+      pdf.roundedRect(
+        xStart + labelWidth + valueWidth,
+        yPos - 2,
+        barAreaWidth * barPercent,
+        5,
+        2,
+        2,
+        'F'
+      );
+      
+      // Label do nível
+      pdf.setFontSize(7);
+      pdf.setTextColor(...barColor);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(nivel, xStart + labelWidth + valueWidth + barAreaWidth + 2, yPos + 3);
+    };
+    
+    // Card com análise visual
+    pdf.setFillColor(252, 251, 245);
+    pdf.roundedRect(marginX, currentY, contentWidth, 75, 8, 8, 'F');
+    pdf.setDrawColor(94, 82, 64);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(marginX, currentY, contentWidth, 75, 8, 8, 'S');
+    
+    // Título
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(26, 43, 74);
+    pdf.text('Analise Visual de Necessidades', marginX + 6, currentY + 8);
+    
+    let barY = currentY + 16;
+    
+    // Macronutrientes (coluna esquerda)
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(107, 114, 128);
+    pdf.text('Macronutrientes', marginX + 6, barY);
+    barY += 6;
+    
+    // P, K, Ca, Mg, S (exemplo - você vai substituir pelos valores reais)
+    const pNivel = interpretarFosforo(soilData.p || 0, soilData.argila || 0);
+    drawNutrientBar('P', soilData.p || 0, pNivel.nivel, barY, true);
+    barY += 8;
+    
+    drawNutrientBar('K', soilData.k || 0, soilData.k >= 0.15 ? 'Adequado' : 'Baixo', barY, true);
+    barY += 8;
+    
+    drawNutrientBar('Ca', soilData.ca || 0, soilData.ca >= 4.0 ? 'Adequado' : 'Baixo', barY, true);
+    barY += 8;
+    
+    drawNutrientBar('Mg', soilData.mg || 0, soilData.mg >= 1.0 ? 'Adequado' : 'Baixo', barY, true);
+    barY += 8;
+    
+    drawNutrientBar('S', soilData.s || 0, soilData.s >= 10 ? 'Adequado' : 'Baixo', barY, true);
+    
+    // Micronutrientes (coluna direita)
+    barY = currentY + 16;
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(107, 114, 128);
+    pdf.text('Micronutrientes', pageWidth / 2 + 5, barY);
+    barY += 6;
+    
+    drawNutrientBar('B', soilData.b || 0, soilData.b >= 0.5 ? 'Adequado' : 'Baixo', barY, false);
+    barY += 8;
+    
+    drawNutrientBar('Zn', soilData.zn || 0, soilData.zn >= 1.2 ? 'Adequado' : 'Baixo', barY, false);
+    barY += 8;
+    
+    drawNutrientBar('Cu', soilData.cu || 0, soilData.cu >= 0.8 ? 'Adequado' : 'Baixo', barY, false);
+    barY += 8;
+    
+    drawNutrientBar('Mn', soilData.mn || 0, soilData.mn >= 5.0 ? 'Adequado' : 'Baixo', barY, false);
+    barY += 8;
+    
+    drawNutrientBar('Fe', soilData.fe || 0, soilData.fe >= 5.0 ? 'Adequado' : 'Baixo', barY, false);
+    
+    currentY += 85;
     
     // ========== FUNÇÃO HELPER: Desenhar Badge Colorido ==========
     const drawBadge = (text: string, x: number, y: number, type: string) => {
