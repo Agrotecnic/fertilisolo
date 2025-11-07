@@ -714,9 +714,10 @@ export const generatePDF = async (
       pdf.setTextColor(55, 65, 81);
       pdf.text(label, xStart, yPos + 3);
       
-      // Valor
+      // Valor - garantir que é string
       pdf.setFont('helvetica', 'normal');
-      pdf.text(value.toFixed(1), xStart + labelWidth, yPos + 3);
+      const valueStr = String(value.toFixed(1));
+      pdf.text(valueStr, xStart + labelWidth, yPos + 3);
       
       // Determinar cor da barra baseado no nível
       let barColor: number[];
@@ -739,21 +740,26 @@ export const generatePDF = async (
       
       // Barra colorida
       pdf.setFillColor(...barColor);
-      pdf.roundedRect(
-        xStart + labelWidth + valueWidth,
-        yPos - 2,
-        barAreaWidth * barPercent,
-        5,
-        2,
-        2,
-        'F'
-      );
+      const barFilledWidth = barAreaWidth * barPercent;
+      if (barFilledWidth > 0) {
+        pdf.roundedRect(
+          xStart + labelWidth + valueWidth,
+          yPos - 2,
+          barFilledWidth,
+          5,
+          2,
+          2,
+          'F'
+        );
+      }
       
-      // Label do nível
+      // Label do nível - garantir que é string
       pdf.setFontSize(7);
       pdf.setTextColor(...barColor);
       pdf.setFont('helvetica', 'bold');
-      pdf.text(nivel, xStart + labelWidth + valueWidth + barAreaWidth + 2, yPos + 3);
+      const nivelStr = String(nivel);
+      const nivelX = xStart + labelWidth + valueWidth + barAreaWidth + 2;
+      pdf.text(nivelStr, nivelX, yPos + 3);
     };
     
     // Card com análise visual
