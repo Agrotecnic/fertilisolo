@@ -26,15 +26,16 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
   // Formata o valor apenas para exibição quando não estamos editando
   const formatValue = (val: number | string): string => {
     if (isEditing) return displayValue;
-    if (type === 'text') return val.toString();
-    if (val === 0 || val === '' || val === '0' || val === null || val === undefined) return '';
+    if (type === 'text') return val?.toString() || '';
+    // Retorna vazio para valores nulos, undefined, zero ou string vazia
+    if (val === null || val === undefined || val === '' || val === 0 || val === '0') return '';
     return val.toString().replace('.', ',');
   };
 
   // Analisa o valor apenas quando precisamos enviar para o componente pai
   const parseValue = (str: string): number | string => {
     if (type === 'text') return str;
-    if (!str || str === '') return 0;
+    if (!str || str === '') return ''; // Retorna string vazia ao invés de 0
     
     // Se for apenas vírgula, mantém como string
     if (str === ',' || str === '.') {
@@ -48,7 +49,7 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
     }
     
     const parsed = parseFloat(numericValue);
-    return isNaN(parsed) ? str : parsed;
+    return isNaN(parsed) ? '' : parsed; // Retorna '' ao invés de str quando NaN
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,10 +92,17 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
   // Quando o campo ganha o foco, mostramos o valor exato para edição
   const handleFocus = () => {
     setIsEditing(true);
+    
+    // Se o valor for 0, vazio, null ou undefined, deixa o campo vazio
+    if (value === 0 || value === '' || value === '0' || value === null || value === undefined) {
+      setDisplayValue('');
+      return;
+    }
+    
     if (typeof value === 'number') {
-      setDisplayValue(value === 0 ? '' : value.toString().replace('.', ','));
+      setDisplayValue(value.toString().replace('.', ','));
     } else if (typeof value === 'string') {
-      setDisplayValue(value === '0' || value === '' ? '' : value);
+      setDisplayValue(value);
     }
   };
 
@@ -104,7 +112,11 @@ export const FormattedInput: React.FC<FormattedInputProps> = ({
       value={formatValue(value)}
       onChange={handleChange}
       onBlur={handleBlur}
-      onFocus={handleFocus}
+      onFocus={(e) => {
+        handleFocus();
+        // Seleciona todo o texto para facilitar substituição
+        e.target.select();
+      }}
       placeholder={placeholder}
       className={`text-gray-800 ${className}`}
       inputMode="decimal"

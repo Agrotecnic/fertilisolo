@@ -32,21 +32,21 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
   const [formData, setFormData] = useState<Omit<SoilData, 'id' | 'date'>>({
     location: '',
     crop: '',
-    targetYield: 4, // Produtividade esperada padrão
-    organicMatter: 0,
-    T: 0,
-    Ca: 0,
-    Mg: 0,
-    K: 0,
-    P: 0,
-    S: 0,
-    B: 0,
-    Cu: 0,
-    Fe: 0,
-    Mn: 0,
-    Zn: 0,
-    Mo: 0,
-    argila: 35, // Adicionando o campo argila que estava faltando
+    targetYield: undefined, // Permite campo vazio
+    organicMatter: '' as any, // Permite campo vazio
+    T: '' as any,
+    Ca: '' as any,
+    Mg: '' as any,
+    K: '' as any,
+    P: '' as any,
+    S: '' as any,
+    B: '' as any,
+    Cu: '' as any,
+    Fe: '' as any,
+    Mn: '' as any,
+    Zn: '' as any,
+    Mo: '' as any,
+    argila: 35, // Mantém valor padrão para argila
   });
 
   const [isAutoFilled, setIsAutoFilled] = useState(false);
