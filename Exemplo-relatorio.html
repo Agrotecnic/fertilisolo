@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Ação de Fertilização - Soja</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-400: rgba(45, 166, 178, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-teal-800: rgba(41, 150, 161, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-400: rgba(230, 129, 97, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            --color-slate-900-rgb: 19, 52, 59;
+            --color-slate-500-rgb: 98, 108, 113;
+            --color-red-500-rgb: 192, 21, 47;
+            --color-red-400-rgb: 255, 84, 89;
+            --color-orange-500-rgb: 168, 75, 47;
+            --color-orange-400-rgb: 230, 129, 97;
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-primary-active: var(--color-teal-700);
+            --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-secondary-active: rgba(var(--color-brown-600-rgb), 0.25);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-btn-primary-text: var(--color-cream-50);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-card-border-inner: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-error: var(--color-red-500);
+            --color-success: var(--color-teal-500);
+            --color-warning: var(--color-orange-500);
+            --color-info: var(--color-slate-500);
+            --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+            --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-size-xs: 11px;
+            --font-size-sm: 12px;
+            --font-size-base: 14px;
+            --font-size-md: 14px;
+            --font-size-lg: 16px;
+            --font-size-xl: 18px;
+            --font-size-2xl: 20px;
+            --font-size-3xl: 24px;
+            --font-size-4xl: 30px;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 550;
+            --font-weight-bold: 600;
+            --line-height-tight: 1.2;
+            --line-height-normal: 1.5;
+            --space-4: 4px;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --radius-sm: 6px;
+            --radius-base: 8px;
+            --radius-md: 10px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --duration-fast: 150ms;
+            --duration-normal: 250ms;
+            --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background-color: var(--color-background);
+            color: var(--color-text);
+            line-height: var(--line-height-normal);
+            font-size: var(--font-size-base);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-16);
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #1a2b4a 0%, #2d4a73 100%);
+            color: white;
+            padding: var(--space-32) var(--space-24);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-24);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #007bff 0%, #00d4ff 100%);
+        }
+
+        .header h1 {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-12);
+        }
+
+        .header-subtitle {
+            font-size: var(--font-size-lg);
+            opacity: 0.95;
+            display: flex;
+            gap: var(--space-16);
+            flex-wrap: wrap;
+        }
+
+        .header-subtitle span {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-8);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: var(--space-12);
+            margin-bottom: var(--space-24);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: var(--space-12) var(--space-20);
+            border: none;
+            border-radius: var(--radius-base);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-standard);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-8);
+            font-family: var(--font-family-base);
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--color-secondary);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-secondary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Alert Box */
+        .alert {
+            background: linear-gradient(135deg, #fff9e6 0%, #fffbe6 100%);
+            border-left: 4px solid #f59e0b;
+            padding: var(--space-16);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-24);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .alert-content {
+            display: flex;
+            gap: var(--space-12);
+            align-items: flex-start;
+        }
+
+        .alert-icon {
+            font-size: var(--font-size-2xl);
+            flex-shrink: 0;
+        }
+
+        .alert-message {
+            font-size: var(--font-size-base);
+            color: #92400e;
+            line-height: 1.6;
+        }
+
+        /* Step Card */
+        .step-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            margin-bottom: var(--space-24);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-card-border);
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .step-card:nth-child(1) { animation-delay: 0.1s; }
+        .step-card:nth-child(2) { animation-delay: 0.2s; }
+        .step-card:nth-child(3) { animation-delay: 0.3s; }
+        .step-card:nth-child(4) { animation-delay: 0.4s; }
+        .step-card:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-header {
+            margin-bottom: var(--space-16);
+        }
+
+        .step-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: #1a2b4a;
+            margin-bottom: var(--space-8);
+        }
+
+        .step-description {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Table Styles */
+        .fertilizer-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--space-16);
+        }
+
+        .fertilizer-table thead {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .fertilizer-table th {
+            padding: var(--space-12) var(--space-16);
+            text-align: left;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            color: #1a2b4a;
+            border-bottom: 2px solid var(--color-border);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .fertilizer-table th.align-right {
+            text-align: right;
+        }
+
+        .fertilizer-table td {
+            padding: var(--space-12) var(--space-16);
+            border-bottom: 1px solid var(--color-card-border);
+            font-size: var(--font-size-base);
+        }
+
+        .fertilizer-table tbody tr {
+            transition: background-color var(--duration-fast) var(--ease-standard);
+        }
+
+        .fertilizer-table tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        .fertilizer-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .quantity {
+            color: #059669;
+            font-weight: var(--font-weight-semibold);
+            text-align: right;
+        }
+
+        /* Badge Styles */
+        .badge {
+            display: inline-block;
+            padding: var(--space-4) var(--space-12);
+            border-radius: 16px;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .badge-foliar {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-sulco {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-lanco {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .badge-incorporado {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .badge-cobertura {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-sementes {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            margin-top: var(--space-32);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-card-border);
+            text-align: center;
+        }
+
+        .footer-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: #1a2b4a;
+            margin-bottom: var(--space-8);
+        }
+
+        .footer-date {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-16);
+        }
+
+        .footer-disclaimer {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+            font-style: italic;
+            padding-top: var(--space-16);
+            border-top: 1px solid var(--color-card-border);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-12);
+            }
+
+            .header {
+                padding: var(--space-24) var(--space-16);
+            }
+
+            .header h1 {
+                font-size: var(--font-size-3xl);
+            }
+
+            .header-subtitle {
+                font-size: var(--font-size-base);
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .fertilizer-table {
+                font-size: var(--font-size-sm);
+            }
+
+            .fertilizer-table th,
+            .fertilizer-table td {
+                padding: var(--space-8) var(--space-12);
+            }
+
+            .step-title {
+                font-size: var(--font-size-xl);
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .action-buttons {
+                display: none;
+            }
+
+            .step-card {
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+
+            .header {
+                background: #1a2b4a;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .alert {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .badge {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .fertilizer-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Plano de Ação de Fertilização</h1>
+            <div class="header-subtitle">
+                <span>🌱 <strong>Cultura:</strong> Soja</span>
+                <span>📋 <strong>Amostra:</strong> Sapé - 234</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="handlePrint()">🖨️ Imprimir Relatório</button>
+            <button class="btn btn-secondary" onclick="handleExportPDF()">📄 Exportar PDF</button>
+            <button class="btn btn-secondary" onclick="handleShare()">📤 Compartilhar</button>
+        </div>
+
+        <!-- Alert Box -->
+        <div class="alert">
+            <div class="alert-content">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-message">
+                    As fontes listadas em cada tabela são alternativas. Escolha APENAS UMA fonte para cada tipo de nutriente, de acordo com disponibilidade e custo no mercado local.
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Correção de Solo -->
+        <div class="step-card">
+            <div class="step-header">
+                <h2 class="step-title">1. Correção de Solo (Pré-Plantio)</h2>
+                <p class="step-description">Correção da acidez do solo e fornecimento de Ca e Mg. Aplicar 60-90 dias antes do plantio.</p>
+            </div>
+            <table class="fertilizer-table">
+                <thead>
+                    <tr>
+                        <th>Fonte de Fertilizante</th>
+                        <th class="align-right">Quantidade</th>
+                        <th>Unidade</th>
+                        <th>Método</th>
+                        <th>Estágio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Calcário Dolomítico</td>
+                        <td class="quantity">2.000</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-lanco">A lanço</span></td>
+                        <td>Pré-plantio</td>
+                    </tr>
+                    <tr>
+                        <td>Calcário Calcítico</td>
+                        <td class="quantity">1.800</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-lanco">A lanço</span></td>
+                        <td>Pré-plantio</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Step 2: Adubação de Base -->
+        <div class="step-card">
+            <div class="step-header">
+                <h2 class="step-title">2. Adubação de Base (Plantio)</h2>
+                <p class="step-description">Fontes de Fósforo (P), Potássio (K) e Fórmulas NPK. Escolha uma opção de P e uma de K, ou uma formulação NPK completa.</p>
+            </div>
+            <table class="fertilizer-table">
+                <thead>
+                    <tr>
+                        <th>Fonte de Fertilizante</th>
+                        <th class="align-right">Quantidade</th>
+                        <th>Unidade</th>
+                        <th>Método</th>
+                        <th>Estágio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Superfosfato Simples</td>
+                        <td class="quantity">400</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-sulco">Sulco</span></td>
+                        <td>Plantio</td>
+                    </tr>
+                    <tr>
+                        <td>Superfosfato Triplo</td>
+                        <td class="quantity">180</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-sulco">Sulco</span></td>
+                        <td>Plantio</td>
+                    </tr>
+                    <tr>
+                        <td>MAP (Fosfato Monoamônico)</td>
+                        <td class="quantity">150</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-sulco">Sulco</span></td>
+                        <td>Plantio</td>
+                    </tr>
+                    <tr>
+                        <td>Cloreto de Potássio (KCl)</td>
+                        <td class="quantity">150</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-sulco">Sulco</span></td>
+                        <td>Plantio</td>
+                    </tr>
+                    <tr>
+                        <td>Sulfato de Potássio</td>
+                        <td class="quantity">180</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-sulco">Sulco</span></td>
+                        <td>Plantio</td>
+                    </tr>
+                    <tr>
+                        <td>NPK 04-14-08</td>
+                        <td class="quantity">350</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-sulco">Sulco</span></td>
+                        <td>Plantio</td>
+                    </tr>
+                    <tr>
+                        <td>NPK 10-10-10</td>
+                        <td class="quantity">300</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-sulco">Sulco</span></td>
+                        <td>Plantio</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Step 3: Adubação de Cobertura -->
+        <div class="step-card">
+            <div class="step-header">
+                <h2 class="step-title">3. Adubação de Cobertura (Nitrogênio)</h2>
+                <p class="step-description">Aplicação de nitrogênio em cobertura entre os estágios V4-V8 da soja.</p>
+            </div>
+            <table class="fertilizer-table">
+                <thead>
+                    <tr>
+                        <th>Fonte de Fertilizante</th>
+                        <th class="align-right">Quantidade</th>
+                        <th>Unidade</th>
+                        <th>Método</th>
+                        <th>Estágio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Ureia (45% N)</td>
+                        <td class="quantity">100</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-cobertura">Cobertura</span></td>
+                        <td>V4-V6</td>
+                    </tr>
+                    <tr>
+                        <td>Sulfato de Amônio (21% N)</td>
+                        <td class="quantity">200</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-cobertura">Cobertura</span></td>
+                        <td>V6-V8</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Step 4: Suplementação de Micronutrientes -->
+        <div class="step-card">
+            <div class="step-header">
+                <h2 class="step-title">4. Suplementação de Micronutrientes</h2>
+                <p class="step-description">Correção de deficiências de B, Zn, Cu, Mn e Mo. Aplicação foliar ou tratamento de sementes conforme indicado.</p>
+            </div>
+            <table class="fertilizer-table">
+                <thead>
+                    <tr>
+                        <th>Fonte de Fertilizante</th>
+                        <th class="align-right">Quantidade</th>
+                        <th>Unidade</th>
+                        <th>Método</th>
+                        <th>Estágio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Ácido Bórico</td>
+                        <td class="quantity">2.0</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-foliar">Foliar</span></td>
+                        <td>V3-V5</td>
+                    </tr>
+                    <tr>
+                        <td>Bórax</td>
+                        <td class="quantity">3.0</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-foliar">Foliar</span></td>
+                        <td>V3-V5</td>
+                    </tr>
+                    <tr>
+                        <td>Sulfato de Zinco</td>
+                        <td class="quantity">3.0</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-foliar">Foliar</span></td>
+                        <td>V4-V6</td>
+                    </tr>
+                    <tr>
+                        <td>Óxido de Zinco</td>
+                        <td class="quantity">2.0</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-foliar">Foliar</span></td>
+                        <td>V4-V6</td>
+                    </tr>
+                    <tr>
+                        <td>Sulfato de Cobre</td>
+                        <td class="quantity">1.5</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-foliar">Foliar</span></td>
+                        <td>V4-V6</td>
+                    </tr>
+                    <tr>
+                        <td>Óxido de Cobre</td>
+                        <td class="quantity">4.0</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-foliar">Foliar</span></td>
+                        <td>V4-V6</td>
+                    </tr>
+                    <tr>
+                        <td>Sulfato de Manganês</td>
+                        <td class="quantity">3.0</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-foliar">Foliar</span></td>
+                        <td>V4-V6</td>
+                    </tr>
+                    <tr>
+                        <td>Óxido de Manganês</td>
+                        <td class="quantity">2.5</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-foliar">Foliar</span></td>
+                        <td>V4-V6</td>
+                    </tr>
+                    <tr>
+                        <td>Molibdato de Sódio</td>
+                        <td class="quantity">0.1</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-sementes">Trat. sementes</span></td>
+                        <td>Plantio</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Step 5: Manejo Orgânico -->
+        <div class="step-card">
+            <div class="step-header">
+                <h2 class="step-title">5. Manejo Orgânico (Opcional)</h2>
+                <p class="step-description">Melhoria da estrutura do solo e fornecimento gradual de nutrientes. Aplicar 30-45 dias antes do plantio.</p>
+            </div>
+            <table class="fertilizer-table">
+                <thead>
+                    <tr>
+                        <th>Fonte de Fertilizante</th>
+                        <th class="align-right">Quantidade</th>
+                        <th>Unidade</th>
+                        <th>Método</th>
+                        <th>Estágio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Esterco Bovino Curtido</td>
+                        <td class="quantity">10.000</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-incorporado">Incorporado</span></td>
+                        <td>Pré-plantio</td>
+                    </tr>
+                    <tr>
+                        <td>Composto Orgânico</td>
+                        <td class="quantity">5.000</td>
+                        <td>kg/ha</td>
+                        <td><span class="badge badge-incorporado">Incorporado</span></td>
+                        <td>Pré-plantio</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-title">Fertilisolo - Sistema de Interpretação e Recomendação de Análise de Solos</div>
+            <div class="footer-date" id="footer-date"></div>
+            <div class="footer-disclaimer">
+                Este relatório é uma recomendação técnica baseada na análise de solo. Consulte sempre um engenheiro agrônomo para ajustes específicos da sua propriedade.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate current date and time in Brazilian format
+        function formatBrazilianDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return now.toLocaleDateString('pt-BR', options);
+        }
+
+        // Set the date in footer
+        document.getElementById('footer-date').textContent = `Gerado em: ${formatBrazilianDateTime()}`;
+
+        // Print functionality
+        function handlePrint() {
+            window.print();
+        }
+
+        // Export PDF functionality
+        function handleExportPDF() {
+            alert('Para exportar como PDF:\n\n1. Clique em "🖨️ Imprimir Relatório"\n2. Na janela de impressão, selecione "Salvar como PDF"\n3. Escolha o local e salve o arquivo');
+        }
+
+        // Share functionality
+        function handleShare() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Plano de Ação de Fertilização - Soja',
+                    text: 'Confira o plano de fertilização para a cultura de Soja - Amostra Sapé - 234',
+                    url: window.location.href
+                }).catch((error) => {
+                    if (error.name !== 'AbortError') {
+                        console.error('Erro ao compartilhar:', error);
+                    }
+                });
+            } else {
+                alert('Funcionalidade de compartilhamento não disponível neste navegador.\n\nVocê pode copiar o link da página para compartilhar manualmente.');
+            }
+        }
+    </script>
+</body>
+</html>

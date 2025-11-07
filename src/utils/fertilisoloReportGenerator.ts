@@ -138,24 +138,63 @@ function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResul
     organizationName: themeOptions?.organizationName
   });
   
-  // Cores personalizáveis (usa tema ou cores padrão)
-  const greenColor: [number, number, number] = themeOptions?.primaryColor 
+  // Paleta de cores moderna baseada no modelo HTML
+  const colors = {
+    // Blues - Cores primárias
+    navyDark: [26, 43, 74] as [number, number, number],    // #1a2b4a
+    navyMedium: [45, 74, 115] as [number, number, number], // #2d4a73
+    blueAccent: [0, 123, 255] as [number, number, number], // #007bff
+    blueLight: [0, 212, 255] as [number, number, number],  // #00d4ff
+    
+    // Grays
+    grayBg: [248, 249, 250] as [number, number, number],   // #f8f9fa
+    grayAlt: [233, 236, 239] as [number, number, number],  // #e9ecef
+    grayBorder: [222, 226, 230] as [number, number, number], // #dee2e6
+    grayText: [73, 80, 87] as [number, number, number],    // #495057
+    
+    // Status colors
+    success: [25, 135, 84] as [number, number, number],    // #198754
+    warning: [255, 193, 7] as [number, number, number],    // #ffc107
+    info: [13, 202, 240] as [number, number, number],      // #0dcaf0
+  };
+  
+  // Usar cores do tema se fornecidas, caso contrário usar as do modelo HTML
+  const primaryColor: [number, number, number] = themeOptions?.primaryColor 
     ? hexToRgb(themeOptions.primaryColor) 
-    : [76, 175, 80]; // #4CAF50
-  const blueColor: [number, number, number] = themeOptions?.secondaryColor 
+    : colors.navyDark;
+  const secondaryColor: [number, number, number] = themeOptions?.secondaryColor 
     ? hexToRgb(themeOptions.secondaryColor) 
-    : [33, 150, 243]; // #2196F3
-  const grayLight: [number, number, number] = [245, 245, 245]; // #F5F5F5
-  const grayBorder: [number, number, number] = [224, 224, 224]; // #E0E0E0
+    : colors.blueAccent;
   
   console.log('🎨 Cores RGB calculadas:', {
-    primary: greenColor,
-    secondary: blueColor
+    primary: primaryColor,
+    secondary: secondaryColor
   });
   
-  // Header Superior (altura aumentada para melhor espaçamento)
-  pdf.setFillColor(greenColor[0], greenColor[1], greenColor[2]);
-  pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 25, 'F');
+  // Header com gradiente (simulando gradient com retângulos sobrepostos)
+  const headerHeight = 25;
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  
+  // Base do gradiente
+  pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  pdf.rect(0, 0, pageWidth, headerHeight, 'F');
+  
+  // Overlay para simular gradiente
+  for (let i = 0; i < 10; i++) {
+    const alpha = i / 10;
+    const r = primaryColor[0] + (colors.navyMedium[0] - primaryColor[0]) * alpha;
+    const g = primaryColor[1] + (colors.navyMedium[1] - primaryColor[1]) * alpha;
+    const b = primaryColor[2] + (colors.navyMedium[2] - primaryColor[2]) * alpha;
+    
+    pdf.setFillColor(r, g, b);
+    const sliceHeight = headerHeight / 10;
+    pdf.rect(0, i * sliceHeight, pageWidth, sliceHeight, 'F');
+  }
+  
+  // Barra azul clara na base do header (como no modelo HTML)
+  pdf.setFillColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+  pdf.rect(0, headerHeight, pageWidth, 4, 'F');
+  
   pdf.setTextColor(255, 255, 255);
   
   // Adicionar logo se disponível
@@ -182,101 +221,165 @@ function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   }
   
   pdf.setFontSize(16);
+  pdf.setFont('helvetica', 'bold');
   const orgName = themeOptions?.organizationName || 'Fertilisolo';
   pdf.text(orgName, textStartX, 15);
   console.log(`📝 Nome da organização: ${orgName}`);
   
   const dataAtual = new Date().toLocaleDateString('pt-BR');
   pdf.setFontSize(10);
+  pdf.setFont('helvetica', 'normal');
   pdf.text(`Relatório gerado em: ${dataAtual}`, textStartX, 21);
   
   // Nome da fazenda/local no canto superior direito
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(12);
+  pdf.setFont('helvetica', 'bold');
   const location = `${farmName || soilData.location || "Não especificado"}`;
-  pdf.text(location, 195 - pdf.getTextWidth(location), 15);
+  pdf.text(location, pageWidth - pdf.getTextWidth(location) - 15, 15);
   
   // Data da coleta
   const dataColeta = soilData.date ? new Date(soilData.date).toLocaleDateString('pt-BR') : dataAtual;
   const textDataColeta = `Data da coleta: ${dataColeta}`;
   pdf.setFontSize(10);
-  pdf.text(textDataColeta, 195 - pdf.getTextWidth(textDataColeta), 21);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text(textDataColeta, pageWidth - pdf.getTextWidth(textDataColeta) - 15, 21);
 
   // Linha divisória
-  pdf.setDrawColor(greenColor[0], greenColor[1], greenColor[2]);
+  pdf.setDrawColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
   pdf.setLineWidth(0.5);
-  pdf.line(15, 28, 195, 28);
+  pdf.line(15, 30, pageWidth - 15, 30);
+  
+  // Função auxiliar para desenhar card com sombra
+  const drawCard = (x: number, y: number, width: number, height: number, withShadow: boolean = true) => {
+    if (withShadow) {
+      // Sombra (simulada com retângulo cinza deslocado)
+      pdf.setFillColor(200, 200, 200);
+      pdf.roundedRect(x + 1, y + 1, width, height, 3, 3, 'F');
+    }
+    
+    // Card branco
+    pdf.setFillColor(255, 255, 255);
+    pdf.setDrawColor(colors.grayBorder[0], colors.grayBorder[1], colors.grayBorder[2]);
+    pdf.setLineWidth(0.5);
+    pdf.roundedRect(x, y, width, height, 3, 3, 'FD');
+  };
   
   // SEÇÃO 1: Detalhes da Análise (Lado Esquerdo)
-  pdf.setFillColor(grayLight[0], grayLight[1], grayLight[2]);
-  pdf.roundedRect(15, 32, 55, 44, 3, 3, 'F');
+  drawCard(15, 34, 55, 50);
   
   pdf.setFontSize(11);
-  pdf.setTextColor(greenColor[0], greenColor[1], greenColor[2]);
-  pdf.text('Detalhes', 17, 40);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  pdf.text('Detalhes da Análise', 17, 42);
   
-  pdf.setFontSize(10);
+  pdf.setFontSize(9);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+  pdf.text('Cultura:', 17, 51);
+  pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(0, 0, 0);
-  pdf.text('Cultura:', 17, 49);
-  pdf.text(cultureName || "Não especificada", 45, 49);
-  pdf.text('Matéria Orgânica:', 17, 57);
-  pdf.text(`${formatNumber(soilData.organicMatter)}%`, 45, 57);
-  pdf.text('Argila:', 17, 65);
-  pdf.text(`${formatNumber(soilData.argila)}%`, 45, 65);
+  pdf.text(cultureName || "Não especificada", 17, 56);
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+  pdf.text('Matéria Orgânica:', 17, 64);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(colors.success[0], colors.success[1], colors.success[2]);
+  pdf.text(`${formatNumber(soilData.organicMatter)}%`, 17, 69);
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+  pdf.text('Argila:', 17, 77);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(0, 0, 0);
+  pdf.text(`${formatNumber(soilData.argila)}%`, 17, 82);
   
   // SEÇÃO 2: Macronutrientes (Centro)
-  pdf.setFillColor(grayLight[0], grayLight[1], grayLight[2]);
-  pdf.roundedRect(75, 32, 55, 52, 3, 3, 'F');
+  drawCard(75, 34, 55, 50);
   
   pdf.setFontSize(11);
-  pdf.setTextColor(greenColor[0], greenColor[1], greenColor[2]);
-  pdf.text('Macronutrientes', 77, 40);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  pdf.text('Macronutrientes', 77, 42);
   
-  pdf.setFontSize(9);
-  pdf.setTextColor(0, 0, 0);
-  pdf.text('CTC (T):', 77, 49);
-  pdf.text(`${formatNumber(soilData.T)} cmolc/dm³`, 115, 49);
-  pdf.text('Fósforo (P):', 77, 57);
-  pdf.text(`${formatNumber(soilData.P)} mg/dm³`, 115, 57);
-  pdf.text('Potássio (K):', 77, 65);
-  const kCmolc = (soilData.K || 0) / 390;
-  pdf.text(`${formatNumber(kCmolc)} cmolc/dm³`, 115, 65);
-  pdf.text('Cálcio (Ca):', 77, 73);
-  pdf.text(`${formatNumber(soilData.Ca)} cmolc/dm³`, 115, 73);
-  pdf.text('Magnésio (Mg):', 77, 81);
-  pdf.text(`${formatNumber(soilData.Mg)} cmolc/dm³`, 115, 81);
-  
-  // SEÇÃO 3: Informação Importante (Lado Direito - Box Azul)
-  pdf.setFillColor(blueColor[0], blueColor[1], blueColor[2], 0.1); // Azul com opacidade
-  pdf.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
-  pdf.roundedRect(135, 32, 55, 52, 3, 3, 'FD');
-  
-  pdf.setFontSize(11);
-  pdf.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
-  pdf.text('Informação Importante', 137, 40);
-  
-  pdf.setFontSize(9);
-  pdf.text('Opções de Correção:', 137, 49);
-  pdf.text('As fontes de nutrientes listadas', 137, 57);
-  pdf.text('são alternativas.', 137, 63);
   pdf.setFontSize(8);
-  pdf.text('Escolha apenas uma fonte para cada', 137, 71);
-  pdf.text('tipo de nutriente com base na', 137, 77);
-  pdf.text('disponibilidade, custo e benefícios.', 137, 83);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+  const kCmolc = (soilData.K || 0) / 390;
+  
+  pdf.text('CTC (T):', 77, 51);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(0, 0, 0);
+  pdf.text(`${formatNumber(soilData.T)} cmolc/dm³`, 110, 51);
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+  pdf.text('Fósforo (P):', 77, 58);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(0, 0, 0);
+  pdf.text(`${formatNumber(soilData.P)} mg/dm³`, 110, 58);
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+  pdf.text('Potássio (K):', 77, 65);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(0, 0, 0);
+  pdf.text(`${formatNumber(kCmolc)} cmolc/dm³`, 110, 65);
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+  pdf.text('Cálcio (Ca):', 77, 72);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(0, 0, 0);
+  pdf.text(`${formatNumber(soilData.Ca)} cmolc/dm³`, 110, 72);
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(colors.grayText[0], colors.grayText[1], colors.grayText[2]);
+  pdf.text('Magnésio (Mg):', 77, 79);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(0, 0, 0);
+  pdf.text(`${formatNumber(soilData.Mg)} cmolc/dm³`, 110, 79);
+  
+  // SEÇÃO 3: Informação Importante (Lado Direito - Box Amarelo/Warning)
+  // Fundo amarelo claro
+  pdf.setFillColor(255, 249, 230);
+  pdf.setDrawColor(colors.warning[0], colors.warning[1], colors.warning[2]);
+  pdf.setLineWidth(3);
+  pdf.roundedRect(135, 34, 55, 50, 3, 3, 'FD');
+  
+  pdf.setFontSize(10);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(colors.warning[0] - 50, colors.warning[1] - 50, 0);
+  pdf.text('⚠️ Importante', 137, 43);
+  
+  pdf.setFontSize(8);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(146, 64, 14); // Marrom escuro
+  pdf.text('As fontes listadas em cada', 137, 52);
+  pdf.text('tabela são alternativas.', 137, 58);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('Escolha APENAS UMA fonte', 137, 66);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('para cada tipo de nutriente,', 137, 72);
+  pdf.text('de acordo com disponibilidade', 137, 78);
+  pdf.text('e custo no mercado local.', 137, 84);
   
   // SEÇÃO 4: Análise Visual de Necessidades
   pdf.setTextColor(0, 0, 0);
   pdf.setFontSize(14);
+  pdf.setFont('helvetica', 'bold');
   pdf.text('Análise Visual de Necessidades', 15, 95);
   
   // Adicionar linha separadora
-  pdf.setDrawColor(greenColor[0], greenColor[1], greenColor[2]);
+  pdf.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   pdf.setLineWidth(0.5);
-  pdf.line(15, 98, 195, 98);
+  pdf.line(15, 98, pageWidth - 15, 98);
   
   // Título Macronutrientes
   pdf.setFontSize(12);
-  pdf.setTextColor(greenColor[0], greenColor[1], greenColor[2]);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   pdf.text('Macronutrientes', 15, 106);
   
   // Barras de Progresso para Macronutrientes
@@ -312,13 +415,14 @@ function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   drawNutrientBar(pdf, 70, 155, soilData.Mg || 0, 2.0, mgAdequate);
   
   // Separador visual entre macro e micro
-  pdf.setDrawColor(200, 200, 200);
+  pdf.setDrawColor(colors.grayBorder[0], colors.grayBorder[1], colors.grayBorder[2]);
   pdf.setLineWidth(0.3);
-  pdf.line(15, 163, 195, 163);
+  pdf.line(15, 163, pageWidth - 15, 163);
   
   // Título Micronutrientes
   pdf.setFontSize(12);
-  pdf.setTextColor(greenColor[0], greenColor[1], greenColor[2]);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   pdf.text('Micronutrientes', 15, 171);
   
   // Barras de Progresso para Micronutrientes
@@ -355,6 +459,7 @@ function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   
   // SEÇÃO 5: Recomendações de Fertilizantes (Tabela)
   pdf.setFontSize(14);
+  pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(0, 0, 0);
   pdf.text('Recomendações de Fertilizantes', 15, 230);
   
@@ -425,17 +530,23 @@ function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResul
     startY: 235,
     theme: 'grid',
     headStyles: { 
-      fillColor: greenColor, 
+      fillColor: primaryColor,
       textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 10
+      fontSize: 10,
+      halign: 'center'
     },
     alternateRowStyles: { 
-      fillColor: [240, 248, 240] 
+      fillColor: colors.grayBg
     },
     styles: {
       fontSize: 10,
-      cellPadding: 4
+      cellPadding: 4,
+      lineColor: colors.grayBorder,
+      lineWidth: 0.1
+    },
+    columnStyles: {
+      1: { halign: 'right', fontStyle: 'bold', textColor: colors.success }
     },
     rowPageBreak: 'avoid',
     margin: { left: 15, right: 15 }
@@ -484,22 +595,54 @@ function generatePage2(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   // Adicionar nova página
   pdf.addPage();
   
-  // Cores personalizáveis (usa tema ou cores padrão)
-  const greenColor: [number, number, number] = themeOptions?.primaryColor 
-    ? hexToRgb(themeOptions.primaryColor) 
-    : [76, 175, 80]; // #4CAF50
+  // Paleta de cores moderna (mesma da página 1)
+  const colors = {
+    navyDark: [26, 43, 74] as [number, number, number],
+    navyMedium: [45, 74, 115] as [number, number, number],
+    blueAccent: [0, 123, 255] as [number, number, number],
+    grayBg: [248, 249, 250] as [number, number, number],
+    grayBorder: [222, 226, 230] as [number, number, number],
+    success: [25, 135, 84] as [number, number, number],
+  };
   
-  // Título da página
-  pdf.setFillColor(greenColor[0], greenColor[1], greenColor[2]);
-  pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 20, 'F');
+  const primaryColor: [number, number, number] = themeOptions?.primaryColor 
+    ? hexToRgb(themeOptions.primaryColor) 
+    : colors.navyDark;
+  const secondaryColor: [number, number, number] = themeOptions?.secondaryColor 
+    ? hexToRgb(themeOptions.secondaryColor) 
+    : colors.blueAccent;
+  
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  
+  // Header com gradiente
+  pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  pdf.rect(0, 0, pageWidth, 20, 'F');
+  
+  for (let i = 0; i < 5; i++) {
+    const alpha = i / 5;
+    const r = primaryColor[0] + (colors.navyMedium[0] - primaryColor[0]) * alpha;
+    const g = primaryColor[1] + (colors.navyMedium[1] - primaryColor[1]) * alpha;
+    const b = primaryColor[2] + (colors.navyMedium[2] - primaryColor[2]) * alpha;
+    
+    pdf.setFillColor(r, g, b);
+    const sliceHeight = 20 / 5;
+    pdf.rect(0, i * sliceHeight, pageWidth, sliceHeight, 'F');
+  }
+  
+  // Barra azul na base
+  pdf.setFillColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+  pdf.rect(0, 20, pageWidth, 4, 'F');
+  
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16);
+  pdf.setFont('helvetica', 'bold');
   pdf.text('Detalhes da Recomendação de Fertilizantes', 15, 13);
   
   // Tabela Completa de Fertilizantes
   pdf.setFontSize(14);
+  pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(0, 0, 0);
-  pdf.text('Tabela Completa de Fertilizantes', 15, 30);
+  pdf.text('Tabela Completa de Fertilizantes', 15, 32);
   
   // Preparar dados para a tabela completa de fertilizantes
   const fertilizerRows: any[] = [];
@@ -741,20 +884,26 @@ function generatePage2(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   autoTable(pdf, {
     head: [['Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
     body: fertilizerRows,
-    startY: 35,
+    startY: 37,
     theme: 'grid',
     headStyles: { 
-      fillColor: greenColor, 
+      fillColor: primaryColor,
       textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 10
+      fontSize: 10,
+      halign: 'center'
     },
     alternateRowStyles: { 
-      fillColor: [240, 248, 240] 
+      fillColor: colors.grayBg
     },
     styles: {
       fontSize: 9,
-      cellPadding: 3.5
+      cellPadding: 3.5,
+      lineColor: colors.grayBorder,
+      lineWidth: 0.1
+    },
+    columnStyles: {
+      1: { halign: 'right', fontStyle: 'bold', textColor: colors.success }
     },
     rowPageBreak: 'avoid',
     margin: { left: 15, right: 15 }
@@ -768,22 +917,54 @@ function generatePage3(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   // Adicionar nova página
   pdf.addPage();
   
-  // Cores personalizáveis (usa tema ou cores padrão)
-  const greenColor: [number, number, number] = themeOptions?.primaryColor 
-    ? hexToRgb(themeOptions.primaryColor) 
-    : [76, 175, 80]; // #4CAF50
+  // Paleta de cores moderna (mesma das outras páginas)
+  const colors = {
+    navyDark: [26, 43, 74] as [number, number, number],
+    navyMedium: [45, 74, 115] as [number, number, number],
+    blueAccent: [0, 123, 255] as [number, number, number],
+    grayBg: [248, 249, 250] as [number, number, number],
+    grayBorder: [222, 226, 230] as [number, number, number],
+    success: [25, 135, 84] as [number, number, number],
+  };
   
-  // Título da página
-  pdf.setFillColor(greenColor[0], greenColor[1], greenColor[2]);
-  pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 20, 'F');
+  const primaryColor: [number, number, number] = themeOptions?.primaryColor 
+    ? hexToRgb(themeOptions.primaryColor) 
+    : colors.navyDark;
+  const secondaryColor: [number, number, number] = themeOptions?.secondaryColor 
+    ? hexToRgb(themeOptions.secondaryColor) 
+    : colors.blueAccent;
+  
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  
+  // Header com gradiente
+  pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  pdf.rect(0, 0, pageWidth, 20, 'F');
+  
+  for (let i = 0; i < 5; i++) {
+    const alpha = i / 5;
+    const r = primaryColor[0] + (colors.navyMedium[0] - primaryColor[0]) * alpha;
+    const g = primaryColor[1] + (colors.navyMedium[1] - primaryColor[1]) * alpha;
+    const b = primaryColor[2] + (colors.navyMedium[2] - primaryColor[2]) * alpha;
+    
+    pdf.setFillColor(r, g, b);
+    const sliceHeight = 20 / 5;
+    pdf.rect(0, i * sliceHeight, pageWidth, sliceHeight, 'F');
+  }
+  
+  // Barra azul na base
+  pdf.setFillColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+  pdf.rect(0, 20, pageWidth, 4, 'F');
+  
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16);
+  pdf.setFont('helvetica', 'bold');
   pdf.text('Análise Detalhada de Nutrientes', 15, 13);
   
   // Título da tabela
   pdf.setFontSize(14);
+  pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(0, 0, 0);
-  pdf.text('Tabela de Análise Completa', 15, 30);
+  pdf.text('Tabela de Análise Completa', 15, 32);
   
   // Converter valores e preparar interpretações
   const kCmolc = (soilData.K || 0) / 390;
@@ -842,20 +1023,26 @@ function generatePage3(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   autoTable(pdf, {
     head: [["Nutriente", "Valor Encontrado", "Unidade", "Nível", "Recomendação"]],
     body: tableRows,
-    startY: 35,
+    startY: 37,
     theme: 'grid',
     headStyles: { 
-      fillColor: greenColor, 
+      fillColor: primaryColor,
       textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 10
+      fontSize: 10,
+      halign: 'center'
     },
     alternateRowStyles: { 
-      fillColor: [240, 248, 240] 
+      fillColor: colors.grayBg
     },
     styles: {
       fontSize: 9,
-      cellPadding: 3.5
+      cellPadding: 3.5,
+      lineColor: colors.grayBorder,
+      lineWidth: 0.1
+    },
+    columnStyles: {
+      1: { halign: 'right', fontStyle: 'bold' }
     },
     rowPageBreak: 'avoid',
     margin: { left: 15, right: 15 }
@@ -894,15 +1081,49 @@ function generatePage3(pdf: jsPDF, soilData: SoilData, results: CalculationResul
  */
 function addFooters(pdf: jsPDF, themeOptions?: PDFThemeOptions) {
   const pageCount = pdf.getNumberOfPages();
-  const dataAtual = new Date().toLocaleDateString('pt-BR');
+  const dataAtual = new Date().toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
   const orgName = themeOptions?.organizationName || 'Fertilisolo';
+  const pageWidth = pdf.internal.pageSize.getWidth();
   
   for (let i = 1; i <= pageCount; i++) {
     pdf.setPage(i);
+    
+    // Linha separadora superior
+    pdf.setDrawColor(220, 220, 220);
+    pdf.setLineWidth(0.3);
+    pdf.line(15, 275, pageWidth - 15, 275);
+    
+    // Título do sistema
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(26, 43, 74); // Navy dark
+    pdf.text(`${orgName} - Sistema de Interpretação e Recomendação de Análise de Solos`, 15, 280);
+    
+    // Data de geração
     pdf.setFontSize(8);
+    pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(100, 100, 100);
-    pdf.text(`${orgName} - Análise e recomendação de fertilizantes        Página ${i}/${pageCount}`, 15, 285);
-    pdf.text(`Relatório gerado por sistema especialista`, 15, 290);
+    pdf.text(`Gerado em: ${dataAtual}`, 15, 285);
+    
+    // Disclaimer (itálico)
+    pdf.setFont('helvetica', 'italic');
+    pdf.setTextColor(100, 100, 100);
+    const disclaimer = 'Este relatório é uma recomendação técnica baseada na análise de solo. Consulte sempre um engenheiro agrônomo para ajustes específicos da sua propriedade.';
+    const splitText = pdf.splitTextToSize(disclaimer, pageWidth - 30);
+    pdf.text(splitText, 15, 289);
+    
+    // Número da página (canto direito)
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(8);
+    const pageText = `Página ${i}/${pageCount}`;
+    pdf.text(pageText, pageWidth - 15 - pdf.getTextWidth(pageText), 293);
   }
 }
 
