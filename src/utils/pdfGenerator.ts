@@ -692,7 +692,380 @@ export const generatePDF = async (
     
     currentY += 24;
     
-    // TODO: Adicionar os 5 cards com tabelas aqui
+    // ========== FUNÇÃO HELPER: Desenhar Badge Colorido ==========
+    const drawBadge = (text: string, x: number, y: number, type: string) => {
+      const badgeColors: Record<string, { bg: number[], text: number[] }> = {
+        foliar: { bg: [220, 252, 231], text: [21, 128, 61] },      // verde claro
+        sulco: { bg: [254, 243, 199], text: [146, 64, 14] },       // amarelo/marrom
+        lanco: { bg: [243, 232, 255], text: [107, 33, 168] },      // roxo claro
+        incorporado: { bg: [243, 232, 255], text: [107, 33, 168] }, // roxo claro
+        cobertura: { bg: [224, 242, 254], text: [3, 105, 161] },   // azul claro
+        sementes: { bg: [224, 242, 254], text: [3, 105, 161] }     // azul claro
+      };
+      
+      const colors = badgeColors[type] || { bg: [240, 240, 240], text: [0, 0, 0] };
+      
+      // Fundo do badge
+      pdf.setFillColor(...colors.bg);
+      pdf.roundedRect(x, y - 3, 20, 5, 2, 2, 'F');
+      
+      // Texto do badge
+      pdf.setTextColor(...colors.text);
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(text, x + 10, y, { align: 'center' });
+    };
+    
+    // ========== CARD 1: CORREÇÃO DE SOLO ==========
+    if (currentY > 240) { pdf.addPage(); currentY = 45; }
+    
+    // Card background
+    pdf.setFillColor(252, 251, 245); // #fcfbf5 (creamSurface)
+    pdf.roundedRect(marginX, currentY, contentWidth, 55, 8, 8, 'F');
+    
+    // Border
+    pdf.setDrawColor(94, 82, 64); // brown-600
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(marginX, currentY, contentWidth, 55, 8, 8, 'S');
+    
+    // Título
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(26, 43, 74); // navyDark
+    pdf.text('1. Correção de Solo (Pré-Plantio)', marginX + 6, currentY + 8);
+    
+    // Descrição
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(107, 114, 128); // gray-500
+    pdf.text('Correção da acidez do solo e fornecimento de Ca e Mg. Aplicar 60-90 dias antes do plantio.', marginX + 6, currentY + 14);
+    
+    // Tabela
+    (pdf as any).autoTable({
+      startY: currentY + 18,
+      head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
+      body: [
+        ['Calcário Dolomítico', '2.000', 'kg/ha', '', 'Pré-plantio'],
+        ['Calcário Calcítico', '1.800', 'kg/ha', '', 'Pré-plantio']
+      ],
+      theme: 'plain',
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        textColor: [55, 65, 81],
+        lineColor: [94, 82, 64],
+        lineWidth: 0.1
+      },
+      headStyles: {
+        fillColor: [248, 249, 250],
+        textColor: [26, 43, 74],
+        fontStyle: 'bold',
+        halign: 'left'
+      },
+      columnStyles: {
+        0: { cellWidth: 60 },
+        1: { cellWidth: 25, halign: 'right', textColor: [5, 150, 105], fontStyle: 'bold' },
+        2: { cellWidth: 20 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 25 }
+      },
+      margin: { left: marginX + 6, right: marginX + 6 },
+      tableWidth: contentWidth - 12,
+      didDrawCell: (data: any) => {
+        if (data.column.index === 3 && data.section === 'body') {
+          const cellX = data.cell.x + 5;
+          const cellY = data.cell.y + data.cell.height / 2 + 1;
+          drawBadge('A lanço', cellX, cellY, 'lanco');
+        }
+      }
+    });
+    
+    currentY = (pdf as any).lastAutoTable.finalY + 10;
+    
+    // ========== CARD 2: ADUBAÇÃO DE BASE ==========
+    if (currentY > 200) { pdf.addPage(); currentY = 45; }
+    
+    // Card background
+    pdf.setFillColor(252, 251, 245);
+    pdf.roundedRect(marginX, currentY, contentWidth, 85, 8, 8, 'F');
+    
+    // Border
+    pdf.setDrawColor(94, 82, 64);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(marginX, currentY, contentWidth, 85, 8, 8, 'S');
+    
+    // Título
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(26, 43, 74);
+    pdf.text('2. Adubação de Base (Plantio)', marginX + 6, currentY + 8);
+    
+    // Descrição
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(107, 114, 128);
+    const desc2 = 'Fontes de Fósforo (P), Potássio (K) e Fórmulas NPK. Escolha uma opção de P e uma de K, ou uma formulação NPK completa.';
+    const splitDesc2 = pdf.splitTextToSize(desc2, contentWidth - 12);
+    pdf.text(splitDesc2, marginX + 6, currentY + 14);
+    
+    // Tabela
+    (pdf as any).autoTable({
+      startY: currentY + 22,
+      head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
+      body: [
+        ['Superfosfato Simples', '400', 'kg/ha', '', 'Plantio'],
+        ['Superfosfato Triplo', '180', 'kg/ha', '', 'Plantio'],
+        ['MAP (Fosfato Monoamônico)', '150', 'kg/ha', '', 'Plantio'],
+        ['Cloreto de Potássio (KCl)', '150', 'kg/ha', '', 'Plantio'],
+        ['Sulfato de Potássio', '180', 'kg/ha', '', 'Plantio'],
+        ['NPK 04-14-08', '350', 'kg/ha', '', 'Plantio'],
+        ['NPK 10-10-10', '300', 'kg/ha', '', 'Plantio']
+      ],
+      theme: 'plain',
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        textColor: [55, 65, 81],
+        lineColor: [94, 82, 64],
+        lineWidth: 0.1
+      },
+      headStyles: {
+        fillColor: [248, 249, 250],
+        textColor: [26, 43, 74],
+        fontStyle: 'bold',
+        halign: 'left'
+      },
+      columnStyles: {
+        0: { cellWidth: 60 },
+        1: { cellWidth: 25, halign: 'right', textColor: [5, 150, 105], fontStyle: 'bold' },
+        2: { cellWidth: 20 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 25 }
+      },
+      margin: { left: marginX + 6, right: marginX + 6 },
+      tableWidth: contentWidth - 12,
+      didDrawCell: (data: any) => {
+        if (data.column.index === 3 && data.section === 'body') {
+          const cellX = data.cell.x + 5;
+          const cellY = data.cell.y + data.cell.height / 2 + 1;
+          drawBadge('Sulco', cellX, cellY, 'sulco');
+        }
+      }
+    });
+    
+    currentY = (pdf as any).lastAutoTable.finalY + 10;
+    
+    // ========== CARD 3: ADUBAÇÃO DE COBERTURA ==========
+    if (currentY > 220) { pdf.addPage(); currentY = 45; }
+    
+    // Card background
+    pdf.setFillColor(252, 251, 245);
+    pdf.roundedRect(marginX, currentY, contentWidth, 45, 8, 8, 'F');
+    
+    // Border
+    pdf.setDrawColor(94, 82, 64);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(marginX, currentY, contentWidth, 45, 8, 8, 'S');
+    
+    // Título
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(26, 43, 74);
+    pdf.text('3. Adubação de Cobertura (Nitrogênio)', marginX + 6, currentY + 8);
+    
+    // Descrição
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(107, 114, 128);
+    pdf.text('Aplicação de nitrogênio em cobertura entre os estágios V4-V8 da soja.', marginX + 6, currentY + 14);
+    
+    // Tabela
+    (pdf as any).autoTable({
+      startY: currentY + 18,
+      head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
+      body: [
+        ['Ureia (45% N)', '100', 'kg/ha', '', 'V4-V6'],
+        ['Sulfato de Amônio (21% N)', '200', 'kg/ha', '', 'V6-V8']
+      ],
+      theme: 'plain',
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        textColor: [55, 65, 81],
+        lineColor: [94, 82, 64],
+        lineWidth: 0.1
+      },
+      headStyles: {
+        fillColor: [248, 249, 250],
+        textColor: [26, 43, 74],
+        fontStyle: 'bold',
+        halign: 'left'
+      },
+      columnStyles: {
+        0: { cellWidth: 60 },
+        1: { cellWidth: 25, halign: 'right', textColor: [5, 150, 105], fontStyle: 'bold' },
+        2: { cellWidth: 20 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 25 }
+      },
+      margin: { left: marginX + 6, right: marginX + 6 },
+      tableWidth: contentWidth - 12,
+      didDrawCell: (data: any) => {
+        if (data.column.index === 3 && data.section === 'body') {
+          const cellX = data.cell.x + 5;
+          const cellY = data.cell.y + data.cell.height / 2 + 1;
+          drawBadge('Cobertura', cellX, cellY, 'cobertura');
+        }
+      }
+    });
+    
+    currentY = (pdf as any).lastAutoTable.finalY + 10;
+    
+    // ========== CARD 4: MICRONUTRIENTES ==========
+    pdf.addPage();
+    currentY = 45;
+    
+    // Card background
+    pdf.setFillColor(252, 251, 245);
+    pdf.roundedRect(marginX, currentY, contentWidth, 95, 8, 8, 'F');
+    
+    // Border
+    pdf.setDrawColor(94, 82, 64);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(marginX, currentY, contentWidth, 95, 8, 8, 'S');
+    
+    // Título
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(26, 43, 74);
+    pdf.text('4. Suplementação de Micronutrientes', marginX + 6, currentY + 8);
+    
+    // Descrição
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(107, 114, 128);
+    const desc4 = 'Correção de deficiências de B, Zn, Cu, Mn e Mo. Aplicação foliar ou tratamento de sementes conforme indicado.';
+    const splitDesc4 = pdf.splitTextToSize(desc4, contentWidth - 12);
+    pdf.text(splitDesc4, marginX + 6, currentY + 14);
+    
+    // Tabela
+    (pdf as any).autoTable({
+      startY: currentY + 22,
+      head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
+      body: [
+        ['Ácido Bórico', '2.0', 'kg/ha', 'foliar', 'V3-V5'],
+        ['Bórax', '3.0', 'kg/ha', 'foliar', 'V3-V5'],
+        ['Sulfato de Zinco', '3.0', 'kg/ha', 'foliar', 'V4-V6'],
+        ['Óxido de Zinco', '2.0', 'kg/ha', 'foliar', 'V4-V6'],
+        ['Sulfato de Cobre', '1.5', 'kg/ha', 'foliar', 'V4-V6'],
+        ['Óxido de Cobre', '4.0', 'kg/ha', 'foliar', 'V4-V6'],
+        ['Sulfato de Manganês', '3.0', 'kg/ha', 'foliar', 'V4-V6'],
+        ['Óxido de Manganês', '2.5', 'kg/ha', 'foliar', 'V4-V6'],
+        ['Molibdato de Sódio', '0.1', 'kg/ha', 'sementes', 'Plantio']
+      ],
+      theme: 'plain',
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        textColor: [55, 65, 81],
+        lineColor: [94, 82, 64],
+        lineWidth: 0.1
+      },
+      headStyles: {
+        fillColor: [248, 249, 250],
+        textColor: [26, 43, 74],
+        fontStyle: 'bold',
+        halign: 'left'
+      },
+      columnStyles: {
+        0: { cellWidth: 60 },
+        1: { cellWidth: 25, halign: 'right', textColor: [5, 150, 105], fontStyle: 'bold' },
+        2: { cellWidth: 20 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 25 }
+      },
+      margin: { left: marginX + 6, right: marginX + 6 },
+      tableWidth: contentWidth - 12,
+      didDrawCell: (data: any) => {
+        if (data.column.index === 3 && data.section === 'body') {
+          const cellX = data.cell.x + 5;
+          const cellY = data.cell.y + data.cell.height / 2 + 1;
+          const badgeType = data.cell.raw === 'sementes' ? 'sementes' : 'foliar';
+          const badgeText = data.cell.raw === 'sementes' ? 'Trat. sementes' : 'Foliar';
+          drawBadge(badgeText, cellX, cellY, badgeType);
+        }
+      }
+    });
+    
+    currentY = (pdf as any).lastAutoTable.finalY + 10;
+    
+    // ========== CARD 5: MANEJO ORGÂNICO ==========
+    if (currentY > 220) { pdf.addPage(); currentY = 45; }
+    
+    // Card background
+    pdf.setFillColor(252, 251, 245);
+    pdf.roundedRect(marginX, currentY, contentWidth, 45, 8, 8, 'F');
+    
+    // Border
+    pdf.setDrawColor(94, 82, 64);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(marginX, currentY, contentWidth, 45, 8, 8, 'S');
+    
+    // Título
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(26, 43, 74);
+    pdf.text('5. Manejo Orgânico (Opcional)', marginX + 6, currentY + 8);
+    
+    // Descrição
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(107, 114, 128);
+    const desc5 = 'Melhoria da estrutura do solo e fornecimento gradual de nutrientes. Aplicar 30-45 dias antes do plantio.';
+    const splitDesc5 = pdf.splitTextToSize(desc5, contentWidth - 12);
+    pdf.text(splitDesc5, marginX + 6, currentY + 14);
+    
+    // Tabela
+    (pdf as any).autoTable({
+      startY: currentY + 22,
+      head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
+      body: [
+        ['Esterco Bovino Curtido', '10.000', 'kg/ha', '', 'Pré-plantio'],
+        ['Composto Orgânico', '5.000', 'kg/ha', '', 'Pré-plantio']
+      ],
+      theme: 'plain',
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        textColor: [55, 65, 81],
+        lineColor: [94, 82, 64],
+        lineWidth: 0.1
+      },
+      headStyles: {
+        fillColor: [248, 249, 250],
+        textColor: [26, 43, 74],
+        fontStyle: 'bold',
+        halign: 'left'
+      },
+      columnStyles: {
+        0: { cellWidth: 60 },
+        1: { cellWidth: 25, halign: 'right', textColor: [5, 150, 105], fontStyle: 'bold' },
+        2: { cellWidth: 20 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 25 }
+      },
+      margin: { left: marginX + 6, right: marginX + 6 },
+      tableWidth: contentWidth - 12,
+      didDrawCell: (data: any) => {
+        if (data.column.index === 3 && data.section === 'body') {
+          const cellX = data.cell.x + 5;
+          const cellY = data.cell.y + data.cell.height / 2 + 1;
+          drawBadge('Incorporado', cellX, cellY, 'incorporado');
+        }
+      }
+    });
+    
+    currentY = (pdf as any).lastAutoTable.finalY + 10;
     
     // Footer simples
     pdf.setFontSize(10);
