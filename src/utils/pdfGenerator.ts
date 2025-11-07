@@ -741,7 +741,7 @@ export const generatePDF = async (
     pdf.text('Correção da acidez do solo e fornecimento de Ca e Mg. Aplicar 60-90 dias antes do plantio.', marginX + 6, currentY + 14);
     
     // Tabela
-    (pdf as any).autoTable({
+    autoTable(pdf, {
       startY: currentY + 18,
       head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
       body: [
@@ -809,7 +809,7 @@ export const generatePDF = async (
     pdf.text(splitDesc2, marginX + 6, currentY + 14);
     
     // Tabela
-    (pdf as any).autoTable({
+    autoTable(pdf, {
       startY: currentY + 22,
       head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
       body: [
@@ -880,7 +880,7 @@ export const generatePDF = async (
     pdf.text('Aplicação de nitrogênio em cobertura entre os estágios V4-V8 da soja.', marginX + 6, currentY + 14);
     
     // Tabela
-    (pdf as any).autoTable({
+    autoTable(pdf, {
       startY: currentY + 18,
       head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
       body: [
@@ -949,7 +949,7 @@ export const generatePDF = async (
     pdf.text(splitDesc4, marginX + 6, currentY + 14);
     
     // Tabela
-    (pdf as any).autoTable({
+    autoTable(pdf, {
       startY: currentY + 22,
       head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
       body: [
@@ -1026,7 +1026,7 @@ export const generatePDF = async (
     pdf.text(splitDesc5, marginX + 6, currentY + 14);
     
     // Tabela
-    (pdf as any).autoTable({
+    autoTable(pdf, {
       startY: currentY + 22,
       head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
       body: [
