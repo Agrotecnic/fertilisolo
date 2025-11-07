@@ -36,37 +36,44 @@ const LandingPage: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-28 md:pt-32 pb-16 md:pb-24 bg-gradient-to-r from-green-50 to-green-100 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <section className="pt-28 md:pt-32 pb-16 md:pb-24 bg-gradient-hero overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-radial from-transparent via-green-100/30 to-transparent pointer-events-none"></div>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2 mb-10 md:mb-0">
+            <div className="md:w-1/2 mb-10 md:mb-0 animate-fade-in-up">
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-green-900 mb-4">
-                Potencialize a produtividade da sua lavoura
+                Potencialize a produtividade da sua <span className="text-gradient">lavoura</span>
               </h1>
               <p className="text-lg md:text-xl text-gray-700 mb-6 md:mb-8">
                 Sistema completo de análise de solo e recomendação de adubação com base em saturação por bases.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                 <Link to="/login" className="w-full sm:w-auto">
-                <Button 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-base md:text-lg py-5 md:py-6 px-6 md:px-8 rounded-lg w-full sm:w-auto"
-                >
-                  Começar agora
-                  <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
-                </Button>
+                  <Button 
+                    variant="modern"
+                    size="lg"
+                    className="w-full sm:w-auto"
+                  >
+                    Começar agora
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
                 </Link>
                 <Link to="/relatorio" className="w-full sm:w-auto">
-                  <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 text-base md:text-lg py-5 md:py-6">
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    className="w-full"
+                  >
                     Ver demonstração
                   </Button>
                 </Link>
               </div>
             </div>
-            <div className="md:w-1/2 flex justify-center">
+            <div className="md:w-1/2 flex justify-center animate-fade-in-up">
               <img 
                 src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" 
                 alt="Análise de solo" 
-                className="rounded-lg shadow-xl max-w-full h-auto"
+                className="rounded-2xl shadow-colored-lg hover:shadow-glow-lg transition-all duration-500 hover:scale-[1.02] max-w-full h-auto"
                 onError={(e) => {
                   e.currentTarget.src = "https://via.placeholder.com/600x400?text=FertiliSolo";
                 }}
@@ -90,11 +97,11 @@ const LandingPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition duration-300">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <Beaker className="h-6 w-6 text-primary" />
+            <div className="group bg-gradient-soft p-6 rounded-xl shadow-soft hover:shadow-colored-lg transition-all duration-300 hover:-translate-y-2 border border-primary/10 hover:border-primary/30 card-shimmer">
+              <div className="w-14 h-14 bg-gradient-primary rounded-xl flex items-center justify-center mb-4 shadow-primary group-hover:scale-110 transition-transform duration-300">
+                <Beaker className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-green-800 mb-3">
+              <h3 className="text-xl font-semibold text-green-800 mb-3 group-hover:text-primary transition-colors">
                 Análise de Solo Intuitiva
               </h3>
               <p className="text-gray-600">
@@ -103,11 +110,11 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* Feature 2 */}
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition duration-300">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <BarChart className="h-6 w-6 text-primary" />
+            <div className="group bg-gradient-soft p-6 rounded-xl shadow-soft hover:shadow-secondary transition-all duration-300 hover:-translate-y-2 border border-secondary/10 hover:border-secondary/30 card-shimmer">
+              <div className="w-14 h-14 bg-gradient-secondary rounded-xl flex items-center justify-center mb-4 shadow-secondary group-hover:scale-110 transition-transform duration-300">
+                <BarChart className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-green-800 mb-3">
+              <h3 className="text-xl font-semibold text-green-800 mb-3 group-hover:text-secondary transition-colors">
                 Cálculo de Saturações
               </h3>
               <p className="text-gray-600">
@@ -116,11 +123,11 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* Feature 3 */}
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition duration-300">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <Leaf className="h-6 w-6 text-primary" />
+            <div className="group bg-gradient-soft p-6 rounded-xl shadow-soft hover:shadow-primary transition-all duration-300 hover:-translate-y-2 border border-primary/10 hover:border-primary/30 card-shimmer">
+              <div className="w-14 h-14 bg-gradient-primary rounded-xl flex items-center justify-center mb-4 shadow-primary group-hover:scale-110 transition-transform duration-300">
+                <Leaf className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-green-800 mb-3">
+              <h3 className="text-xl font-semibold text-green-800 mb-3 group-hover:text-primary transition-colors">
                 Recomendações Precisas
               </h3>
               <p className="text-gray-600">
@@ -129,11 +136,11 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* Feature 4 */}
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition duration-300">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <Database className="h-6 w-6 text-primary" />
+            <div className="group bg-gradient-soft p-6 rounded-xl shadow-soft hover:shadow-colored-lg transition-all duration-300 hover:-translate-y-2 border border-primary/10 hover:border-primary/30 card-shimmer">
+              <div className="w-14 h-14 bg-gradient-primary rounded-xl flex items-center justify-center mb-4 shadow-primary group-hover:scale-110 transition-transform duration-300">
+                <Database className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-green-800 mb-3">
+              <h3 className="text-xl font-semibold text-green-800 mb-3 group-hover:text-primary transition-colors">
                 Histórico de Análises
               </h3>
               <p className="text-gray-600">
@@ -142,11 +149,11 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* Feature 5 */}
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition duration-300">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <BarChart2 className="h-6 w-6 text-primary" />
+            <div className="group bg-gradient-soft p-6 rounded-xl shadow-soft hover:shadow-secondary transition-all duration-300 hover:-translate-y-2 border border-secondary/10 hover:border-secondary/30 card-shimmer">
+              <div className="w-14 h-14 bg-gradient-secondary rounded-xl flex items-center justify-center mb-4 shadow-secondary group-hover:scale-110 transition-transform duration-300">
+                <BarChart2 className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-green-800 mb-3">
+              <h3 className="text-xl font-semibold text-green-800 mb-3 group-hover:text-secondary transition-colors">
                 Insights Visuais
               </h3>
               <p className="text-gray-600">
@@ -155,11 +162,11 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* Feature 6 */}
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition duration-300">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-primary" />
+            <div className="group bg-gradient-soft p-6 rounded-xl shadow-soft hover:shadow-accent transition-all duration-300 hover:-translate-y-2 border border-accent-dark/10 hover:border-accent-dark/30 card-shimmer">
+              <div className="w-14 h-14 bg-gradient-accent rounded-xl flex items-center justify-center mb-4 shadow-accent group-hover:scale-110 transition-transform duration-300">
+                <Shield className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-green-800 mb-3">
+              <h3 className="text-xl font-semibold text-green-800 mb-3 group-hover:text-accent-dark transition-colors">
                 Disponível Offline
               </h3>
               <p className="text-gray-600">
@@ -184,11 +191,12 @@ const LandingPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
-                <span className="text-2xl font-bold text-primary">1</span>
+            <div className="text-center group animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              <div className="relative w-20 h-20 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-primary group-hover:shadow-glow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <span className="text-3xl font-bold text-white">1</span>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-accent rounded-full animate-pulse-soft"></div>
               </div>
-              <h3 className="text-xl font-semibold text-green-800 mb-3">
+              <h3 className="text-xl font-semibold text-green-800 mb-3 group-hover:text-primary transition-colors">
                 Insira os Dados
               </h3>
               <p className="text-gray-600">
@@ -197,11 +205,12 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* Step 2 */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
-                <span className="text-2xl font-bold text-primary">2</span>
+            <div className="text-center group animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              <div className="relative w-20 h-20 bg-gradient-secondary rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-secondary group-hover:shadow-glow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <span className="text-3xl font-bold text-white">2</span>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-accent rounded-full animate-pulse-soft" style={{ animationDelay: '0.5s' }}></div>
               </div>
-              <h3 className="text-xl font-semibold text-green-800 mb-3">
+              <h3 className="text-xl font-semibold text-green-800 mb-3 group-hover:text-secondary transition-colors">
                 Obtenha a Análise
               </h3>
               <p className="text-gray-600">
@@ -210,11 +219,12 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* Step 3 */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
-                <span className="text-2xl font-bold text-primary">3</span>
+            <div className="text-center group animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+              <div className="relative w-20 h-20 bg-gradient-accent rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-accent group-hover:shadow-glow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <span className="text-3xl font-bold text-white">3</span>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary rounded-full animate-pulse-soft" style={{ animationDelay: '1s' }}></div>
               </div>
-              <h3 className="text-xl font-semibold text-green-800 mb-3">
+              <h3 className="text-xl font-semibold text-green-800 mb-3 group-hover:text-accent-dark transition-colors">
                 Aplique as Recomendações
               </h3>
               <p className="text-gray-600">
@@ -302,22 +312,30 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-12 md:py-16 lg:py-24 bg-primary overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 md:mb-4">
-            Pronto para otimizar sua produção?
+      <section className="relative py-12 md:py-16 lg:py-24 bg-gradient-to-br from-primary via-primary-light to-secondary overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-20"></div>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 text-center relative z-10">
+          <h2 className="text-2xl md:text-3xl lg:text-5xl font-bold text-white mb-3 md:mb-4 animate-fade-in-up">
+            Pronto para otimizar sua produção? 🌱
           </h2>
-          <p className="text-base md:text-lg lg:text-xl text-green-50 max-w-3xl mx-auto mb-6 md:mb-8">
+          <p className="text-base md:text-lg lg:text-xl text-green-50 max-w-3xl mx-auto mb-6 md:mb-8 animate-fade-in-up">
             Comece a usar o FertiliSolo hoje mesmo e transforme a forma como você gerencia a fertilidade do seu solo.
           </p>
-          <Button 
-            onClick={() => navigate('/login')} 
-            className="bg-white text-primary hover:bg-primary/10 text-base md:text-lg py-5 md:py-6 px-6 md:px-8 rounded-lg w-full max-w-xs mx-auto sm:w-auto"
-          >
-            Começar agora
-            <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
-          </Button>
+          <div className="animate-fade-in-up">
+            <Button 
+              onClick={() => navigate('/login')} 
+              size="xl"
+              className="bg-white text-primary hover:bg-green-50 hover:scale-105 shadow-glow-lg hover:shadow-[0_0_40px_rgba(255,255,255,0.5)] transition-all duration-300 w-full max-w-xs mx-auto sm:w-auto"
+            >
+              Começar agora
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
         </div>
+        {/* Elementos decorativos */}
+        <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-float"></div>
+        <div className="absolute bottom-10 right-10 w-32 h-32 bg-accent/20 rounded-full blur-2xl animate-float" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-secondary/20 rounded-full blur-xl animate-pulse-soft"></div>
       </section>
 
       {/* Footer */}
