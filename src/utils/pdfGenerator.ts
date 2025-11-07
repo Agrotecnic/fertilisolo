@@ -793,33 +793,34 @@ export const generatePDF = async (
     barY += 5;
     
     // P, K, Ca, Mg, S (espaçamento reduzido)
+    // CORREÇÃO: Usar MAIÚSCULAS conforme interface SoilData
     console.log('📊 Dados do Solo na Análise Visual:', {
-      P: soilData.p,
-      K: soilData.k,
-      Ca: soilData.ca,
-      Mg: soilData.mg,
-      S: soilData.s,
-      B: soilData.b,
-      Zn: soilData.zn,
-      Cu: soilData.cu,
-      Mn: soilData.mn,
-      Fe: soilData.fe
+      P: soilData.P,
+      K: soilData.K,
+      Ca: soilData.Ca,
+      Mg: soilData.Mg,
+      S: soilData.S,
+      B: soilData.B,
+      Zn: soilData.Zn,
+      Cu: soilData.Cu,
+      Mn: soilData.Mn,
+      Fe: soilData.Fe
     });
     
-    const pNivel = interpretarFosforo(soilData.p || 0, soilData.argila || 0);
-    drawNutrientBar('P', soilData.p || 0, pNivel.nivel, barY, true);
+    const pNivel = interpretarFosforo(soilData.P || 0, soilData.argila || 0);
+    drawNutrientBar('P', soilData.P || 0, pNivel.nivel, barY, true);
     barY += 6;
     
-    drawNutrientBar('K', soilData.k || 0, soilData.k >= 0.15 ? 'Adequado' : 'Baixo', barY, true);
+    drawNutrientBar('K', soilData.K || 0, soilData.K >= 0.15 ? 'Adequado' : 'Baixo', barY, true);
     barY += 6;
     
-    drawNutrientBar('Ca', soilData.ca || 0, soilData.ca >= 4.0 ? 'Adequado' : 'Baixo', barY, true);
+    drawNutrientBar('Ca', soilData.Ca || 0, soilData.Ca >= 4.0 ? 'Adequado' : 'Baixo', barY, true);
     barY += 6;
     
-    drawNutrientBar('Mg', soilData.mg || 0, soilData.mg >= 1.0 ? 'Adequado' : 'Baixo', barY, true);
+    drawNutrientBar('Mg', soilData.Mg || 0, soilData.Mg >= 1.0 ? 'Adequado' : 'Baixo', barY, true);
     barY += 6;
     
-    drawNutrientBar('S', soilData.s || 0, soilData.s >= 10 ? 'Adequado' : 'Baixo', barY, true);
+    drawNutrientBar('S', soilData.S || 0, soilData.S >= 10 ? 'Adequado' : 'Baixo', barY, true);
     
     // Micronutrientes (coluna direita)
     barY = currentY + 14;
@@ -829,19 +830,19 @@ export const generatePDF = async (
     pdf.text('Micronutrientes', pageWidth / 2 + 2, barY);
     barY += 5;
     
-    drawNutrientBar('B', soilData.b || 0, soilData.b >= 0.5 ? 'Adequado' : 'Baixo', barY, false);
+    drawNutrientBar('B', soilData.B || 0, soilData.B >= 0.5 ? 'Adequado' : 'Baixo', barY, false);
     barY += 6;
     
-    drawNutrientBar('Zn', soilData.zn || 0, soilData.zn >= 1.2 ? 'Adequado' : 'Baixo', barY, false);
+    drawNutrientBar('Zn', soilData.Zn || 0, soilData.Zn >= 1.2 ? 'Adequado' : 'Baixo', barY, false);
     barY += 6;
     
-    drawNutrientBar('Cu', soilData.cu || 0, soilData.cu >= 0.8 ? 'Adequado' : 'Baixo', barY, false);
+    drawNutrientBar('Cu', soilData.Cu || 0, soilData.Cu >= 0.8 ? 'Adequado' : 'Baixo', barY, false);
     barY += 6;
     
-    drawNutrientBar('Mn', soilData.mn || 0, soilData.mn >= 5.0 ? 'Adequado' : 'Baixo', barY, false);
+    drawNutrientBar('Mn', soilData.Mn || 0, soilData.Mn >= 5.0 ? 'Adequado' : 'Baixo', barY, false);
     barY += 6;
     
-    drawNutrientBar('Fe', soilData.fe || 0, soilData.fe >= 5.0 ? 'Adequado' : 'Baixo', barY, false);
+    drawNutrientBar('Fe', soilData.Fe || 0, soilData.Fe >= 5.0 ? 'Adequado' : 'Baixo', barY, false);
     
     currentY += 63;
     

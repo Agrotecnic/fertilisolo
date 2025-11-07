@@ -85,17 +85,17 @@ export const FertilizerHeader: React.FC<FertilizerHeaderProps> = ({
       });
 
       console.log('🔍 soilData ANTES de gerar PDF:', soilData);
-      console.log('🔍 Nutrientes no soilData:', {
-        P: soilData.p,
-        K: soilData.k,
-        Ca: soilData.ca,
-        Mg: soilData.mg,
-        S: soilData.s,
-        B: soilData.b,
-        Zn: soilData.zn,
-        Cu: soilData.cu,
-        Mn: soilData.mn,
-        Fe: soilData.fe
+      console.log('🔍 Nutrientes no soilData (MAIÚSCULAS):', {
+        P: soilData.P,
+        K: soilData.K,
+        Ca: soilData.Ca,
+        Mg: soilData.Mg,
+        S: soilData.S,
+        B: soilData.B,
+        Zn: soilData.Zn,
+        Cu: soilData.Cu,
+        Mn: soilData.Mn,
+        Fe: soilData.Fe
       });
 
       // Gerar PDF com personalização
