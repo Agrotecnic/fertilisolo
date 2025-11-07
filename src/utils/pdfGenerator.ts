@@ -628,44 +628,49 @@ export const generatePDF = async (
     const pageWidth = 210;
     const contentWidth = pageWidth - (marginX * 2);
     
-    // ========== HEADER (igual ao HTML) ==========
-    const headerHeight = 32;
-    
-    // Gradiente azul escuro (#1a2b4a → #2d4a73)
-    pdf.setFillColor(26, 43, 74);
-    pdf.rect(0, 0, pageWidth, headerHeight, 'F');
-    
-    for (let i = 0; i < 10; i++) {
-      const alpha = i / 10;
-      const r = 26 + (45 - 26) * alpha;
-      const g = 43 + (74 - 43) * alpha;
-      const b = 74 + (115 - 74) * alpha;
+    // ========== FUNÇÃO PARA DESENHAR HEADER EM TODAS AS PÁGINAS ==========
+    const drawHeader = async () => {
+      const headerHeight = 32;
       
-      pdf.setFillColor(r, g, b);
-      pdf.rect(0, i * (headerHeight / 10), pageWidth, headerHeight / 10, 'F');
-    }
+      // Gradiente azul escuro (#1a2b4a → #2d4a73)
+      pdf.setFillColor(26, 43, 74);
+      pdf.rect(0, 0, pageWidth, headerHeight, 'F');
+      
+      for (let i = 0; i < 10; i++) {
+        const alpha = i / 10;
+        const r = 26 + (45 - 26) * alpha;
+        const g = 43 + (74 - 43) * alpha;
+        const b = 74 + (115 - 74) * alpha;
+        
+        pdf.setFillColor(r, g, b);
+        pdf.rect(0, i * (headerHeight / 10), pageWidth, headerHeight / 10, 'F');
+      }
+      
+      // Barra azul accent embaixo (gradiente #007bff → #00d4ff)
+      pdf.setFillColor(0, 123, 255);
+      pdf.rect(0, headerHeight, pageWidth, 4, 'F');
+      
+      // Logo no header
+      if (themeOptions?.logo) {
+        await addLogoToPage(pdf, themeOptions.logo, pageWidth, 8, true);
+      }
+      
+      // Título do Header
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(24);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Plano de Ação de Fertilização', marginX, 18);
+      
+      // Subtítulo: Cultura e Amostra
+      pdf.setFontSize(13);
+      pdf.setFont('helvetica', 'normal');
+      const culturaText = `Cultura: ${cultureName || 'Soja'}`;
+      const amostraText = `Amostra: ${farmName || soilData.location || 'Não especificado'}`;
+      pdf.text(`${culturaText}     ${amostraText}`, marginX, 28);
+    };
     
-    // Barra azul accent embaixo (gradiente #007bff → #00d4ff)
-    pdf.setFillColor(0, 123, 255);
-    pdf.rect(0, headerHeight, pageWidth, 4, 'F');
-    
-    // Logo no header
-    if (themeOptions?.logo) {
-      await addLogoToPage(pdf, themeOptions.logo, pageWidth, 8, true);
-    }
-    
-    // Título do Header
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(24);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Plano de Ação de Fertilização', marginX, 18);
-    
-    // Subtítulo: Cultura e Amostra
-    pdf.setFontSize(13);
-    pdf.setFont('helvetica', 'normal');
-    const culturaText = `Cultura: ${cultureName || 'Soja'}`;
-    const amostraText = `Amostra: ${farmName || soilData.location || 'Não especificado'}`;
-    pdf.text(`${culturaText}     ${amostraText}`, marginX, 28);
+    // Desenhar header na primeira página
+    await drawHeader();
 
     // ========== ALERT BOX AMARELO (igual ao HTML) ==========
     let currentY = 45;
@@ -788,6 +793,19 @@ export const generatePDF = async (
     barY += 5;
     
     // P, K, Ca, Mg, S (espaçamento reduzido)
+    console.log('📊 Dados do Solo na Análise Visual:', {
+      P: soilData.p,
+      K: soilData.k,
+      Ca: soilData.ca,
+      Mg: soilData.mg,
+      S: soilData.s,
+      B: soilData.b,
+      Zn: soilData.zn,
+      Cu: soilData.cu,
+      Mn: soilData.mn,
+      Fe: soilData.fe
+    });
+    
     const pNivel = interpretarFosforo(soilData.p || 0, soilData.argila || 0);
     drawNutrientBar('P', soilData.p || 0, pNivel.nivel, barY, true);
     barY += 6;
@@ -855,11 +873,7 @@ export const generatePDF = async (
     // Verificar se há espaço suficiente para o card (85 de altura + margem)
     if (currentY > 200) { 
       pdf.addPage(); 
-      currentY = 45; 
-      // Re-adicionar logo no topo da nova página
-      if (themeOptions?.logo) {
-        await addLogoToPage(pdf, themeOptions.logo, pageWidth, 8, true);
-      }
+      await drawHeader();
       currentY = 45;
     }
     
@@ -938,10 +952,7 @@ export const generatePDF = async (
     // ========== CARD 2: ADUBAÇÃO DE BASE ==========
     if (currentY > 200) { 
       pdf.addPage(); 
-      currentY = 45;
-      if (themeOptions?.logo) {
-        await addLogoToPage(pdf, themeOptions.logo, pageWidth, 8, true);
-      }
+      await drawHeader();
       currentY = 45;
     }
     
@@ -1023,10 +1034,7 @@ export const generatePDF = async (
     // ========== CARD 3: ADUBAÇÃO DE COBERTURA ==========
     if (currentY > 190) { 
       pdf.addPage(); 
-      currentY = 45;
-      if (themeOptions?.logo) {
-        await addLogoToPage(pdf, themeOptions.logo, pageWidth, 8, true);
-      }
+      await drawHeader();
       currentY = 45;
     }
     
@@ -1105,10 +1113,7 @@ export const generatePDF = async (
     // Quebra de página inteligente (95 de altura + margem)
     if (currentY > 190) { 
       pdf.addPage(); 
-      currentY = 45;
-      if (themeOptions?.logo) {
-        await addLogoToPage(pdf, themeOptions.logo, pageWidth, 8, true);
-      }
+      await drawHeader();
       currentY = 45;
     }
     
@@ -1195,10 +1200,7 @@ export const generatePDF = async (
     // ========== CARD 5: MANEJO ORGÂNICO ==========
     if (currentY > 230) { 
       pdf.addPage(); 
-      currentY = 45;
-      if (themeOptions?.logo) {
-        await addLogoToPage(pdf, themeOptions.logo, pageWidth, 8, true);
-      }
+      await drawHeader();
       currentY = 45;
     }
     
