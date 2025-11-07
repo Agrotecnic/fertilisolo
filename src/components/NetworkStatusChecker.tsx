@@ -39,50 +39,15 @@ export function NetworkStatusChecker() {
       try {
         // Apenas verificar se estamos online
         if (navigator.onLine) {
-          // Tentar fazer uma requisição para verificar a conexão real
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 5000);
           
-          // Tenta usar nossa API de ping primeiro
-          try {
-            const response = await fetch('/api/ping', {
-              method: 'GET',
-              signal: controller.signal,
-              // Evitar cache do navegador
-              headers: {
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0',
-              },
-            });
-            
-            clearTimeout(timeoutId);
-            
-            if (!response.ok) {
-              throw new Error('Resposta do servidor não ok');
-            }
-            
-            // Se chegamos aqui, a conexão com a API está boa
-            if (hasConnectivityIssues) {
-              setHasConnectivityIssues(false);
-              toast({
-                title: "Conexão estável",
-                description: "A conexão com o servidor foi reestabelecida.",
-                variant: "default",
-              });
-            }
-            return;
-          } catch (apiError) {
-            console.warn('Erro ao acessar API de ping, tentando Supabase:', apiError);
-            // Se falhar, tenta usar o Supabase como fallback
-          }
-          
-          // Fallback para verificar com o Supabase
+          // Verificar conexão com o Supabase
           const result = await pingServer();
           clearTimeout(timeoutId);
           
           if (result.status === 'error') {
-            throw new Error('Falha ao conectar com o Supabase');
+            throw new Error('Falha ao conectar com o servidor');
           }
           
           // Se chegamos aqui, a conexão está boa
@@ -99,6 +64,7 @@ export function NetworkStatusChecker() {
         // Se estamos "online" mas a requisição falhou, temos problemas de conectividade
         if (navigator.onLine && !hasConnectivityIssues) {
           setHasConnectivityIssues(true);
+          console.warn('Problemas de conectividade detectados:', error);
           toast({
             title: "Problemas de conectividade",
             description: "Sua conexão com o servidor está instável.",
