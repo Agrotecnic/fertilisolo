@@ -852,7 +852,16 @@ export const generatePDF = async (
     };
     
     // ========== CARD 1: CORREÇÃO DE SOLO ==========
-    if (currentY > 240) { pdf.addPage(); currentY = 45; }
+    // Verificar se há espaço suficiente para o card (55 de altura + margem)
+    if (currentY > 230) { 
+      pdf.addPage(); 
+      currentY = 45; 
+      // Re-adicionar logo no topo da nova página
+      if (themeOptions?.logo) {
+        await addLogoToPage(pdf, themeOptions.logo, pageWidth, 8, true);
+      }
+      currentY = 45;
+    }
     
     // Card background
     pdf.setFillColor(252, 251, 245); // #fcfbf5 (creamSurface)
@@ -923,7 +932,14 @@ export const generatePDF = async (
     currentY = (pdf as any).lastAutoTable.finalY + 8;
     
     // ========== CARD 2: ADUBAÇÃO DE BASE ==========
-    if (currentY > 200) { pdf.addPage(); currentY = 45; }
+    if (currentY > 200) { 
+      pdf.addPage(); 
+      currentY = 45;
+      if (themeOptions?.logo) {
+        await addLogoToPage(pdf, themeOptions.logo, pageWidth, 8, true);
+      }
+      currentY = 45;
+    }
     
     // Card background
     pdf.setFillColor(252, 251, 245);
@@ -1001,16 +1017,23 @@ export const generatePDF = async (
     currentY = (pdf as any).lastAutoTable.finalY + 8;
     
     // ========== CARD 3: ADUBAÇÃO DE COBERTURA ==========
-    if (currentY > 220) { pdf.addPage(); currentY = 45; }
+    if (currentY > 190) { 
+      pdf.addPage(); 
+      currentY = 45;
+      if (themeOptions?.logo) {
+        await addLogoToPage(pdf, themeOptions.logo, pageWidth, 8, true);
+      }
+      currentY = 45;
+    }
     
-    // Card background
+    // Card background (altura aumentada para mais linhas)
     pdf.setFillColor(252, 251, 245);
-    pdf.roundedRect(marginX, currentY, contentWidth, 45, 8, 8, 'F');
+    pdf.roundedRect(marginX, currentY, contentWidth, 68, 8, 8, 'F');
     
     // Border
     pdf.setDrawColor(94, 82, 64);
     pdf.setLineWidth(0.3);
-    pdf.roundedRect(marginX, currentY, contentWidth, 45, 8, 8, 'S');
+    pdf.roundedRect(marginX, currentY, contentWidth, 68, 8, 8, 'S');
     
     // Título
     pdf.setFontSize(16);
@@ -1024,13 +1047,16 @@ export const generatePDF = async (
     pdf.setTextColor(107, 114, 128);
     pdf.text('Aplicação de nitrogênio em cobertura entre os estágios V4-V8 da soja.', marginX + 6, currentY + 14);
     
-    // Tabela
+    // Tabela (MAIS FONTES DE NITROGÊNIO)
     autoTable(pdf, {
       startY: currentY + 18,
       head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
       body: [
         ['Ureia (45% N)', '100', 'kg/ha', '', 'V4-V6'],
-        ['Sulfato de Amônio (21% N)', '200', 'kg/ha', '', 'V6-V8']
+        ['Sulfato de Amônio (21% N)', '200', 'kg/ha', '', 'V6-V8'],
+        ['Nitrato de Amônio (33% N)', '140', 'kg/ha', '', 'V4-V6'],
+        ['Ureia Revestida (44% N)', '105', 'kg/ha', '', 'V4-V6'],
+        ['Nitrato de Cálcio (15% N)', '300', 'kg/ha', '', 'V4-V8']
       ],
       theme: 'plain',
       styles: {
@@ -1072,8 +1098,15 @@ export const generatePDF = async (
     currentY = (pdf as any).lastAutoTable.finalY + 8;
     
     // ========== CARD 4: MICRONUTRIENTES ==========
-    pdf.addPage();
-    currentY = 45;
+    // Quebra de página inteligente (95 de altura + margem)
+    if (currentY > 190) { 
+      pdf.addPage(); 
+      currentY = 45;
+      if (themeOptions?.logo) {
+        await addLogoToPage(pdf, themeOptions.logo, pageWidth, 8, true);
+      }
+      currentY = 45;
+    }
     
     // Card background
     pdf.setFillColor(252, 251, 245);
@@ -1156,7 +1189,14 @@ export const generatePDF = async (
     currentY = (pdf as any).lastAutoTable.finalY + 8;
     
     // ========== CARD 5: MANEJO ORGÂNICO ==========
-    if (currentY > 220) { pdf.addPage(); currentY = 45; }
+    if (currentY > 230) { 
+      pdf.addPage(); 
+      currentY = 45;
+      if (themeOptions?.logo) {
+        await addLogoToPage(pdf, themeOptions.logo, pageWidth, 8, true);
+      }
+      currentY = 45;
+    }
     
     // Card background
     pdf.setFillColor(252, 251, 245);
