@@ -629,13 +629,6 @@ export const generatePDF = async (
     const pageWidth = 210; // A4 width in mm
     const contentWidth = pageWidth - (marginX * 2);
     
-    // Logo personalizado no canto superior direito (PÁGINA 1)
-    if (themeOptions?.logo) {
-      await addLogoToPage(pdf, themeOptions.logo, pageWidth, marginY, false);
-    } else {
-      console.log('⚠️ Nenhum logo fornecido para o PDF');
-    }
-
     // Header com gradiente (simulando gradient com retângulos sobrepostos)
     const headerHeight = 25;
     
@@ -659,11 +652,17 @@ export const generatePDF = async (
     pdf.setFillColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
     pdf.rect(0, headerHeight, pageWidth, 4, 'F');
     
-    // Texto do header
+    // Logo APÓS o header para ficar na frente (PÁGINA 1)
+    if (themeOptions?.logo) {
+      await addLogoToPage(pdf, themeOptions.logo, pageWidth, marginY, true);
+    }
+    
+    // Texto do header - REMOVER "Demo" usando apenas "Fertilisolo"
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(16);
     pdf.setFont('helvetica', 'bold');
-    pdf.text(themeOptions?.organizationName || 'Fertilisolo', marginX, 15);
+    const orgName = (themeOptions?.organizationName || 'Fertilisolo').replace(/\s*Demo\s*/gi, '').trim();
+    pdf.text(orgName, marginX, 15);
     
     // Subtítulo
     pdf.setFontSize(10);
@@ -699,9 +698,9 @@ export const generatePDF = async (
       pdf.roundedRect(x, y, width, height, 3, 3, 'FD');
     };
     
-    // Seção 1: Layout de 3 Colunas (Y = 34) - larguras ajustadas
-    const colY = 34;
-    const colHeight = 50;
+    // Seção 1: Layout de 3 Colunas (Y = 40 para não sobrepor o header) - larguras ajustadas
+    const colY = 40;
+    const colHeight = 48;
     const col1Width = 52;
     const col2Width = 58;
     const col3Width = 52;
@@ -824,8 +823,8 @@ export const generatePDF = async (
 
     // ============ PÁGINA 1: RESUMO EXECUTIVO ============
     
-    // SEÇÃO 1: AÇÕES PRIORITÁRIAS (NOVO - topo da página)
-    let currentY = 90;
+    // SEÇÃO 1: AÇÕES PRIORITÁRIAS (após as 3 colunas)
+    let currentY = 95;
     
     // Card de Ações Prioritárias
     pdf.setFillColor(colors.warningBg[0], colors.warningBg[1], colors.warningBg[2]);
