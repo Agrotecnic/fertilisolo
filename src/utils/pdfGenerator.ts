@@ -852,8 +852,8 @@ export const generatePDF = async (
     };
     
     // ========== CARD 1: CORREÇÃO DE SOLO ==========
-    // Verificar se há espaço suficiente para o card (55 de altura + margem)
-    if (currentY > 230) { 
+    // Verificar se há espaço suficiente para o card (85 de altura + margem)
+    if (currentY > 200) { 
       pdf.addPage(); 
       currentY = 45; 
       // Re-adicionar logo no topo da nova página
@@ -863,14 +863,14 @@ export const generatePDF = async (
       currentY = 45;
     }
     
-    // Card background
+    // Card background (altura aumentada para mais linhas)
     pdf.setFillColor(252, 251, 245); // #fcfbf5 (creamSurface)
-    pdf.roundedRect(marginX, currentY, contentWidth, 55, 8, 8, 'F');
+    pdf.roundedRect(marginX, currentY, contentWidth, 85, 8, 8, 'F');
     
     // Border
     pdf.setDrawColor(94, 82, 64); // brown-600
     pdf.setLineWidth(0.3);
-    pdf.roundedRect(marginX, currentY, contentWidth, 55, 8, 8, 'S');
+    pdf.roundedRect(marginX, currentY, contentWidth, 85, 8, 8, 'S');
     
     // Título
     pdf.setFontSize(16);
@@ -884,13 +884,17 @@ export const generatePDF = async (
     pdf.setTextColor(107, 114, 128); // gray-500
     pdf.text('Correção da acidez do solo e fornecimento de Ca e Mg. Aplicar 60-90 dias antes do plantio.', marginX + 6, currentY + 14);
     
-    // Tabela
+    // Tabela (MAIS FONTES DE Ca E Mg)
     autoTable(pdf, {
       startY: currentY + 18,
       head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
       body: [
-        ['Calcário Dolomítico', '2.000', 'kg/ha', '', 'Pré-plantio'],
-        ['Calcário Calcítico', '1.800', 'kg/ha', '', 'Pré-plantio']
+        ['Calcário Dolomítico (Ca+Mg)', '2.000', 'kg/ha', '', 'Pré-plantio'],
+        ['Calcário Calcítico (Ca)', '1.800', 'kg/ha', '', 'Pré-plantio'],
+        ['Calcário Magnesiano (Ca+Mg)', '2.200', 'kg/ha', '', 'Pré-plantio'],
+        ['Gesso Agrícola (Ca+S)', '1.000', 'kg/ha', '', 'Pré-plantio'],
+        ['Sulfato de Magnésio (Mg+S)', '150', 'kg/ha', '', 'Pré-plantio'],
+        ['Cal Virgem (Ca)', '1.200', 'kg/ha', '', 'Pré-plantio']
       ],
       theme: 'plain',
       styles: {
