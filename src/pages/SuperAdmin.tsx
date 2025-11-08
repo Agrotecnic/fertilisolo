@@ -50,7 +50,7 @@ interface Organization {
 }
 
 export default function SuperAdmin() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -70,6 +70,11 @@ export default function SuperAdmin() {
 
   // Verificar acesso
   useEffect(() => {
+    // Esperar o carregamento do auth terminar
+    if (authLoading) {
+      return;
+    }
+
     if (!user) {
       navigate('/login');
       return;
@@ -88,7 +93,7 @@ export default function SuperAdmin() {
     setHasAccess(true);
     setLoading(false);
     loadOrganizations();
-  }, [user, navigate, toast]);
+  }, [user, authLoading, navigate, toast]);
 
   // Carregar organizações
   const loadOrganizations = async () => {
@@ -258,10 +263,13 @@ export default function SuperAdmin() {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+          <p className="text-sm text-muted-foreground">Verificando permissões...</p>
+        </div>
       </div>
     );
   }
