@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import ResetPassword from "./pages/ResetPassword";
 import AdminPanel from "./pages/AdminPanel";
+import SuperAdmin from "./pages/SuperAdmin";
 import { TechnicalMethodology } from "./pages/TechnicalMethodology";
 import { useAuth } from "./hooks/useAuth";
 import { AuthBox } from "./components/AuthBox";
@@ -114,6 +115,15 @@ const AppContent = () => {
           element={
             <ProtectedRoute>
               <AdminPanel />
+            </ProtectedRoute>
+          } 
+        />
+        {/* Rota de Super Admin: acesso exclusivo para deyvidrb@icloud.com */}
+        <Route 
+          path="/super-admin" 
+          element={
+            <ProtectedRoute>
+              <SuperAdmin />
             </ProtectedRoute>
           } 
         />

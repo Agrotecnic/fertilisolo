@@ -15,7 +15,7 @@ import { InviteLinkGenerator } from '@/components/admin/InviteLinkGenerator';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ArrowLeft, Settings, Palette, Image, Users, Shield, Link } from 'lucide-react';
+import { ArrowLeft, Settings, Palette, Image, Users, Shield, Link, Crown } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import { DynamicLogo } from '@/components/DynamicLogo';
 
@@ -25,6 +25,9 @@ export default function AdminPanel() {
   const { organizationId, organizationName, loading: themeLoading } = useTheme();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [checkingPermission, setCheckingPermission] = useState(true);
+  
+  // Verificar se é super admin
+  const isSuperAdmin = user?.email === 'deyvidrb@icloud.com';
 
   useEffect(() => {
     console.log('🎨 AdminPanel montado!');
@@ -127,6 +130,20 @@ export default function AdminPanel() {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Voltar ao Dashboard
               </Button>
+              
+              {/* Botão Super Admin - visível apenas para deyvidrb@icloud.com */}
+              {isSuperAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/super-admin')}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 border-0"
+                >
+                  <Crown className="h-4 w-4 mr-2" />
+                  Super Admin
+                </Button>
+              )}
+              
               <div className="flex items-center gap-3">
                 <div className="bg-white/20 p-3 rounded-full">
                   <Settings className="h-8 w-8" />
