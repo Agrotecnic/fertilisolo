@@ -98,16 +98,30 @@ export default function SuperAdmin() {
   // Carregar organizações
   const loadOrganizations = async () => {
     try {
+      console.log('🔍 Super Admin: Carregando organizações...');
+      
       const { data: orgs, error } = await supabase
         .from('organizations')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('📊 Organizações encontradas:', orgs?.length || 0);
+      console.log('📋 Dados:', orgs);
+      
+      if (error) {
+        console.error('❌ Erro ao buscar organizações:', error);
+        throw error;
+      }
+
+      if (!orgs || orgs.length === 0) {
+        console.warn('⚠️ Nenhuma organização encontrada - possível problema com RLS!');
+        setOrganizations([]);
+        return;
+      }
 
       // Buscar contagem de usuários para cada org
       const orgsWithCount = await Promise.all(
-        (orgs || []).map(async (org) => {
+        orgs.map(async (org) => {
           const { count } = await supabase
             .from('user_organizations')
             .select('*', { count: 'exact', head: true })
@@ -117,9 +131,10 @@ export default function SuperAdmin() {
         })
       );
 
+      console.log('✅ Organizações com contagem:', orgsWithCount);
       setOrganizations(orgsWithCount);
     } catch (error: any) {
-      console.error('Erro ao carregar organizações:', error);
+      console.error('❌ Erro ao carregar organizações:', error);
       toast({
         variant: 'destructive',
         title: 'Erro ao carregar organizações',
