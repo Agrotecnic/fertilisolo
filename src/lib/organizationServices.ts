@@ -48,9 +48,18 @@ export async function getUserOrganization() {
         )
       `)
       .eq('user_id', user.id)
+      .limit(1)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Erro ao buscar user_organization:', error);
+      throw error;
+    }
+
+    if (!data) {
+      console.warn('Usuário não pertence a nenhuma organização');
+      return { data: null, error: new Error('Usuário não pertence a nenhuma organização') };
+    }
     
     return { data, error: null };
   } catch (error: any) {
@@ -196,23 +205,39 @@ export async function getUserOrganizationTheme() {
       return { data: null, error: new Error('Usuário não autenticado') };
     }
 
-    // Buscar organização do usuário
+    // Buscar organização do usuário (maybeSingle para evitar erro se não houver)
     const { data: userOrg, error: userOrgError } = await supabase
       .from('user_organizations')
       .select('organization_id')
       .eq('user_id', user.id)
-      .single();
+      .limit(1)
+      .maybeSingle();
 
-    if (userOrgError) throw userOrgError;
+    if (userOrgError) {
+      console.error('Erro ao buscar user_organization:', userOrgError);
+      throw userOrgError;
+    }
+
+    if (!userOrg) {
+      return { data: null, error: new Error('Usuário não pertence a nenhuma organização') };
+    }
 
     // Buscar tema da organização
     const { data: theme, error: themeError } = await supabase
       .from('organization_themes')
       .select('*')
       .eq('organization_id', userOrg.organization_id)
-      .single();
+      .maybeSingle();
 
-    if (themeError) throw themeError;
+    if (themeError) {
+      console.error('Erro ao buscar theme:', themeError);
+      throw themeError;
+    }
+
+    if (!theme) {
+      console.warn('Tema não encontrado para organização:', userOrg.organization_id);
+      return { data: null, error: new Error('Tema não encontrado') };
+    }
     
     return { data: theme, error: null };
   } catch (error: any) {
