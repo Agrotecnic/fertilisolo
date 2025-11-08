@@ -71,7 +71,7 @@ export default function SuperAdmin() {
   // Verificar acesso
   useEffect(() => {
     if (!user) {
-      navigate('/auth');
+      navigate('/login');
       return;
     }
 
@@ -88,7 +88,7 @@ export default function SuperAdmin() {
     setHasAccess(true);
     setLoading(false);
     loadOrganizations();
-  }, [user, navigate]);
+  }, [user, navigate, toast]);
 
   // Carregar organizações
   const loadOrganizations = async () => {
