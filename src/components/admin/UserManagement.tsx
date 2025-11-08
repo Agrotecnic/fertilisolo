@@ -5,8 +5,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -22,21 +20,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, UserPlus, Trash2, Users, Shield } from 'lucide-react';
+import { Loader2, Trash2, Users, Shield } from 'lucide-react';
 import {
   getOrganizationMembers,
-  addOrganizationMember,
   removeOrganizationMember,
   updateMemberRole,
   UserRole,
@@ -49,6 +37,8 @@ interface Member {
   user_id: string;
   role: UserRole;
   created_at: string;
+  email?: string;
+  name?: string;
 }
 
 const roleLabels: Record<UserRole, string> = {
@@ -68,12 +58,6 @@ export function UserManagement() {
   const { toast } = useToast();
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [addingMember, setAddingMember] = useState(false);
-
-  // Form state
-  const [newUserEmail, setNewUserEmail] = useState('');
-  const [newUserRole, setNewUserRole] = useState<UserRole>('member');
 
   useEffect(() => {
     if (organizationId) {
@@ -100,37 +84,6 @@ export function UserManagement() {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleAddMember = async () => {
-    if (!organizationId || !newUserEmail) return;
-
-    setAddingMember(true);
-    try {
-      // Nota: Esta é uma versão simplificada. Em produção, você precisaria:
-      // 1. Validar se o email existe no sistema
-      // 2. Enviar um convite por email
-      // 3. Aguardar aceitação do convite
-
-      // Por enquanto, vamos apenas mostrar um aviso
-      toast({
-        title: 'Funcionalidade em desenvolvimento',
-        description: 'O sistema de convites ainda não está implementado. Por enquanto, os usuários precisam ser adicionados manualmente no banco de dados.',
-      });
-
-      setDialogOpen(false);
-      setNewUserEmail('');
-      setNewUserRole('member');
-    } catch (error: any) {
-      console.error('Erro ao adicionar membro:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao adicionar membro',
-        description: error.message,
-      });
-    } finally {
-      setAddingMember(false);
     }
   };
 
@@ -181,76 +134,12 @@ export function UserManagement() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-primary" />
-            <CardTitle className="text-gray-900">Gerenciamento de Usuários</CardTitle>
-          </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <UserPlus className="h-4 w-4 mr-2" />
-                Adicionar Usuário
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Adicionar Novo Usuário</DialogTitle>
-                <DialogDescription>
-                  Convide um usuário para fazer parte da sua organização
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email do Usuário</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="usuario@exemplo.com"
-                    value={newUserEmail}
-                    onChange={(e) => setNewUserEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role">Função</Label>
-                  <Select
-                    value={newUserRole}
-                    onValueChange={(value) => setNewUserRole(value as UserRole)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="member">Membro</SelectItem>
-                      <SelectItem value="admin">Administrador</SelectItem>
-                      <SelectItem value="owner">Proprietário</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">
-                    <strong>Membro:</strong> Acesso básico à aplicação<br />
-                    <strong>Admin:</strong> Pode gerenciar usuários e tema<br />
-                    <strong>Owner:</strong> Controle total da organização
-                  </p>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setDialogOpen(false)}
-                  disabled={addingMember}
-                >
-                  Cancelar
-                </Button>
-                <Button onClick={handleAddMember} disabled={addingMember || !newUserEmail}>
-                  {addingMember && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Adicionar
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+        <div className="flex items-center gap-2">
+          <Users className="h-5 w-5 text-primary" />
+          <CardTitle className="text-gray-900">Gerenciamento de Usuários</CardTitle>
         </div>
         <CardDescription className="text-gray-700 font-medium">
-          Gerencie os usuários que têm acesso à sua organização
+          Gerencie os usuários que têm acesso à sua organização. Para adicionar novos usuários, utilize a aba "Convites".
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -270,7 +159,8 @@ export function UserManagement() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-gray-900 font-semibold">ID do Usuário</TableHead>
+                  <TableHead className="text-gray-900 font-semibold">Nome</TableHead>
+                  <TableHead className="text-gray-900 font-semibold">Email</TableHead>
                   <TableHead className="text-gray-900 font-semibold">Função</TableHead>
                   <TableHead className="text-gray-900 font-semibold">Data de Adição</TableHead>
                   <TableHead className="text-right text-gray-900 font-semibold">Ações</TableHead>
@@ -279,8 +169,11 @@ export function UserManagement() {
               <TableBody>
                 {members.map((member) => (
                   <TableRow key={member.id}>
-                    <TableCell className="font-mono text-sm text-gray-900">
-                      {member.user_id.substring(0, 8)}...
+                    <TableCell className="text-gray-900 font-medium">
+                      {member.name || 'Nome não disponível'}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm">
+                      {member.email || 'Email não disponível'}
                     </TableCell>
                     <TableCell>
                       <Badge variant={roleBadgeVariants[member.role]}>
@@ -323,9 +216,7 @@ export function UserManagement() {
 
         <Alert className="mt-4">
           <AlertDescription className="text-sm">
-            <strong>Nota:</strong> O sistema de convites por email ainda está em desenvolvimento.
-            Por enquanto, os usuários precisam ser adicionados manualmente através do banco de dados
-            ou podem se cadastrar normalmente e serem associados à organização posteriormente.
+            <strong>Nota:</strong> Para adicionar novos usuários à organização, utilize a aba <strong>"Convites"</strong> para gerar links de convite que podem ser compartilhados com os novos membros.
           </AlertDescription>
         </Alert>
       </CardContent>

@@ -296,10 +296,24 @@ export async function createOrganizationTheme(
 // ============================================
 
 /**
- * Busca todos os membros de uma organização
+ * Busca todos os membros de uma organização com informações do usuário
+ * Nota: Como não temos acesso direto ao auth.users no client-side,
+ * vamos usar uma função RPC ou buscar informações de uma tabela auxiliar
  */
 export async function getOrganizationMembers(organizationId: string) {
   try {
+    // Primeiro, tentar usar uma RPC function se existir
+    const { data: rpcData, error: rpcError } = await supabase
+      .rpc('get_organization_members_with_details', { 
+        org_id: organizationId 
+      });
+    
+    // Se a RPC existir e funcionar, retornar os dados
+    if (!rpcError && rpcData) {
+      return { data: rpcData, error: null };
+    }
+    
+    // Fallback: buscar dados básicos e usar o user_id como identificador
     const { data, error } = await supabase
       .from('user_organizations')
       .select(`
@@ -311,6 +325,34 @@ export async function getOrganizationMembers(organizationId: string) {
       .eq('organization_id', organizationId);
 
     if (error) throw error;
+    
+    // Para cada membro, tentar buscar email do usuário atual se for ele mesmo
+    if (data && data.length > 0) {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      
+      const membersWithInfo = data.map((member) => {
+        // Se for o usuário atual, podemos pegar o email dele
+        if (currentUser && member.user_id === currentUser.id) {
+          return {
+            ...member,
+            email: currentUser.email || 'Email não disponível',
+            name: currentUser.user_metadata?.full_name || 
+                  currentUser.user_metadata?.name || 
+                  currentUser.email?.split('@')[0] || 
+                  'Usuário'
+          };
+        }
+        
+        // Para outros usuários, retornar com ID parcial como fallback
+        return {
+          ...member,
+          email: `ID: ${member.user_id.substring(0, 8)}...`,
+          name: `Usuário ${member.user_id.substring(0, 8)}`
+        };
+      });
+      
+      return { data: membersWithInfo, error: null };
+    }
     
     return { data, error: null };
   } catch (error: any) {
