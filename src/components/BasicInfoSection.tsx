@@ -73,17 +73,17 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
 }) => {
   return (
     <Card className="bg-gray-50 border-gray-200">
-      <CardHeader className="pb-1 pt-3 px-3">
-        <CardTitle className="text-gray-800 text-sm">Informações Básicas</CardTitle>
-        <CardDescription className="text-gray-600 text-xs">Dados gerais da análise</CardDescription>
+      <CardHeader className="pb-1 pt-2 md:pt-3 px-2 md:px-3">
+        <CardTitle className="text-gray-800 text-xs md:text-sm">Informações Básicas</CardTitle>
+        <CardDescription className="text-gray-600 text-[10px] md:text-xs">Dados gerais da análise</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-2 px-3 pb-3">
+      <CardContent className="space-y-2 px-2 md:px-3 pb-2 md:pb-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <div>
             <Label htmlFor="location" className="text-gray-700 text-xs font-medium">
               Nome do Talhão *
               {isAutoFilled && (
-                <span className="ml-2 text-green-600 text-xs">✓ Preenchido automaticamente</span>
+                <span className="ml-2 text-green-600 text-[10px] md:text-xs">✓ Preenchido automaticamente</span>
               )}
             </Label>
             <Input
@@ -91,15 +91,15 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
               value={location}
               onChange={(e) => onLocationChange(e.target.value)}
               placeholder="Ex: Talhão 1A, Área Norte"
-              className={`h-7 text-xs text-gray-800 ${errors.location ? 'border-red-500' : isAutoFilled ? 'border-green-500 bg-green-50' : ''}`}
+              className={`h-8 md:h-7 text-xs text-gray-800 ${errors.location ? 'border-red-500' : isAutoFilled ? 'border-green-500 bg-green-50' : ''}`}
             />
-            {errors.location && <span className="text-red-500 text-xs">{errors.location}</span>}
+            {errors.location && <span className="text-red-500 text-[10px] md:text-xs">{errors.location}</span>}
           </div>
           
           <div>
             <Label htmlFor="crop" className="text-gray-700 text-xs font-medium">Cultura *</Label>
             <Select value={crop} onValueChange={onCropChange}>
-              <SelectTrigger className={`h-7 text-xs text-gray-800 ${errors.crop ? 'border-red-500' : ''}`}>
+              <SelectTrigger className={`h-8 md:h-7 text-xs text-gray-800 ${errors.crop ? 'border-red-500' : ''}`}>
                 <SelectValue placeholder="Selecione a cultura" className="text-gray-800" />
               </SelectTrigger>
               <SelectContent>
@@ -110,7 +110,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
                 ))}
               </SelectContent>
             </Select>
-            {errors.crop && <span className="text-red-500 text-xs">{errors.crop}</span>}
+            {errors.crop && <span className="text-red-500 text-[10px] md:text-xs">{errors.crop}</span>}
           </div>
         </div>
 
@@ -123,9 +123,9 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
                 type="date"
                 value={date || new Date().toISOString().split('T')[0]}
                 onChange={(e) => onDateChange(e.target.value)}
-                className="h-7 text-xs text-gray-800"
+                className="h-8 md:h-7 text-xs text-gray-800"
               />
-              {errors.date && <span className="text-red-500 text-xs">{errors.date}</span>}
+              {errors.date && <span className="text-red-500 text-[10px] md:text-xs">{errors.date}</span>}
             </div>
           )}
 
@@ -140,10 +140,10 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
                 value={targetYield !== undefined && targetYield !== null && targetYield !== '' ? targetYield : ''}
                 onChange={(e) => onTargetYieldChange(e.target.value === '' ? undefined : Number(e.target.value))}
                 placeholder="4.0"
-                className="h-7 text-xs text-gray-800"
+                className="h-8 md:h-7 text-xs text-gray-800"
                 onFocus={(e) => e.target.select()}
               />
-              <p className="text-xs text-gray-500 mt-1">Produtividade esperada em toneladas por hectare</p>
+              <p className="text-[10px] md:text-xs text-gray-500 mt-1">Produtividade esperada em toneladas por hectare</p>
             </div>
           )}
         </div>

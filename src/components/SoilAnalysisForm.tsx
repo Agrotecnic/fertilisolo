@@ -305,234 +305,66 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
       </div>
 
       {/* Macronutrientes Secundários e Argila */}
-      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-800 mb-3">Macronutrientes Secundários e Argila</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Enxofre (S) */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="S" className="text-sm font-medium text-gray-700">Enxofre (S)</Label>
-              <UnitSelector
-                nutrient="S"
-                selectedUnit={selectedUnits.S || 'mg_dm3'}
-                onUnitChange={(unit) => handleUnitChange('S', unit)}
-                className="w-20"
-              />
-            </div>
-            <FormattedInput
-              value={formData.S}
-              onChange={(value) => handleInputChange('S', value)}
-              placeholder="0,00"
-              className="h-10 text-sm text-gray-800 border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-500"
-            />
-            {errors.S && <p className="text-sm text-red-500">{errors.S}</p>}
-            <p className="text-xs text-gray-500">{getUnitLabel('S', selectedUnits.S || 'mg_dm3')}</p>
-          </div>
-
-          {/* Argila */}
-          <div className="space-y-2">
-            <Label htmlFor="argila" className="text-sm font-medium text-gray-700">Argila (%)</Label>
-            <Input 
-              id="argila" 
-              type="number" 
-              step="0.1"
-              min="0"
-              max="100"
-              placeholder="Ex: 35"
-              value={formData.argila || 35}
-              onChange={(e) => handleInputChange('argila', parseFloat(e.target.value) || 0)}
-              className="h-10"
-            />
-            {errors.argila && <p className="text-sm text-red-500">{errors.argila}</p>}
-            <p className="text-xs text-gray-500">% de argila no solo</p>
-          </div>
-
-          {/* Matéria Orgânica */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="organicMatter" className="text-sm font-medium text-gray-700">Matéria Orgânica</Label>
-              <UnitSelector
-                nutrient="organicMatter"
-                selectedUnit={selectedUnits.organicMatter || 'percent'}
-                onUnitChange={(unit) => handleUnitChange('organicMatter', unit)}
-                className="w-20"
-              />
-            </div>
-            <FormattedInput
-              value={formData.organicMatter}
-              onChange={(value) => handleInputChange('organicMatter', value)}
-              placeholder="0,00"
-              className="h-10 text-sm text-gray-800 border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-500"
-            />
-            {errors.organicMatter && <p className="text-sm text-red-500">{errors.organicMatter}</p>}
-            <p className="text-xs text-gray-500">{getUnitLabel('organicMatter', selectedUnits.organicMatter || 'percent')}</p>
-          </div>
+      <div className="bg-gray-50 p-3 md:p-4 rounded-lg border border-gray-200">
+        <h3 className="text-xs md:text-sm font-semibold text-gray-800 mb-3">Macronutrientes Secundários e Argila</h3>
+        <SecondaryMacronutrientsSection
+          S={formData.S}
+          organicMatter={formData.organicMatter}
+          onSChange={(value) => handleInputChange('S', value)}
+          onOrganicMatterChange={(value) => handleInputChange('organicMatter', value)}
+          errors={errors}
+          selectedUnits={selectedUnits}
+          onUnitChange={handleUnitChange}
+        />
+        {/* Argila */}
+        <div className="mt-3 md:mt-4 space-y-2">
+          <Label htmlFor="argila" className="text-xs md:text-sm font-medium text-gray-700">Argila (%)</Label>
+          <Input 
+            id="argila" 
+            type="number" 
+            step="0.1"
+            min="0"
+            max="100"
+            placeholder="Ex: 35"
+            value={formData.argila || 35}
+            onChange={(e) => handleInputChange('argila', parseFloat(e.target.value) || 0)}
+            className="h-9 md:h-10 text-xs md:text-sm"
+          />
+          {errors.argila && <p className="text-xs md:text-sm text-red-500">{errors.argila}</p>}
+          <p className="text-[10px] md:text-xs text-gray-500">% de argila no solo</p>
         </div>
       </div>
 
       {/* Micronutrientes */}
-      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-800 mb-3">Micronutrientes</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {/* Boro (B) */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="B" className="text-sm font-medium text-gray-700">Boro (B)</Label>
-              <UnitSelector
-                nutrient="B"
-                selectedUnit={selectedUnits.B || 'mg_dm3'}
-                onUnitChange={(unit) => handleUnitChange('B', unit)}
-                className="w-20"
-              />
-            </div>
-            <Input 
-              id="B" 
-              type="number" 
-              step="0.01"
-              min="0"
-              placeholder="0,00"
-              value={formData.B}
-              onChange={(e) => handleInputChange('B', parseFloat(e.target.value) || 0)}
-              className="h-10"
-            />
-            {errors.B && <p className="text-sm text-red-500">{errors.B}</p>}
-            <p className="text-xs text-gray-500">{getUnitLabel('B', selectedUnits.B || 'mg_dm3')}</p>
-          </div>
-
-          {/* Cobre (Cu) */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="Cu" className="text-sm font-medium text-gray-700">Cobre (Cu)</Label>
-              <UnitSelector
-                nutrient="Cu"
-                selectedUnit={selectedUnits.Cu || 'mg_dm3'}
-                onUnitChange={(unit) => handleUnitChange('Cu', unit)}
-                className="w-20"
-              />
-            </div>
-            <Input 
-              id="Cu" 
-              type="number" 
-              step="0.01"
-              min="0"
-              placeholder="0,00"
-              value={formData.Cu}
-              onChange={(e) => handleInputChange('Cu', parseFloat(e.target.value) || 0)}
-              className="h-10"
-            />
-            {errors.Cu && <p className="text-sm text-red-500">{errors.Cu}</p>}
-            <p className="text-xs text-gray-500">{getUnitLabel('Cu', selectedUnits.Cu || 'mg_dm3')}</p>
-          </div>
-
-          {/* Ferro (Fe) */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="Fe" className="text-sm font-medium text-gray-700">Ferro (Fe)</Label>
-              <UnitSelector
-                nutrient="Fe"
-                selectedUnit={selectedUnits.Fe || 'mg_dm3'}
-                onUnitChange={(unit) => handleUnitChange('Fe', unit)}
-                className="w-20"
-              />
-            </div>
-            <Input 
-              id="Fe" 
-              type="number" 
-              step="0.01"
-              min="0"
-              placeholder="0,00"
-              value={formData.Fe}
-              onChange={(e) => handleInputChange('Fe', parseFloat(e.target.value) || 0)}
-              className="h-10"
-            />
-            {errors.Fe && <p className="text-sm text-red-500">{errors.Fe}</p>}
-            <p className="text-xs text-gray-500">{getUnitLabel('Fe', selectedUnits.Fe || 'mg_dm3')}</p>
-          </div>
-
-          {/* Manganês (Mn) */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="Mn" className="text-sm font-medium text-gray-700">Manganês (Mn)</Label>
-              <UnitSelector
-                nutrient="Mn"
-                selectedUnit={selectedUnits.Mn || 'mg_dm3'}
-                onUnitChange={(unit) => handleUnitChange('Mn', unit)}
-                className="w-20"
-              />
-            </div>
-            <Input 
-              id="Mn" 
-              type="number" 
-              step="0.01"
-              min="0"
-              placeholder="0,00"
-              value={formData.Mn}
-              onChange={(e) => handleInputChange('Mn', parseFloat(e.target.value) || 0)}
-              className="h-10"
-            />
-            {errors.Mn && <p className="text-sm text-red-500">{errors.Mn}</p>}
-            <p className="text-xs text-gray-500">{getUnitLabel('Mn', selectedUnits.Mn || 'mg_dm3')}</p>
-          </div>
-
-          {/* Zinco (Zn) */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="Zn" className="text-sm font-medium text-gray-700">Zinco (Zn)</Label>
-              <UnitSelector
-                nutrient="Zn"
-                selectedUnit={selectedUnits.Zn || 'mg_dm3'}
-                onUnitChange={(unit) => handleUnitChange('Zn', unit)}
-                className="w-20"
-              />
-            </div>
-            <Input 
-              id="Zn" 
-              type="number" 
-              step="0.01"
-              min="0"
-              placeholder="0,00"
-              value={formData.Zn}
-              onChange={(e) => handleInputChange('Zn', parseFloat(e.target.value) || 0)}
-              className="h-10"
-            />
-            {errors.Zn && <p className="text-sm text-red-500">{errors.Zn}</p>}
-            <p className="text-xs text-gray-500">{getUnitLabel('Zn', selectedUnits.Zn || 'mg_dm3')}</p>
-          </div>
-
-          {/* Molibdênio (Mo) */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="Mo" className="text-sm font-medium text-gray-700">Molibdênio (Mo)</Label>
-              <UnitSelector
-                nutrient="Mo"
-                selectedUnit={selectedUnits.Mo || 'mg_dm3'}
-                onUnitChange={(unit) => handleUnitChange('Mo', unit)}
-                className="w-20"
-              />
-            </div>
-            <Input 
-              id="Mo" 
-              type="number" 
-              step="0.01"
-              min="0"
-              placeholder="0,00"
-              value={formData.Mo}
-              onChange={(e) => handleInputChange('Mo', parseFloat(e.target.value) || 0)}
-              className="h-10"
-            />
-            {errors.Mo && <p className="text-sm text-red-500">{errors.Mo}</p>}
-            <p className="text-xs text-gray-500">{getUnitLabel('Mo', selectedUnits.Mo || 'mg_dm3')}</p>
-          </div>
-        </div>
+      <div className="bg-gray-50 p-3 md:p-4 rounded-lg border border-gray-200">
+        <h3 className="text-xs md:text-sm font-semibold text-gray-800 mb-3">Micronutrientes</h3>
+        <MicronutrientsSection
+          B={formData.B}
+          Cu={formData.Cu}
+          Fe={formData.Fe}
+          Mn={formData.Mn}
+          Zn={formData.Zn}
+          Mo={formData.Mo}
+          onBChange={(value) => handleInputChange('B', value)}
+          onCuChange={(value) => handleInputChange('Cu', value)}
+          onFeChange={(value) => handleInputChange('Fe', value)}
+          onMnChange={(value) => handleInputChange('Mn', value)}
+          onZnChange={(value) => handleInputChange('Zn', value)}
+          onMoChange={(value) => handleInputChange('Mo', value)}
+          errors={errors}
+          selectedUnits={selectedUnits}
+          onUnitChange={handleUnitChange}
+        />
       </div>
 
-      <div className="flex justify-center pt-4">
+      <div className="flex justify-center pt-4 md:pt-6">
         <Button 
           type="submit" 
           size="lg"
-          className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-base font-medium"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground w-full md:w-auto px-4 md:px-8 py-3 text-sm md:text-base font-medium"
         >
-          Calcular Saturações e Recomendações
+          <span className="block md:inline">Calcular Saturações e</span>
+          <span className="block md:inline md:ml-1">Recomendações</span>
         </Button>
       </div>
     </form>

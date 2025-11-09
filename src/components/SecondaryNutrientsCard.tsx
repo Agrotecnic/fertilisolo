@@ -22,7 +22,7 @@ export const SecondaryNutrientsCard: React.FC<SecondaryNutrientsCardProps> = ({ 
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
       <Card className="bg-white/80 backdrop-blur-sm border-green-200">
         <CardHeader className="pb-2">
           <CardTitle className="text-green-800 flex items-center gap-2">

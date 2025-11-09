@@ -18,7 +18,7 @@ export const NeedsCard: React.FC<NeedsCardProps> = ({ results }) => {
         <CardDescription className="text-neutral-medium">Quantidades necessárias para atingir os níveis ideais</CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="text-center p-3 rounded-lg border border-border bg-bg-lighter shadow-sm">
             <div className="text-xl font-bold text-primary mb-1">
               {formatNumber(results.needs.Ca, 2)}

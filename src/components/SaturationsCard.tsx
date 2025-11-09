@@ -33,7 +33,7 @@ export const SaturationsCard: React.FC<SaturationsCardProps> = ({ soilData, resu
         <CardDescription className="text-neutral-medium">Porcentagem de cada nutriente em relação à CTC</CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-4">
           {/* Cálcio */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
