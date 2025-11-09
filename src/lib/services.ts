@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { SoilData } from '../types/soilAnalysis';
+import { getSecurityContext, addOrganizationIdToData, validateResourceOwnership } from './securityHelpers';
 
 // Interface para fazendas
 export interface Farm {
@@ -106,25 +107,33 @@ export const convertDBToSoilDataFormat = (data: SoilAnalysisDB): SoilData => {
 
 /**
  * Salva uma nova fazenda no Supabase
+ * Usa securityHelpers para garantir isolamento por organização
  */
 export const saveFarm = async (farm: Farm) => {
   try {
-    // Verificar se o usuário está autenticado
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) {
-      throw new Error('Usuário não autenticado');
+    // Obter contexto de segurança
+    const validation = await getSecurityContext();
+    if (!validation.isValid || !validation.context) {
+      return { 
+        data: null, 
+        error: validation.error || 'Erro de autenticação' 
+      };
     }
 
-    // Adicionar o ID do usuário à fazenda
-    const farmWithUserId = {
+    // Adicionar organization_id automaticamente usando helper
+    const { data: secureData, error: secureError } = await addOrganizationIdToData({
       ...farm,
-      user_id: session.user.id
-    };
+      user_id: validation.context.userId
+    });
+
+    if (secureError || !secureData) {
+      return { data: null, error: secureError || 'Erro ao preparar dados' };
+    }
 
     // Inserir a fazenda no banco de dados
     const { data, error } = await supabase
       .from('farms')
-      .insert(farmWithUserId)
+      .insert(secureData)
       .select();
 
     if (error) throw error;
@@ -138,20 +147,24 @@ export const saveFarm = async (farm: Farm) => {
 
 /**
  * Busca todas as fazendas do usuário logado
+ * Usa securityHelpers para garantir isolamento por organização
  */
 export const getUserFarms = async () => {
   try {
-    // Verificar se o usuário está autenticado
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) {
-      throw new Error('Usuário não autenticado');
+    // Obter contexto de segurança
+    const validation = await getSecurityContext();
+    if (!validation.isValid || !validation.context) {
+      return { 
+        data: [], 
+        error: validation.error || 'Erro de autenticação' 
+      };
     }
 
-    // Buscar fazendas do usuário
+    // Buscar fazendas da organização do usuário
     const { data, error } = await supabase
       .from('farms')
       .select('*')
-      .eq('user_id', session.user.id);
+      .eq('organization_id', validation.context.organizationId);
 
     if (error) throw error;
     
@@ -164,19 +177,30 @@ export const getUserFarms = async () => {
 
 /**
  * Salva um novo talhão/parcela no Supabase
+ * Usa securityHelpers para garantir isolamento por organização
  */
 export const savePlot = async (plot: Plot) => {
   try {
-    // Verificar se o usuário está autenticado
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) {
-      throw new Error('Usuário não autenticado');
+    // Obter contexto de segurança
+    const validation = await getSecurityContext();
+    if (!validation.isValid || !validation.context) {
+      return { 
+        data: null, 
+        error: validation.error || 'Erro de autenticação' 
+      };
+    }
+
+    // Adicionar organization_id automaticamente usando helper
+    const { data: secureData, error: secureError } = await addOrganizationIdToData(plot);
+
+    if (secureError || !secureData) {
+      return { data: null, error: secureError || 'Erro ao preparar dados' };
     }
 
     // Inserir o talhão no banco de dados
     const { data, error } = await supabase
       .from('plots')
-      .insert(plot)
+      .insert(secureData)
       .select();
 
     if (error) throw error;
@@ -190,20 +214,25 @@ export const savePlot = async (plot: Plot) => {
 
 /**
  * Busca todos os talhões de uma fazenda
+ * Usa securityHelpers para garantir isolamento por organização
  */
 export const getFarmPlots = async (farmId: string) => {
   try {
-    // Verificar se o usuário está autenticado
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) {
-      throw new Error('Usuário não autenticado');
+    // Obter contexto de segurança
+    const validation = await getSecurityContext();
+    if (!validation.isValid || !validation.context) {
+      return { 
+        data: [], 
+        error: validation.error || 'Erro de autenticação' 
+      };
     }
 
-    // Buscar talhões da fazenda
+    // Buscar talhões da fazenda, garantindo que pertencem à organização do usuário
     const { data, error } = await supabase
       .from('plots')
       .select('*')
-      .eq('farm_id', farmId);
+      .eq('farm_id', farmId)
+      .eq('organization_id', validation.context.organizationId);
 
     if (error) throw error;
     
@@ -216,33 +245,49 @@ export const getFarmPlots = async (farmId: string) => {
 
 /**
  * Salva uma análise de solo no Supabase
+ * Usa securityHelpers para garantir isolamento por organização
  */
 export const saveSoilAnalysis = async (analysis: SoilData, plotId?: string) => {
   try {
     console.log('🔍 [SAVE] Iniciando salvamento de análise...');
     
-    // Verificar se o usuário está autenticado
-    const { data: { session } } = await supabase.auth.getSession();
-    console.log('🔍 [SAVE] Session:', session ? 'Existe' : 'NULL', 'User ID:', session?.user?.id);
-    
-    if (!session?.user) {
-      throw new Error('Usuário não autenticado');
+    // Obter contexto de segurança
+    const validation = await getSecurityContext();
+    if (!validation.isValid || !validation.context) {
+      return { 
+        data: null, 
+        error: validation.error || 'Erro de autenticação' 
+      };
     }
+
+    console.log('🔍 [SAVE] Contexto de segurança obtido:', {
+      userId: validation.context.userId,
+      organizationId: validation.context.organizationId
+    });
 
     // Verificar se plotId é válido (não vazio)
     const validPlotId = plotId && plotId.trim() !== '' ? plotId : null;
     console.log('🔍 [SAVE] Plot ID:', validPlotId);
 
     // Converter para o formato do banco
-    const analysisDB = convertSoilDataToDBFormat(analysis, session.user.id, validPlotId);
+    const analysisDB = convertSoilDataToDBFormat(analysis, validation.context.userId, validPlotId);
+    
+    // Adicionar organization_id automaticamente usando helper
+    const { data: secureData, error: secureError } = await addOrganizationIdToData(analysisDB);
+    
+    if (secureError || !secureData) {
+      return { data: null, error: secureError || 'Erro ao preparar dados' };
+    }
+
     console.log('🔍 [SAVE] Dados convertidos para DB:', {
-      user_id: analysisDB.user_id,
-      location: analysisDB.location,
-      collection_date: analysisDB.collection_date,
+      user_id: secureData.user_id,
+      organization_id: secureData.organization_id,
+      location: secureData.location,
+      collection_date: secureData.collection_date,
       hasValues: {
-        Ca: !!analysisDB.calcium,
-        Mg: !!analysisDB.magnesium,
-        K: !!analysisDB.potassium
+        Ca: !!secureData.calcium,
+        Mg: !!secureData.magnesium,
+        K: !!secureData.potassium
       }
     });
 
@@ -250,7 +295,7 @@ export const saveSoilAnalysis = async (analysis: SoilData, plotId?: string) => {
     console.log('🔍 [SAVE] Tentando inserir no Supabase...');
     const { data, error } = await supabase
       .from('soil_analyses')
-      .insert(analysisDB)
+      .insert(secureData)
       .select();
 
     if (error) {
@@ -274,20 +319,24 @@ export const saveSoilAnalysis = async (analysis: SoilData, plotId?: string) => {
 
 /**
  * Busca as análises de solo do usuário
+ * Usa securityHelpers para garantir isolamento por organização
  */
 export const getUserSoilAnalyses = async () => {
   try {
-    // Verificar se o usuário está autenticado
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) {
-      throw new Error('Usuário não autenticado');
+    // Obter contexto de segurança
+    const validation = await getSecurityContext();
+    if (!validation.isValid || !validation.context) {
+      return { 
+        data: [], 
+        error: validation.error || 'Erro de autenticação' 
+      };
     }
 
-    // Buscar análises do usuário
+    // Buscar análises da organização do usuário
     const { data, error } = await supabase
       .from('soil_analyses')
       .select('*')
-      .eq('user_id', session.user.id);
+      .eq('organization_id', validation.context.organizationId);
 
     if (error) throw error;
     
@@ -309,19 +358,56 @@ export const getUserSoilAnalyses = async () => {
 
 /**
  * Salva uma recomendação de fertilizante no Supabase
+ * Usa securityHelpers para garantir isolamento por organização
  */
 export const saveFertilizerRecommendation = async (recommendation: FertilizerRecommendation) => {
   try {
-    // Verificar se o usuário está autenticado
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) {
-      throw new Error('Usuário não autenticado');
+    // Obter contexto de segurança
+    const validation = await getSecurityContext();
+    if (!validation.isValid || !validation.context) {
+      return { 
+        data: null, 
+        error: validation.error || 'Erro de autenticação' 
+      };
     }
+
+    // Verificar se a análise de solo pertence à organização do usuário
+    const { data: analysis, error: fetchError } = await supabase
+      .from('soil_analyses')
+      .select('organization_id')
+      .eq('id', recommendation.soil_analysis_id)
+      .single();
+
+    if (fetchError || !analysis) {
+      return { 
+        data: null, 
+        error: fetchError?.message || 'Análise de solo não encontrada' 
+      };
+    }
+
+    // Validar que a análise pertence à organização do usuário
+    const isValid = await validateResourceOwnership(analysis.organization_id);
+    if (!isValid) {
+      return { 
+        data: null, 
+        error: 'Análise de solo não pertence à sua organização' 
+      };
+    }
+
+    // Adicionar organization_id à recomendação usando helper
+    const { data: secureData, error: secureError } = await addOrganizationIdToData(recommendation);
+
+    if (secureError || !secureData) {
+      return { data: null, error: secureError || 'Erro ao preparar dados' };
+    }
+
+    // Garantir que o organization_id seja o mesmo da análise
+    secureData.organization_id = analysis.organization_id;
 
     // Inserir recomendação no banco de dados
     const { data, error } = await supabase
       .from('fertilizer_recommendations')
-      .insert(recommendation)
+      .insert(secureData)
       .select();
 
     if (error) throw error;
@@ -335,13 +421,40 @@ export const saveFertilizerRecommendation = async (recommendation: FertilizerRec
 
 /**
  * Deleta uma análise de solo do Supabase pelo ID
+ * Usa securityHelpers para garantir isolamento por organização
  */
 export const deleteSoilAnalysis = async (analysisId: string) => {
   try {
-    // Verificar se o usuário está autenticado
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) {
-      throw new Error('Usuário não autenticado');
+    // Obter contexto de segurança
+    const validation = await getSecurityContext();
+    if (!validation.isValid || !validation.context) {
+      return { 
+        success: false, 
+        error: validation.error || 'Erro de autenticação' 
+      };
+    }
+
+    // Primeiro, buscar a análise para verificar se pertence à organização do usuário
+    const { data: analysis, error: fetchError } = await supabase
+      .from('soil_analyses')
+      .select('organization_id')
+      .eq('id', analysisId)
+      .single();
+
+    if (fetchError || !analysis) {
+      return { 
+        success: false, 
+        error: fetchError?.message || 'Análise não encontrada' 
+      };
+    }
+
+    // Validar que a análise pertence à organização do usuário
+    const isValid = await validateResourceOwnership(analysis.organization_id);
+    if (!isValid) {
+      return { 
+        success: false, 
+        error: 'Análise não pertence à sua organização' 
+      };
     }
 
     // Deletar a análise
@@ -349,7 +462,7 @@ export const deleteSoilAnalysis = async (analysisId: string) => {
       .from('soil_analyses')
       .delete()
       .eq('id', analysisId)
-      .eq('user_id', session.user.id); // Garantir que a análise pertence ao usuário
+      .eq('organization_id', validation.context.organizationId);
 
     if (error) throw error;
     

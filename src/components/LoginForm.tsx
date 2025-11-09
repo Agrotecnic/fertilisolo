@@ -13,6 +13,8 @@ import { SUPABASE_URL } from '@/lib/env';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ForgotPasswordForm } from './ForgotPasswordForm';
 import { DynamicLogo } from '@/components/DynamicLogo';
+import { checkRateLimit, clearRateLimit, formatRateLimitError } from '@/utils/rateLimiting';
+import { sanitizeEmail } from '@/utils/validators';
 
 const formSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -58,14 +60,34 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onCreateAc
       return;
     }
 
+    // Sanitizar email
+    const sanitizedEmail = sanitizeEmail(data.email);
+    
+    // Verificar rate limiting
+    const rateLimitResult = checkRateLimit('login', sanitizedEmail);
+    if (!rateLimitResult.allowed) {
+      toast({
+        variant: 'destructive',
+        title: 'Muitas tentativas',
+        description: formatRateLimitError(rateLimitResult),
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email: data.email,
+        email: sanitizedEmail,
         password: data.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Se erro de autenticação, já foi registrado no rate limit acima
+        throw error;
+      }
+      
+      // Limpar rate limit em caso de sucesso
+      clearRateLimit('login', sanitizedEmail);
       
       onLoginSuccess();
       toast({

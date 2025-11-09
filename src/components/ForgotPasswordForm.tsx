@@ -10,6 +10,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { AlertCircle, Loader2, ArrowLeft } from 'lucide-react';
 import { sendPasswordResetEmail } from '@/lib/custom-email-handler';
 import { DynamicLogo } from '@/components/DynamicLogo';
+import { checkRateLimit, formatRateLimitError } from '@/utils/rateLimiting';
+import { sanitizeEmail } from '@/utils/validators';
 
 const formSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -30,9 +32,23 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
   });
 
   const onSubmit = async (data: FormData) => {
+    // Sanitizar email
+    const sanitizedEmail = sanitizeEmail(data.email);
+    
+    // Verificar rate limiting
+    const rateLimitResult = checkRateLimit('passwordReset', sanitizedEmail);
+    if (!rateLimitResult.allowed) {
+      toast({
+        variant: 'destructive',
+        title: 'Muitas tentativas',
+        description: formatRateLimitError(rateLimitResult),
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const result = await sendPasswordResetEmail(data.email);
+      const result = await sendPasswordResetEmail(sanitizedEmail);
 
       if (!result.success) throw new Error(result.error);
       

@@ -275,31 +275,56 @@ export async function addOrganizationIdToMultipleData<T extends Record<string, a
 
 /**
  * Loga tentativas de acesso não autorizado
+ * Persiste logs no banco de dados usando função RPC segura
  */
 export async function logSecurityViolation(
   action: string,
   resourceType: string,
   resourceId?: string,
-  details?: string
+  details?: string,
+  severity: 'low' | 'medium' | 'high' | 'critical' = 'medium'
 ): Promise<void> {
   try {
     const validation = await getSecurityContext();
     
+    // Capturar informações do contexto
+    const userId = validation.context?.userId || null;
+    const organizationId = validation.context?.organizationId || null;
+    const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : null;
+    
+    // Log no console para desenvolvimento (fallback)
     console.error('🚨 VIOLAÇÃO DE SEGURANÇA DETECTADA', {
       timestamp: new Date().toISOString(),
-      userId: validation.context?.userId || 'unknown',
-      organizationId: validation.context?.organizationId || 'unknown',
+      userId: userId || 'unknown',
+      organizationId: organizationId || 'unknown',
       action,
       resourceType,
       resourceId,
       details,
-      userAgent: navigator?.userAgent
+      severity,
+      userAgent
     });
 
-    // TODO: Implementar logging no banco de dados ou serviço externo
-    // await supabase.from('security_logs').insert({...})
+    // Persistir no banco de dados usando função RPC
+    const { data, error } = await supabase.rpc('log_security_event', {
+      p_action: action,
+      p_resource_type: resourceType,
+      p_resource_id: resourceId || null,
+      p_details: details || null,
+      p_severity: severity,
+      p_user_id: userId,
+      p_organization_id: organizationId,
+      p_ip_address: null, // Será capturado no backend se necessário
+      p_user_agent: userAgent
+    });
+    
+    if (error) {
+      console.error('Erro ao persistir log de segurança no banco:', error);
+      // Continuar mesmo se falhar - não queremos que erros de logging quebrem a aplicação
+    }
   } catch (error) {
     console.error('Erro ao logar violação de segurança:', error);
+    // Não lançar erro - logging não deve quebrar a aplicação
   }
 }
 

@@ -1,14 +1,22 @@
 import { useState } from 'react';
 
 export default function EnvConfigHelper() {
-  const supabaseUrl = 'https://crtdfzqejhkccglatcmc.supabase.co';
-  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNydGRmenFlamhrY2NnbGF0Y21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgzOTMzNjAsImV4cCI6MjA2Mzk2OTM2MH0.XCCbyz6BQYQl2mBFizzmidI6SSiuFdiiSF3zFUYQC0w';
+  // ✅ SEGURANÇA: Usar variáveis de ambiente ao invés de valores hardcoded
+  // As credenciais devem ser configuradas no arquivo .env.local
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
   
   const [showEnvFile, setShowEnvFile] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const envFileContent = `VITE_SUPABASE_URL=${supabaseUrl}
-VITE_SUPABASE_ANON_KEY=${supabaseAnonKey}`;
+  // Só mostrar conteúdo se as variáveis estiverem configuradas
+  const envFileContent = supabaseUrl && supabaseAnonKey 
+    ? `VITE_SUPABASE_URL=${supabaseUrl}
+VITE_SUPABASE_ANON_KEY=${supabaseAnonKey}`
+    : `# Configure suas credenciais do Supabase abaixo:
+# Obtenha-as em: https://app.supabase.com > Project Settings > API
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_ANON_KEY=sua_chave_anonima_aqui`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(envFileContent);
@@ -72,12 +80,37 @@ VITE_SUPABASE_ANON_KEY=${supabaseAnonKey}`;
         </div>
       )}
       
-      <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded">
-        <h3 className="font-semibold text-yellow-800 mb-2">Observações importantes:</h3>
+      {!supabaseUrl || !supabaseAnonKey ? (
+        <div className="mt-8 p-4 bg-red-50 border border-red-200 rounded">
+          <h3 className="font-semibold text-red-800 mb-2">⚠️ Variáveis de ambiente não configuradas</h3>
+          <p className="text-red-800 mb-2">
+            Para obter suas credenciais do Supabase:
+          </p>
+          <ol className="list-decimal pl-5 space-y-1 text-red-800">
+            <li>Acesse <a href="https://app.supabase.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">https://app.supabase.com</a></li>
+            <li>Selecione seu projeto</li>
+            <li>Vá para <strong>Project Settings</strong> → <strong>API</strong></li>
+            <li>Copie a <strong>URL</strong> e a <strong>anon/public key</strong></li>
+            <li>Cole-as no arquivo .env.local seguindo o formato acima</li>
+          </ol>
+        </div>
+      ) : (
+        <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded">
+          <h3 className="font-semibold text-green-800 mb-2">✅ Variáveis de ambiente configuradas</h3>
+          <p className="text-green-800">
+            Suas credenciais estão sendo lidas das variáveis de ambiente. 
+            Acesse <a href="/diagnostico" className="text-blue-600 underline">/diagnostico</a> para verificar se a conexão está funcionando.
+          </p>
+        </div>
+      )}
+      
+      <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
+        <h3 className="font-semibold text-yellow-800 mb-2">🔒 Observações de segurança:</h3>
         <ul className="list-disc pl-5 space-y-1 text-yellow-800">
-          <li>Nunca compartilhe suas chaves de API em repositórios públicos</li>
-          <li>Em produção, essas variáveis devem ser configuradas no seu provedor de hospedagem</li>
-          <li>Após configurar as variáveis, acesse <a href="/diagnostico" className="text-blue-600 underline">/diagnostico</a> para verificar se a conexão está funcionando</li>
+          <li><strong>NUNCA</strong> compartilhe suas chaves de API em repositórios públicos</li>
+          <li>O arquivo <code className="bg-gray-100 px-1 py-0.5 rounded">.env.local</code> está no <code className="bg-gray-100 px-1 py-0.5 rounded">.gitignore</code> e não será commitado</li>
+          <li>Em produção, configure as variáveis no seu provedor de hospedagem (Cloudflare Pages)</li>
+          <li>Nunca hardcode credenciais diretamente no código-fonte</li>
         </ul>
       </div>
     </div>

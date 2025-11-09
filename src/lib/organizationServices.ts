@@ -4,6 +4,7 @@
  */
 
 import { supabase, Database } from './supabase';
+import { checkRateLimit, formatRateLimitError } from '@/utils/rateLimiting';
 
 // Tipos auxiliares
 export type Organization = Database['public']['Tables']['organizations']['Row'];
@@ -564,6 +565,7 @@ export async function removeOrganizationLogo(organizationId: string, logoUrl: st
 
 /**
  * Gera um novo link de convite para a organização
+ * Inclui rate limiting para prevenir abuso
  */
 export async function createInviteLink(
   organizationId: string,
@@ -574,6 +576,16 @@ export async function createInviteLink(
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Não autenticado');
+
+    // Verificar rate limiting (usar user.id como identificador)
+    const rateLimitResult = checkRateLimit('inviteCreation', user.id);
+    if (!rateLimitResult.allowed) {
+      return { 
+        data: null, 
+        inviteUrl: null, 
+        error: new Error(formatRateLimitError(rateLimitResult))
+      };
+    }
 
     // Gerar token único usando crypto.randomUUID()
     const token = crypto.randomUUID();
