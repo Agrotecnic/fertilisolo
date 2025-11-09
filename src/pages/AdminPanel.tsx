@@ -172,29 +172,28 @@ export default function AdminPanel() {
             🎉 Bem-vindo ao Painel de Administração!
           </AlertTitle>
           <AlertDescription className="text-green-700 text-base">
-            Você está no painel administrativo do sistema multi-tenant. 
-            Aqui você pode personalizar cores, logo e gerenciar usuários da sua organização.
+            Você está no painel administrativo do sistema. Aqui você pode personalizar cores, logo e gerenciar usuários da sua organização.
             <strong className="block mt-2">🔐 Acesso exclusivo para Administradores e Proprietários</strong>
           </AlertDescription>
         </Alert>
 
         <Tabs defaultValue="theme" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl mb-8">
-            <TabsTrigger value="theme" className="flex items-center gap-2">
-              <Palette className="h-4 w-4" />
-              Tema
+          <TabsList className="flex w-full overflow-x-auto bg-white shadow-sm text-xs gap-1 p-1 mb-6 md:mb-8 scrollbar-hide max-w-2xl">
+            <TabsTrigger value="theme" className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-[70px] px-2 md:px-3 py-2 text-[10px] md:text-sm">
+              <Palette className="h-3 w-3 md:h-4 md:w-4" />
+              <span>Tema</span>
             </TabsTrigger>
-            <TabsTrigger value="logo" className="flex items-center gap-2">
-              <Image className="h-4 w-4" />
-              Logo
+            <TabsTrigger value="logo" className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-[70px] px-2 md:px-3 py-2 text-[10px] md:text-sm">
+              <Image className="h-3 w-3 md:h-4 md:w-4" />
+              <span>Logo</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Usuários
+            <TabsTrigger value="users" className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-[70px] px-2 md:px-3 py-2 text-[10px] md:text-sm">
+              <Users className="h-3 w-3 md:h-4 md:w-4" />
+              <span>Usuários</span>
             </TabsTrigger>
-            <TabsTrigger value="invites" className="flex items-center gap-2">
-              <Link className="h-4 w-4" />
-              Convites
+            <TabsTrigger value="invites" className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-[70px] px-2 md:px-3 py-2 text-[10px] md:text-sm">
+              <Link className="h-3 w-3 md:h-4 md:w-4" />
+              <span>Convites</span>
             </TabsTrigger>
           </TabsList>
 

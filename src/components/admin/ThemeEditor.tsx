@@ -164,18 +164,19 @@ export function ThemeEditor() {
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
+      <CardHeader className="pb-3">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex items-center gap-2">
             <Palette className="h-5 w-5 text-primary" />
-            <CardTitle className="text-gray-900">Editor de Tema</CardTitle>
+            <CardTitle className="text-gray-900 text-base md:text-lg">Editor de Tema</CardTitle>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button
               variant="outline"
               size="sm"
               onClick={handleReset}
               disabled={saving}
+              className="w-full sm:w-auto"
             >
               <RotateCcw className="h-4 w-4 mr-2" />
               Resetar
@@ -184,6 +185,7 @@ export function ThemeEditor() {
               size="sm"
               onClick={handleSave}
               disabled={saving}
+              className="w-full sm:w-auto"
             >
               {saving ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -194,17 +196,25 @@ export function ThemeEditor() {
             </Button>
           </div>
         </div>
-        <CardDescription className="text-gray-700 font-medium">
+        <CardDescription className="text-gray-700 font-medium text-sm mt-2">
           Personalize as cores e estilos da aplicação
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="primary" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="primary">Primárias</TabsTrigger>
-            <TabsTrigger value="secondary">Secundárias</TabsTrigger>
-            <TabsTrigger value="accent">Destaque</TabsTrigger>
-            <TabsTrigger value="other">Outras</TabsTrigger>
+          <TabsList className="flex w-full overflow-x-auto bg-white shadow-sm text-xs gap-1 p-1 scrollbar-hide">
+            <TabsTrigger value="primary" className="flex-shrink-0 min-w-[80px] px-2 py-2 text-[10px] md:text-xs">
+              Primária
+            </TabsTrigger>
+            <TabsTrigger value="secondary" className="flex-shrink-0 min-w-[80px] px-2 py-2 text-[10px] md:text-xs">
+              Secundária
+            </TabsTrigger>
+            <TabsTrigger value="accent" className="flex-shrink-0 min-w-[80px] px-2 py-2 text-[10px] md:text-xs">
+              Destaque
+            </TabsTrigger>
+            <TabsTrigger value="other" className="flex-shrink-0 min-w-[80px] px-2 py-2 text-[10px] md:text-xs">
+              Outras
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="primary" className="space-y-4 mt-4">
