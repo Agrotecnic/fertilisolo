@@ -11,19 +11,15 @@ interface MicronutrientsCardProps {
 }
 
 export const MicronutrientsCard: React.FC<MicronutrientsCardProps> = ({ soilData, results }) => {
-  const getStatusIcon = (isAdequate: boolean) => {
-    if (isAdequate) return <CheckCircle className="h-4 w-4 text-green-600" />;
-    return <XCircle className="h-4 w-4 text-red-600" />;
-  };
-
-  const getStatusColor = (isAdequate: boolean) => {
-    return isAdequate ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200';
-  };
-
   const getNutrientStatus = (value: number, min: number, max?: number) => {
     if (value < min) return 'Baixo';
     if (max && value > max) return 'Alto';
     return 'Adequado';
+  };
+
+  const getStatusIcon = (status: string) => {
+    if (status === 'Adequado') return <CheckCircle className="h-4 w-4 text-green-600" />;
+    return <XCircle className="h-4 w-4 text-red-600" />;
   };
 
   const getStatusColorByValue = (value: number, min: number, max?: number) => {
@@ -43,14 +39,14 @@ export const MicronutrientsCard: React.FC<MicronutrientsCardProps> = ({ soilData
         <div className="grid grid-cols-2 gap-3">
           <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
             <div className="flex items-center justify-center mb-2">
-              {getStatusIcon(results.isAdequate.B)}
+              {getStatusIcon(getNutrientStatus(soilData.B, 0.2, 0.6))}
               <span className="ml-2 font-medium text-sm">Boro</span>
             </div>
             <div className="text-base font-bold text-gray-800 mb-1">
               {soilData.B} mg/dm³
             </div>
-            <Badge className={`text-xs ${getStatusColor(results.isAdequate.B)}`}>
-              {results.isAdequate.B ? 'Adequado' : 'Baixo'}
+            <Badge className={`text-xs ${getStatusColorByValue(soilData.B, 0.2, 0.6)}`}>
+              {getNutrientStatus(soilData.B, 0.2, 0.6)}
             </Badge>
             <div className="text-xs text-gray-600 mt-1">
               Ideal: 0,2-0,6
@@ -59,7 +55,7 @@ export const MicronutrientsCard: React.FC<MicronutrientsCardProps> = ({ soilData
           
           <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
             <div className="flex items-center justify-center mb-2">
-              {getStatusIcon(results.isAdequate.Cu)}
+              {getStatusIcon(getNutrientStatus(soilData.Cu, 0.8, 1.2))}
               <span className="ml-2 font-medium text-sm">Cobre</span>
             </div>
             <div className="text-base font-bold text-gray-800 mb-1">
@@ -75,7 +71,7 @@ export const MicronutrientsCard: React.FC<MicronutrientsCardProps> = ({ soilData
           
           <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
             <div className="flex items-center justify-center mb-2">
-              {getStatusIcon(results.isAdequate.Fe)}
+              {getStatusIcon(getNutrientStatus(soilData.Fe, 12, 30))}
               <span className="ml-2 font-medium text-sm">Ferro</span>
             </div>
             <div className="text-base font-bold text-gray-800 mb-1">
@@ -91,7 +87,7 @@ export const MicronutrientsCard: React.FC<MicronutrientsCardProps> = ({ soilData
           
           <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
             <div className="flex items-center justify-center mb-2">
-              {getStatusIcon(results.isAdequate.Mn)}
+              {getStatusIcon(getNutrientStatus(soilData.Mn, 5, 12))}
               <span className="ml-2 font-medium text-sm">Manganês</span>
             </div>
             <div className="text-base font-bold text-gray-800 mb-1">
@@ -107,14 +103,14 @@ export const MicronutrientsCard: React.FC<MicronutrientsCardProps> = ({ soilData
           
           <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
             <div className="flex items-center justify-center mb-2">
-              {getStatusIcon(results.isAdequate.Zn)}
+              {getStatusIcon(getNutrientStatus(soilData.Zn, 0.5, 1.2))}
               <span className="ml-2 font-medium text-sm">Zinco</span>
             </div>
             <div className="text-base font-bold text-gray-800 mb-1">
               {soilData.Zn} mg/dm³
             </div>
-            <Badge className={`text-xs ${getStatusColor(results.isAdequate.Zn)}`}>
-              {results.isAdequate.Zn ? 'Adequado' : 'Baixo'}
+            <Badge className={`text-xs ${getStatusColorByValue(soilData.Zn, 0.5, 1.2)}`}>
+              {getNutrientStatus(soilData.Zn, 0.5, 1.2)}
             </Badge>
             <div className="text-xs text-gray-600 mt-1">
               Ideal: 0,5-1,2
@@ -123,7 +119,7 @@ export const MicronutrientsCard: React.FC<MicronutrientsCardProps> = ({ soilData
 
           <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
             <div className="flex items-center justify-center mb-2">
-              {getStatusIcon(results.isAdequate.Mo)}
+              {getStatusIcon(getNutrientStatus(soilData.Mo, 0.1, 0.2))}
               <span className="ml-2 font-medium text-sm">Molibdênio</span>
             </div>
             <div className="text-base font-bold text-gray-800 mb-1">

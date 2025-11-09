@@ -699,17 +699,25 @@ export const generatePDF = async (
     
     // ========== ANÁLISE VISUAL DOS NUTRIENTES (BARRAS COLORIDAS) ==========
     
+    // Função auxiliar para determinar o nível do nutriente (Baixo, Adequado, Alto)
+    const getNutrientLevel = (value: number, min: number, max?: number): string => {
+      if (value < min) return 'Baixo';
+      if (max && value > max) return 'Alto';
+      return 'Adequado';
+    };
+    
     // Função para desenhar barra visual de nível (OTIMIZADO)
     const drawNutrientBar = (
       label: string,
       value: number,
       nivel: string,
       yPos: number,
-      isLeft: boolean = true
+      isLeft: boolean = true,
+      unit: string = ''
     ) => {
       const xStart = isLeft ? marginX + 6 : pageWidth / 2 + 2;
       const labelWidth = 10; // Reduzido de 35 para 10
-      const valueWidth = 15; // Reduzido de 20 para 15
+      const valueWidth = 22; // Aumentado para acomodar unidade
       const nivelWidth = 18; // Espaço para o texto do nível
       const availableWidth = isLeft ? (pageWidth / 2 - marginX - 14) : (pageWidth / 2 - marginX - 8);
       const barAreaWidth = availableWidth - labelWidth - valueWidth - nivelWidth;
@@ -720,9 +728,10 @@ export const generatePDF = async (
       pdf.setTextColor(55, 65, 81);
       pdf.text(label, xStart, yPos + 3);
       
-      // Valor - garantir que é string (mais próximo)
+      // Valor com unidade - garantir que é string (mais próximo)
       pdf.setFont('helvetica', 'normal');
-      const valueStr = String(value.toFixed(1));
+      pdf.setFontSize(7);
+      const valueStr = `${value.toFixed(1)} ${unit}`;
       pdf.text(valueStr, xStart + labelWidth + 2, yPos + 3);
       
       // Determinar cor da barra baseado no nível
@@ -733,7 +742,7 @@ export const generatePDF = async (
         barColor = [239, 68, 68]; // vermelho
         barPercent = 0.3;
       } else if (nivel === 'Alto') {
-        barColor = [34, 197, 94]; // verde
+        barColor = [251, 146, 60]; // laranja (cor de alerta para excesso)
         barPercent = 1.0;
       } else {
         barColor = [34, 197, 94]; // verde (Adequado)
@@ -807,20 +816,28 @@ export const generatePDF = async (
       Fe: soilData.Fe
     });
     
+    // Fósforo - usar interpretarFosforo que retorna uma string diretamente
     const pNivel = interpretarFosforo(soilData.P || 0, soilData.argila || 0);
-    drawNutrientBar('P', soilData.P || 0, pNivel.nivel, barY, true);
+    // Mapear "Muito Baixo", "Baixo", "Médio", "Alto", "Muito Alto" para "Baixo", "Adequado", "Alto"
+    let pNivelSimplificado = 'Adequado';
+    if (pNivel === 'Muito Baixo' || pNivel === 'Baixo') {
+      pNivelSimplificado = 'Baixo';
+    } else if (pNivel === 'Muito Alto') {
+      pNivelSimplificado = 'Alto';
+    }
+    drawNutrientBar('P', soilData.P || 0, pNivelSimplificado, barY, true, 'mg/dm³');
     barY += 6;
     
-    drawNutrientBar('K', soilData.K || 0, soilData.K >= 0.15 ? 'Adequado' : 'Baixo', barY, true);
+    drawNutrientBar('K', soilData.K || 0, soilData.K >= 0.15 ? 'Adequado' : 'Baixo', barY, true, 'cmolc/dm³');
     barY += 6;
     
-    drawNutrientBar('Ca', soilData.Ca || 0, soilData.Ca >= 4.0 ? 'Adequado' : 'Baixo', barY, true);
+    drawNutrientBar('Ca', soilData.Ca || 0, soilData.Ca >= 4.0 ? 'Adequado' : 'Baixo', barY, true, 'cmolc/dm³');
     barY += 6;
     
-    drawNutrientBar('Mg', soilData.Mg || 0, soilData.Mg >= 1.0 ? 'Adequado' : 'Baixo', barY, true);
+    drawNutrientBar('Mg', soilData.Mg || 0, soilData.Mg >= 1.0 ? 'Adequado' : 'Baixo', barY, true, 'cmolc/dm³');
     barY += 6;
     
-    drawNutrientBar('S', soilData.S || 0, soilData.S >= 10 ? 'Adequado' : 'Baixo', barY, true);
+    drawNutrientBar('S', soilData.S || 0, soilData.S >= 10 ? 'Adequado' : 'Baixo', barY, true, 'mg/dm³');
     
     // Micronutrientes (coluna direita)
     barY = currentY + 14;
@@ -830,19 +847,24 @@ export const generatePDF = async (
     pdf.text('Micronutrientes', pageWidth / 2 + 2, barY);
     barY += 5;
     
-    drawNutrientBar('B', soilData.B || 0, soilData.B >= 0.5 ? 'Adequado' : 'Baixo', barY, false);
+    // Boro (B): Ideal 0,2-0,6 mg/dm³
+    drawNutrientBar('B', soilData.B || 0, getNutrientLevel(soilData.B || 0, 0.2, 0.6), barY, false, 'mg/dm³');
     barY += 6;
     
-    drawNutrientBar('Zn', soilData.Zn || 0, soilData.Zn >= 1.2 ? 'Adequado' : 'Baixo', barY, false);
+    // Zinco (Zn): Ideal 0,5-1,2 mg/dm³
+    drawNutrientBar('Zn', soilData.Zn || 0, getNutrientLevel(soilData.Zn || 0, 0.5, 1.2), barY, false, 'mg/dm³');
     barY += 6;
     
-    drawNutrientBar('Cu', soilData.Cu || 0, soilData.Cu >= 0.8 ? 'Adequado' : 'Baixo', barY, false);
+    // Cobre (Cu): Ideal 0,8-1,2 mg/dm³
+    drawNutrientBar('Cu', soilData.Cu || 0, getNutrientLevel(soilData.Cu || 0, 0.8, 1.2), barY, false, 'mg/dm³');
     barY += 6;
     
-    drawNutrientBar('Mn', soilData.Mn || 0, soilData.Mn >= 5.0 ? 'Adequado' : 'Baixo', barY, false);
+    // Manganês (Mn): Ideal 5-12 mg/dm³
+    drawNutrientBar('Mn', soilData.Mn || 0, getNutrientLevel(soilData.Mn || 0, 5, 12), barY, false, 'mg/dm³');
     barY += 6;
     
-    drawNutrientBar('Fe', soilData.Fe || 0, soilData.Fe >= 5.0 ? 'Adequado' : 'Baixo', barY, false);
+    // Ferro (Fe): Ideal 12-30 mg/dm³
+    drawNutrientBar('Fe', soilData.Fe || 0, getNutrientLevel(soilData.Fe || 0, 12, 30), barY, false, 'mg/dm³');
     
     currentY += 63;
     
