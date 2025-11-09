@@ -30,160 +30,160 @@ export const MicronutrientsSection: React.FC<MicronutrientsSectionProps> = ({
   onUnitChange
 }) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-1">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-1">
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-0 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[8px]">Boro (B)</CardTitle>
-          <div className="flex items-center justify-between">
-            <CardDescription className="text-gray-600 text-[6px]">
+        <CardHeader className="pb-1 md:pb-0 pt-2 md:pt-1 px-2 md:px-1">
+          <CardTitle className="text-gray-800 text-[10px] md:text-[8px] font-semibold">Boro (B)</CardTitle>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 mt-1">
+            <CardDescription className="text-gray-600 text-[9px] md:text-[6px]">
               {getUnitLabel('B', selectedUnits.B)}
             </CardDescription>
             <UnitSelector
               nutrient="B"
               selectedUnit={selectedUnits.B}
               onUnitChange={(unit) => onUnitChange('B', unit)}
-              className="w-12"
+              className="w-full md:w-12 h-7 md:h-6 text-[9px] md:text-[8px]"
             />
           </div>
         </CardHeader>
-        <CardContent className="pt-0 px-1 pb-1">
+        <CardContent className="pt-0 px-2 md:px-1 pb-2 md:pb-1">
           <FormattedInput
             value={B}
             onChange={onBChange}
             placeholder="0,0"
-            className={`h-5 text-[8px] text-gray-800 ${errors.B ? 'border-red-500' : ''}`}
+            className={`h-8 md:h-5 text-[10px] md:text-[8px] text-gray-800 ${errors.B ? 'border-red-500' : ''}`}
           />
-          {errors.B && <span className="text-red-500 text-[6px]">{errors.B}</span>}
+          {errors.B && <span className="text-red-500 text-[9px] md:text-[6px]">{errors.B}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-0 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[8px]">Cobre (Cu)</CardTitle>
-          <div className="flex items-center justify-between">
-            <CardDescription className="text-gray-600 text-[6px]">
+        <CardHeader className="pb-1 md:pb-0 pt-2 md:pt-1 px-2 md:px-1">
+          <CardTitle className="text-gray-800 text-[10px] md:text-[8px] font-semibold">Cobre (Cu)</CardTitle>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 mt-1">
+            <CardDescription className="text-gray-600 text-[9px] md:text-[6px]">
               {getUnitLabel('Cu', selectedUnits.Cu)}
             </CardDescription>
             <UnitSelector
               nutrient="Cu"
               selectedUnit={selectedUnits.Cu}
               onUnitChange={(unit) => onUnitChange('Cu', unit)}
-              className="w-12"
+              className="w-full md:w-12 h-7 md:h-6 text-[9px] md:text-[8px]"
             />
           </div>
         </CardHeader>
-        <CardContent className="pt-0 px-1 pb-1">
+        <CardContent className="pt-0 px-2 md:px-1 pb-2 md:pb-1">
           <FormattedInput
             value={Cu}
             onChange={onCuChange}
             placeholder="0,0"
-            className={`h-5 text-[8px] text-gray-800 ${errors.Cu ? 'border-red-500' : ''}`}
+            className={`h-8 md:h-5 text-[10px] md:text-[8px] text-gray-800 ${errors.Cu ? 'border-red-500' : ''}`}
           />
-          {errors.Cu && <span className="text-red-500 text-[6px]">{errors.Cu}</span>}
+          {errors.Cu && <span className="text-red-500 text-[9px] md:text-[6px]">{errors.Cu}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-0 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[8px]">Ferro (Fe)</CardTitle>
-          <div className="flex items-center justify-between">
-            <CardDescription className="text-gray-600 text-[6px]">
+        <CardHeader className="pb-1 md:pb-0 pt-2 md:pt-1 px-2 md:px-1">
+          <CardTitle className="text-gray-800 text-[10px] md:text-[8px] font-semibold">Ferro (Fe)</CardTitle>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 mt-1">
+            <CardDescription className="text-gray-600 text-[9px] md:text-[6px]">
               {getUnitLabel('Fe', selectedUnits.Fe)}
             </CardDescription>
             <UnitSelector
               nutrient="Fe"
               selectedUnit={selectedUnits.Fe}
               onUnitChange={(unit) => onUnitChange('Fe', unit)}
-              className="w-12"
+              className="w-full md:w-12 h-7 md:h-6 text-[9px] md:text-[8px]"
             />
           </div>
         </CardHeader>
-        <CardContent className="pt-0 px-1 pb-1">
+        <CardContent className="pt-0 px-2 md:px-1 pb-2 md:pb-1">
           <FormattedInput
             value={Fe}
             onChange={onFeChange}
             placeholder="0,0"
-            className={`h-5 text-[8px] text-gray-800 ${errors.Fe ? 'border-red-500' : ''}`}
+            className={`h-8 md:h-5 text-[10px] md:text-[8px] text-gray-800 ${errors.Fe ? 'border-red-500' : ''}`}
           />
-          {errors.Fe && <span className="text-red-500 text-[6px]">{errors.Fe}</span>}
+          {errors.Fe && <span className="text-red-500 text-[9px] md:text-[6px]">{errors.Fe}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-0 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[8px]">Manganês (Mn)</CardTitle>
-          <div className="flex items-center justify-between">
-            <CardDescription className="text-gray-600 text-[6px]">
+        <CardHeader className="pb-1 md:pb-0 pt-2 md:pt-1 px-2 md:px-1">
+          <CardTitle className="text-gray-800 text-[10px] md:text-[8px] font-semibold">Manganês (Mn)</CardTitle>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 mt-1">
+            <CardDescription className="text-gray-600 text-[9px] md:text-[6px]">
               {getUnitLabel('Mn', selectedUnits.Mn)}
             </CardDescription>
             <UnitSelector
               nutrient="Mn"
               selectedUnit={selectedUnits.Mn}
               onUnitChange={(unit) => onUnitChange('Mn', unit)}
-              className="w-12"
+              className="w-full md:w-12 h-7 md:h-6 text-[9px] md:text-[8px]"
             />
           </div>
         </CardHeader>
-        <CardContent className="pt-0 px-1 pb-1">
+        <CardContent className="pt-0 px-2 md:px-1 pb-2 md:pb-1">
           <FormattedInput
             value={Mn}
             onChange={onMnChange}
             placeholder="0,0"
-            className={`h-5 text-[8px] text-gray-800 ${errors.Mn ? 'border-red-500' : ''}`}
+            className={`h-8 md:h-5 text-[10px] md:text-[8px] text-gray-800 ${errors.Mn ? 'border-red-500' : ''}`}
           />
-          {errors.Mn && <span className="text-red-500 text-[6px]">{errors.Mn}</span>}
+          {errors.Mn && <span className="text-red-500 text-[9px] md:text-[6px]">{errors.Mn}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-0 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[8px]">Zinco (Zn)</CardTitle>
-          <div className="flex items-center justify-between">
-            <CardDescription className="text-gray-600 text-[6px]">
+        <CardHeader className="pb-1 md:pb-0 pt-2 md:pt-1 px-2 md:px-1">
+          <CardTitle className="text-gray-800 text-[10px] md:text-[8px] font-semibold">Zinco (Zn)</CardTitle>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 mt-1">
+            <CardDescription className="text-gray-600 text-[9px] md:text-[6px]">
               {getUnitLabel('Zn', selectedUnits.Zn)}
             </CardDescription>
             <UnitSelector
               nutrient="Zn"
               selectedUnit={selectedUnits.Zn}
               onUnitChange={(unit) => onUnitChange('Zn', unit)}
-              className="w-12"
+              className="w-full md:w-12 h-7 md:h-6 text-[9px] md:text-[8px]"
             />
           </div>
         </CardHeader>
-        <CardContent className="pt-0 px-1 pb-1">
+        <CardContent className="pt-0 px-2 md:px-1 pb-2 md:pb-1">
           <FormattedInput
             value={Zn}
             onChange={onZnChange}
             placeholder="0,0"
-            className={`h-5 text-[8px] text-gray-800 ${errors.Zn ? 'border-red-500' : ''}`}
+            className={`h-8 md:h-5 text-[10px] md:text-[8px] text-gray-800 ${errors.Zn ? 'border-red-500' : ''}`}
           />
-          {errors.Zn && <span className="text-red-500 text-[6px]">{errors.Zn}</span>}
+          {errors.Zn && <span className="text-red-500 text-[9px] md:text-[6px]">{errors.Zn}</span>}
         </CardContent>
       </Card>
 
       <Card className="bg-gray-50 border-gray-200">
-        <CardHeader className="pb-0 pt-1 px-1">
-          <CardTitle className="text-gray-800 text-[8px]">Molibdênio (Mo)</CardTitle>
-          <div className="flex items-center justify-between">
-            <CardDescription className="text-gray-600 text-[6px]">
+        <CardHeader className="pb-1 md:pb-0 pt-2 md:pt-1 px-2 md:px-1">
+          <CardTitle className="text-gray-800 text-[10px] md:text-[8px] font-semibold">Molibdênio (Mo)</CardTitle>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 mt-1">
+            <CardDescription className="text-gray-600 text-[9px] md:text-[6px]">
               {getUnitLabel('Mo', selectedUnits.Mo)}
             </CardDescription>
             <UnitSelector
               nutrient="Mo"
               selectedUnit={selectedUnits.Mo}
               onUnitChange={(unit) => onUnitChange('Mo', unit)}
-              className="w-12"
+              className="w-full md:w-12 h-7 md:h-6 text-[9px] md:text-[8px]"
             />
           </div>
         </CardHeader>
-        <CardContent className="pt-0 px-1 pb-1">
+        <CardContent className="pt-0 px-2 md:px-1 pb-2 md:pb-1">
           <FormattedInput
             value={Mo}
             onChange={onMoChange}
             placeholder="0,0"
-            className={`h-5 text-[8px] text-gray-800 ${errors.Mo ? 'border-red-500' : ''}`}
+            className={`h-8 md:h-5 text-[10px] md:text-[8px] text-gray-800 ${errors.Mo ? 'border-red-500' : ''}`}
           />
-          {errors.Mo && <span className="text-red-500 text-[6px]">{errors.Mo}</span>}
+          {errors.Mo && <span className="text-red-500 text-[9px] md:text-[6px]">{errors.Mo}</span>}
         </CardContent>
       </Card>
     </div>

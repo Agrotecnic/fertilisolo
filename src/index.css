@@ -299,4 +299,14 @@
   .shadow-accent {
     box-shadow: 0 4px 14px 0 rgba(255, 143, 0, 0.15);
   }
+
+  /* Esconder scrollbar mas manter funcionalidade de scroll */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE e Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari e Opera */
+  }
 }

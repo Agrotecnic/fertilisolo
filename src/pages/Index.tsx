@@ -297,31 +297,28 @@ const Index = () => {
             </TabsTrigger>
           </TabsList>
           
-          {/* Versão para dispositivos móveis - layout em duas linhas */}
+          {/* Versão para dispositivos móveis - layout com scroll horizontal */}
           <div className="md:hidden mb-4">
-            <TabsList className="grid w-full grid-cols-3 mb-2 bg-white shadow-sm text-xs">
-              <TabsTrigger value="input" className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsList className="flex w-full overflow-x-auto bg-white shadow-sm text-xs gap-1 p-1 scrollbar-hide">
+              <TabsTrigger value="input" className="flex flex-col items-center gap-1 py-2 px-3 min-w-[70px] flex-shrink-0 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <Calculator className="h-4 w-4" />
-                <span>Nova</span>
+                <span className="text-[10px]">Nova</span>
               </TabsTrigger>
-              <TabsTrigger value="results" disabled={!results} className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="results" disabled={!results} className="flex flex-col items-center gap-1 py-2 px-3 min-w-[70px] flex-shrink-0 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <FileText className="h-4 w-4" />
-                <span>Resultados</span>
+                <span className="text-[10px]">Resultados</span>
               </TabsTrigger>
-              <TabsTrigger value="insights" disabled={!results} className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="insights" disabled={!results} className="flex flex-col items-center gap-1 py-2 px-3 min-w-[70px] flex-shrink-0 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <Brain className="h-4 w-4" />
-                <span>Insights</span>
+                <span className="text-[10px]">Insights</span>
               </TabsTrigger>
-            </TabsList>
-            
-            <TabsList className="grid w-full grid-cols-2 bg-white shadow-sm text-xs">
-              <TabsTrigger value="recommendations" disabled={!results} className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="recommendations" disabled={!results} className="flex flex-col items-center gap-1 py-2 px-3 min-w-[70px] flex-shrink-0 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <Leaf className="h-4 w-4" />
-                <span>Recomendações</span>
+                <span className="text-[10px]">Recomendações</span>
               </TabsTrigger>
-              <TabsTrigger value="history" className="flex flex-col items-center gap-1 py-2 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="history" className="flex flex-col items-center gap-1 py-2 px-3 min-w-[70px] flex-shrink-0 text-gray-700 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <Database className="h-4 w-4" />
-                <span>Histórico</span>
+                <span className="text-[10px]">Histórico</span>
               </TabsTrigger>
             </TabsList>
           </div>
