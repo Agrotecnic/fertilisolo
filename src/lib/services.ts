@@ -41,8 +41,10 @@ export interface SoilAnalysisDB {
   iron?: number;       // Fe
   manganese?: number;  // Mn
   zinc?: number;       // Zn
+  molybdenum?: number; // Mo
   clay_content?: number; // Percentual de argila
   plot_id?: string;
+  cec?: number; // CTC (T)
 }
 
 // Interface para recomendação de fertilizantes
@@ -75,7 +77,9 @@ export const convertSoilDataToDBFormat = (data: SoilData, userId?: string, plotI
     iron: data.Fe,
     manganese: data.Mn,
     zinc: data.Zn,
+    molybdenum: data.Mo, // Adicionado Mo (Molibdênio)
     clay_content: data.argila,
+    cec: data.T, // Adicionado CTC
     plot_id: plotId && plotId.trim() !== '' ? plotId : null // Apenas use plotId se não for vazio
   };
 };
@@ -89,7 +93,7 @@ export const convertDBToSoilDataFormat = (data: SoilAnalysisDB): SoilData => {
     location: data.location || '',
     date: data.collection_date || new Date().toISOString().split('T')[0],
     organicMatter: data.organic_matter || 0,
-    T: 10, // Valor padrão de CTC, deve ser calculado baseado nos dados
+    T: data.cec || 10, // Usar CTC do banco ou valor padrão
     P: data.phosphorus || 0,
     argila: data.clay_content || 35, // Valor padrão de 35% se não tiver o dado
     K: data.potassium || 0,
@@ -101,7 +105,7 @@ export const convertDBToSoilDataFormat = (data: SoilAnalysisDB): SoilData => {
     Fe: data.iron || 0,
     Mn: data.manganese || 0,
     Zn: data.zinc || 0,
-    Mo: 0 // Valor padrão para Molibdênio que não está no banco
+    Mo: data.molybdenum || 0 // Usar molibdênio do banco
   };
 };
 
@@ -293,6 +297,16 @@ export const saveSoilAnalysis = async (analysis: SoilData, plotId?: string) => {
 
     // Inserir análise no banco de dados
     console.log('🔍 [SAVE] Tentando inserir no Supabase...');
+    console.log('🔍 [SAVE] Campos sendo enviados:', Object.keys(secureData));
+    console.log('🔍 [SAVE] Valores dos nutrientes:', {
+      P: secureData.phosphorus,
+      K: secureData.potassium,
+      Ca: secureData.calcium,
+      Mg: secureData.magnesium,
+      Mo: secureData.molybdenum,
+      CEC: secureData.cec
+    });
+    
     const { data, error } = await supabase
       .from('soil_analyses')
       .insert(secureData)
@@ -300,7 +314,17 @@ export const saveSoilAnalysis = async (analysis: SoilData, plotId?: string) => {
 
     if (error) {
       console.error('❌ [SAVE] Erro do Supabase:', error);
-      throw error;
+      console.error('❌ [SAVE] Código do erro:', error.code);
+      console.error('❌ [SAVE] Mensagem:', error.message);
+      console.error('❌ [SAVE] Detalhes:', error.details);
+      console.error('❌ [SAVE] Dica:', error.hint);
+      
+      // Retornar mensagem de erro mais amigável
+      const errorMessage = error.message || 'Erro desconhecido ao salvar análise';
+      return { 
+        data: null, 
+        error: errorMessage
+      };
     }
     
     console.log('✅ [SAVE] Análise salva com sucesso!', data);
@@ -311,9 +335,16 @@ export const saveSoilAnalysis = async (analysis: SoilData, plotId?: string) => {
       message: error.message,
       code: error.code,
       details: error.details,
-      hint: error.hint
+      hint: error.hint,
+      stack: error.stack
     });
-    return { data: null, error };
+    
+    // Retornar mensagem de erro mais amigável
+    const errorMessage = error.message || 'Erro desconhecido ao salvar análise';
+    return { 
+      data: null, 
+      error: errorMessage 
+    };
   }
 };
 

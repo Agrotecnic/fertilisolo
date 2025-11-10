@@ -48,7 +48,17 @@ export const SecondaryMacronutrientsSection: React.FC<SecondaryMacronutrientsSec
       <Card className="bg-gray-50 border-gray-200">
         <CardHeader className="pb-1 md:pb-0 pt-2 md:pt-1 px-2 md:px-1">
           <CardTitle className="text-gray-800 text-[10px] md:text-[8px] font-semibold">Matéria Orgânica</CardTitle>
-          <CardDescription className="text-gray-600 text-[9px] md:text-[6px]">%</CardDescription>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 mt-1">
+            <CardDescription className="text-gray-600 text-[9px] md:text-[6px]">
+              {getUnitLabel('organicMatter', selectedUnits.organicMatter)}
+            </CardDescription>
+            <UnitSelector
+              nutrient="organicMatter"
+              selectedUnit={selectedUnits.organicMatter}
+              onUnitChange={(unit) => onUnitChange('organicMatter', unit)}
+              className="w-full md:w-12 h-7 md:h-6 text-[9px] md:text-[8px]"
+            />
+          </div>
         </CardHeader>
         <CardContent className="pt-0 px-2 md:px-1 pb-2 md:pb-1">
           <FormattedInput

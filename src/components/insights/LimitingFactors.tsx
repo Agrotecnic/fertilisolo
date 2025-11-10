@@ -67,18 +67,20 @@ export const LimitingFactors: React.FC<LimitingFactorsProps> = ({ results }) => 
       <CardContent>
         <div className="space-y-3">
           {limitingFactors.map((factor, index) => (
-            <div key={index} className="flex items-center gap-4 p-3 bg-orange-50 rounded-lg border-l-4 border-orange-400">
-              <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  {index + 1}
+            <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 bg-orange-50 rounded-lg border-l-4 border-orange-400">
+              <div className="flex items-center gap-3 sm:gap-4 flex-1">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    {index + 1}
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h5 className="font-medium text-orange-800">{factor.factor}</h5>
+                  <p className="text-sm text-gray-700 break-words">{factor.impact}</p>
                 </div>
               </div>
-              <div className="flex-1">
-                <h5 className="font-medium text-orange-800">{factor.factor}</h5>
-                <p className="text-sm text-gray-700">{factor.impact}</p>
-              </div>
-              <div className="flex-shrink-0">
-                <Badge variant="outline" className="text-orange-700 border-orange-300">
+              <div className="flex-shrink-0 ml-11 sm:ml-0">
+                <Badge variant="outline" className="text-orange-700 border-orange-300 whitespace-nowrap text-xs">
                   Prioridade {factor.severity}/10
                 </Badge>
               </div>

@@ -119,28 +119,31 @@ export const FertilizerHeader: React.FC<FertilizerHeaderProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg border border-green-200">
-      <div className="flex justify-between items-start">
-        <div>
-          <h3 className="text-xl font-bold text-green-800 mb-2 flex items-center gap-2">
-            <Sprout className="h-6 w-6" />
+    <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 sm:p-6 rounded-lg border border-green-200">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+        <div className="flex-1">
+          <h3 className="text-lg sm:text-xl font-bold text-green-800 mb-2 flex items-center gap-2">
+            <Sprout className="h-5 w-5 sm:h-6 sm:w-6" />
             Recomendações de Fertilizantes
           </h3>
-          <p className="text-gray-700">
+          <p className="text-sm sm:text-base text-gray-700">
             Opções alternativas para correção de nutrientes - escolha <strong>uma fonte</strong> para cada tipo de nutriente
           </p>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">
             Cálculos baseados no método de Saturação por Bases e resultados da análise de solo
           </p>
           {cultureName && (
-            <p className="text-green-700 text-sm mt-1 font-medium">
+            <p className="text-xs sm:text-sm text-green-700 mt-1 font-medium">
               Cultura: {cultureName}
             </p>
           )}
         </div>
-        <Button onClick={handleExportPDF} className="bg-green-600 hover:bg-green-700 shadow-md">
-          <FileText className="h-4 w-4 mr-2" />
-          Exportar PDF
+        <Button 
+          onClick={handleExportPDF} 
+          className="bg-green-600 hover:bg-green-700 shadow-md w-full sm:w-auto flex-shrink-0"
+        >
+          <FileText className="h-4 w-4 mr-2 flex-shrink-0" />
+          <span className="whitespace-nowrap">Exportar PDF</span>
         </Button>
       </div>
     </div>
