@@ -178,20 +178,32 @@ export default function AdminPanel() {
         </Alert>
 
         <Tabs defaultValue="theme" className="w-full">
-          <TabsList className="flex w-full overflow-x-auto bg-white shadow-sm text-xs gap-1 p-1 mb-6 md:mb-8 scrollbar-hide max-w-2xl">
-            <TabsTrigger value="theme" className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-[70px] px-2 md:px-3 py-2 text-[10px] md:text-sm">
+          <TabsList className="flex w-full overflow-x-auto bg-gray-100 border border-gray-300 shadow-sm text-xs gap-1 p-1 mb-6 md:mb-8 scrollbar-hide max-w-2xl">
+            <TabsTrigger 
+              value="theme" 
+              className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-[70px] px-2 md:px-3 py-2 text-[10px] md:text-sm data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 font-medium"
+            >
               <Palette className="h-3 w-3 md:h-4 md:w-4" />
               <span>Tema</span>
             </TabsTrigger>
-            <TabsTrigger value="logo" className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-[70px] px-2 md:px-3 py-2 text-[10px] md:text-sm">
+            <TabsTrigger 
+              value="logo" 
+              className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-[70px] px-2 md:px-3 py-2 text-[10px] md:text-sm data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 font-medium"
+            >
               <Image className="h-3 w-3 md:h-4 md:w-4" />
               <span>Logo</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-[70px] px-2 md:px-3 py-2 text-[10px] md:text-sm">
+            <TabsTrigger 
+              value="users" 
+              className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-[70px] px-2 md:px-3 py-2 text-[10px] md:text-sm data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 font-medium"
+            >
               <Users className="h-3 w-3 md:h-4 md:w-4" />
               <span>Usuários</span>
             </TabsTrigger>
-            <TabsTrigger value="invites" className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-[70px] px-2 md:px-3 py-2 text-[10px] md:text-sm">
+            <TabsTrigger 
+              value="invites" 
+              className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-[70px] px-2 md:px-3 py-2 text-[10px] md:text-sm data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 font-medium"
+            >
               <Link className="h-3 w-3 md:h-4 md:w-4" />
               <span>Convites</span>
             </TabsTrigger>

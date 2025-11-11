@@ -163,12 +163,12 @@ export function ThemeEditor() {
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="bg-white border-gray-200">
+      <CardHeader className="pb-3 bg-gray-50">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Palette className="h-5 w-5 text-primary" />
-            <CardTitle className="text-gray-900 text-base md:text-lg">Editor de Tema</CardTitle>
+            <Palette className="h-5 w-5 text-blue-600" />
+            <CardTitle className="text-gray-900 text-base md:text-lg font-bold">Editor de Tema</CardTitle>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button
@@ -176,7 +176,7 @@ export function ThemeEditor() {
               size="sm"
               onClick={handleReset}
               disabled={saving}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-gray-100"
             >
               <RotateCcw className="h-4 w-4 mr-2" />
               Resetar
@@ -185,7 +185,7 @@ export function ThemeEditor() {
               size="sm"
               onClick={handleSave}
               disabled={saving}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
             >
               {saving ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -200,24 +200,36 @@ export function ThemeEditor() {
           Personalize as cores e estilos da aplicação
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="bg-gray-50">
         <Tabs defaultValue="primary" className="w-full">
-          <TabsList className="flex w-full overflow-x-auto bg-white shadow-sm text-xs gap-1 p-1 scrollbar-hide">
-            <TabsTrigger value="primary" className="flex-shrink-0 min-w-[80px] px-2 py-2 text-[10px] md:text-xs">
+          <TabsList className="flex w-full overflow-x-auto bg-gray-100 border border-gray-300 shadow-sm text-xs gap-1 p-1 scrollbar-hide">
+            <TabsTrigger 
+              value="primary" 
+              className="flex-shrink-0 min-w-[80px] px-2 py-2 text-[10px] md:text-xs data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900"
+            >
               Primária
             </TabsTrigger>
-            <TabsTrigger value="secondary" className="flex-shrink-0 min-w-[80px] px-2 py-2 text-[10px] md:text-xs">
+            <TabsTrigger 
+              value="secondary" 
+              className="flex-shrink-0 min-w-[80px] px-2 py-2 text-[10px] md:text-xs data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900"
+            >
               Secundária
             </TabsTrigger>
-            <TabsTrigger value="accent" className="flex-shrink-0 min-w-[80px] px-2 py-2 text-[10px] md:text-xs">
+            <TabsTrigger 
+              value="accent" 
+              className="flex-shrink-0 min-w-[80px] px-2 py-2 text-[10px] md:text-xs data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900"
+            >
               Destaque
             </TabsTrigger>
-            <TabsTrigger value="other" className="flex-shrink-0 min-w-[80px] px-2 py-2 text-[10px] md:text-xs">
+            <TabsTrigger 
+              value="other" 
+              className="flex-shrink-0 min-w-[80px] px-2 py-2 text-[10px] md:text-xs data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900"
+            >
               Outras
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="primary" className="space-y-4 mt-4">
+          <TabsContent value="primary" className="space-y-4 mt-4 bg-white p-4 rounded-md border border-gray-200">
             <ColorInput
               label="Cor Primária"
               value={themeState.primary_color || '#1B5E20'}
@@ -232,7 +244,7 @@ export function ThemeEditor() {
             />
           </TabsContent>
 
-          <TabsContent value="secondary" className="space-y-4 mt-4">
+          <TabsContent value="secondary" className="space-y-4 mt-4 bg-white p-4 rounded-md border border-gray-200">
             <ColorInput
               label="Cor Secundária"
               value={themeState.secondary_color || '#1565C0'}
@@ -247,7 +259,7 @@ export function ThemeEditor() {
             />
           </TabsContent>
 
-          <TabsContent value="accent" className="space-y-4 mt-4">
+          <TabsContent value="accent" className="space-y-4 mt-4 bg-white p-4 rounded-md border border-gray-200">
             <ColorInput
               label="Cor de Destaque"
               value={themeState.accent_color || '#FF8F00'}
@@ -262,7 +274,7 @@ export function ThemeEditor() {
             />
           </TabsContent>
 
-          <TabsContent value="other" className="space-y-4 mt-4">
+          <TabsContent value="other" className="space-y-4 mt-4 bg-white p-4 rounded-md border border-gray-200">
             <ColorInput
               label="Cor de Fundo"
               value={themeState.background_color || '#FAFAFA'}
