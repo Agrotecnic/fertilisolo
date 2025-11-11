@@ -1,5 +1,5 @@
 import { SoilData, CalculationResult } from '@/types/soilAnalysis';
-import { calculateFertilizerRecommendations } from './soilCalculations';
+import { calculateFertilizerRecommendations, calculateSoilAnalysis } from './soilCalculations';
 import { formatNumber, formatNumberOptional } from './numberFormat';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -570,6 +570,9 @@ export const generatePDF = async (
       organizationName: themeOptions?.organizationName
     });
     
+    // Calcular results para usar na classificação de nutrientes com saturação
+    const results = calculateSoilAnalysis(soilData);
+    
     const pdf = new jsPDF();
     
     // Paleta de cores moderna EXATAMENTE DO MODELO HTML
@@ -706,6 +709,23 @@ export const generatePDF = async (
       return 'Adequado';
     };
     
+    // Função auxiliar para classificação com saturação (usa results.isAdequate e saturations)
+    const getNutrientLevelWithSaturation = (nutrient: string): string => {
+      switch(nutrient) {
+        case 'K':
+          return results.isAdequate.K ? 'Adequado' : 
+                 (results.saturations.K > 5 ? 'Alto' : 'Baixo');
+        case 'Ca':
+          return results.isAdequate.Ca ? 'Adequado' : 
+                 (results.saturations.Ca > 60 ? 'Alto' : 'Baixo');
+        case 'Mg':
+          return results.isAdequate.Mg ? 'Adequado' : 
+                 (results.saturations.Mg > 20.5 ? 'Alto' : 'Baixo');
+        default:
+          return 'Adequado';
+      }
+    };
+    
     // Função para desenhar barra visual de nível (OTIMIZADO)
     const drawNutrientBar = (
       label: string,
@@ -756,7 +776,7 @@ export const generatePDF = async (
       pdf.roundedRect(barStartX, yPos - 2, barAreaWidth, 5, 2, 2, 'F');
       
       // Barra colorida
-      pdf.setFillColor(...barColor);
+      pdf.setFillColor(barColor[0], barColor[1], barColor[2]);
       const barFilledWidth = barAreaWidth * barPercent;
       if (barFilledWidth > 0) {
         pdf.roundedRect(
@@ -772,7 +792,7 @@ export const generatePDF = async (
       
       // Label do nível - garantir que é string (mais próximo)
       pdf.setFontSize(7);
-      pdf.setTextColor(...barColor);
+      pdf.setTextColor(barColor[0], barColor[1], barColor[2]);
       pdf.setFont('helvetica', 'bold');
       const nivelStr = String(nivel);
       const nivelX = barStartX + barAreaWidth + 2;
@@ -828,13 +848,13 @@ export const generatePDF = async (
     drawNutrientBar('P', soilData.P || 0, pNivelSimplificado, barY, true, 'mg/dm³');
     barY += 6;
     
-    drawNutrientBar('K', soilData.K || 0, soilData.K >= 0.15 ? 'Adequado' : 'Baixo', barY, true, 'cmolc/dm³');
+    drawNutrientBar('K', soilData.K || 0, getNutrientLevelWithSaturation('K'), barY, true, 'mg/dm³');
     barY += 6;
     
-    drawNutrientBar('Ca', soilData.Ca || 0, soilData.Ca >= 4.0 ? 'Adequado' : 'Baixo', barY, true, 'cmolc/dm³');
+    drawNutrientBar('Ca', soilData.Ca || 0, getNutrientLevelWithSaturation('Ca'), barY, true, 'cmolc/dm³');
     barY += 6;
     
-    drawNutrientBar('Mg', soilData.Mg || 0, soilData.Mg >= 1.0 ? 'Adequado' : 'Baixo', barY, true, 'cmolc/dm³');
+    drawNutrientBar('Mg', soilData.Mg || 0, getNutrientLevelWithSaturation('Mg'), barY, true, 'cmolc/dm³');
     barY += 6;
     
     drawNutrientBar('S', soilData.S || 0, soilData.S >= 10 ? 'Adequado' : 'Baixo', barY, true, 'mg/dm³');
@@ -865,6 +885,12 @@ export const generatePDF = async (
     
     // Ferro (Fe): Ideal 12-30 mg/dm³
     drawNutrientBar('Fe', soilData.Fe || 0, getNutrientLevel(soilData.Fe || 0, 12, 30), barY, false, 'mg/dm³');
+    barY += 6;
+    
+    // Molibdênio (Mo): Ideal 0,1-0,2 mg/dm³ - só aparece se houver dados
+    if (soilData.Mo !== undefined && soilData.Mo > 0) {
+      drawNutrientBar('Mo', soilData.Mo, getNutrientLevel(soilData.Mo, 0.1, 0.2), barY, false, 'mg/dm³');
+    }
     
     currentY += 63;
     
@@ -882,11 +908,11 @@ export const generatePDF = async (
       const colors = badgeColors[type] || { bg: [240, 240, 240], text: [0, 0, 0] };
       
       // Fundo do badge
-      pdf.setFillColor(...colors.bg);
+      pdf.setFillColor(colors.bg[0], colors.bg[1], colors.bg[2]);
       pdf.roundedRect(x, y - 3, 20, 5, 2, 2, 'F');
       
       // Texto do badge
-      pdf.setTextColor(...colors.text);
+      pdf.setTextColor(colors.text[0], colors.text[1], colors.text[2]);
       pdf.setFontSize(7);
       pdf.setFont('helvetica', 'normal');
       pdf.text(text, x + 10, y, { align: 'center' });
