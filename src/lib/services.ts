@@ -10,6 +10,7 @@ export interface Farm {
   area_size?: number;
   area_unit?: string;
   user_id?: string;
+  organization_id?: string; // ID da organização (multi-tenant)
 }
 
 // Interface para talhões/parcelas
@@ -20,12 +21,14 @@ export interface Plot {
   area_size?: number;
   area_unit?: string;
   soil_type?: string;
+  organization_id?: string; // ID da organização (multi-tenant)
 }
 
 // Interface para análise de solo com formato compatível com o banco de dados
 export interface SoilAnalysisDB {
   id?: string;
   user_id?: string;
+  organization_id?: string; // ID da organização (multi-tenant)
   farm_name?: string;
   location?: string;
   collection_date?: string;
@@ -91,6 +94,7 @@ export const convertDBToSoilDataFormat = (data: SoilAnalysisDB): SoilData => {
   return {
     id: data.id,
     location: data.location || '',
+    crop: '', // Campo de cultura (não armazenado no banco por enquanto)
     date: data.collection_date || new Date().toISOString().split('T')[0],
     organicMatter: data.organic_matter || 0,
     T: data.cec || 10, // Usar CTC do banco ou valor padrão
@@ -384,6 +388,163 @@ export const getUserSoilAnalyses = async () => {
   } catch (error: any) {
     console.error('Erro ao buscar análises de solo:', error);
     return { data: [], error };
+  }
+};
+
+/**
+ * Busca uma análise de solo específica por ID
+ * IMPORTANTE: Valida que a análise pertence à organização do usuário
+ * Use esta função quando acessar análises via link ou ID específico
+ */
+export const getSoilAnalysisById = async (analysisId: string) => {
+  try {
+    console.log('🔍 [GET_BY_ID] Buscando análise:', analysisId);
+
+    // Obter contexto de segurança
+    const validation = await getSecurityContext();
+    if (!validation.isValid || !validation.context) {
+      return { 
+        data: null, 
+        error: validation.error || 'Erro de autenticação' 
+      };
+    }
+
+    console.log('🔍 [GET_BY_ID] Contexto de segurança:', {
+      userId: validation.context.userId,
+      organizationId: validation.context.organizationId
+    });
+
+    // Buscar análise por ID E organização (dupla validação)
+    const { data, error } = await supabase
+      .from('soil_analyses')
+      .select('*')
+      .eq('id', analysisId)
+      .eq('organization_id', validation.context.organizationId)
+      .single();
+
+    if (error) {
+      console.error('❌ [GET_BY_ID] Erro ao buscar análise:', error);
+      
+      // Se não encontrou, pode ser porque não existe OU não pertence à organização
+      if (error.code === 'PGRST116') {
+        return { 
+          data: null, 
+          error: 'Análise não encontrada ou você não tem permissão para acessá-la' 
+        };
+      }
+      
+      throw error;
+    }
+
+    // Validação adicional de segurança
+    if (data.organization_id !== validation.context.organizationId) {
+      console.error('❌ [GET_BY_ID] TENTATIVA DE ACESSO NÃO AUTORIZADO:', {
+        analysisId,
+        analysisOrgId: data.organization_id,
+        userOrgId: validation.context.organizationId
+      });
+      
+      return { 
+        data: null, 
+        error: 'Você não tem permissão para acessar esta análise' 
+      };
+    }
+
+    console.log('✅ [GET_BY_ID] Análise encontrada e validada');
+
+    // Converter para formato SoilData
+    const converted = convertDBToSoilDataFormat(data);
+    
+    return { data: converted, error: null };
+  } catch (error: any) {
+    console.error('❌ [GET_BY_ID] Erro ao buscar análise por ID:', error);
+    return { 
+      data: null, 
+      error: error.message || 'Erro ao buscar análise' 
+    };
+  }
+};
+
+/**
+ * Busca uma análise de solo por ID com informações da organização
+ * RETORNA também os dados da organização (logo, cores) para PDFs compartilhados
+ * Use esta função quando precisar gerar PDF com tema da organização da análise
+ */
+export const getSoilAnalysisWithOrganization = async (analysisId: string) => {
+  try {
+    console.log('🔍 [GET_WITH_ORG] Buscando análise com dados da organização:', analysisId);
+
+    // Obter contexto de segurança
+    const validation = await getSecurityContext();
+    if (!validation.isValid || !validation.context) {
+      return { 
+        data: null, 
+        organization: null,
+        error: validation.error || 'Erro de autenticação' 
+      };
+    }
+
+    // Buscar análise com dados da organização em uma única query
+    const { data, error } = await supabase
+      .from('soil_analyses')
+      .select(`
+        *,
+        organizations:organization_id (
+          id,
+          name,
+          logo_url,
+          organization_themes (
+            primary_color,
+            secondary_color,
+            accent_color
+          )
+        )
+      `)
+      .eq('id', analysisId)
+      .eq('organization_id', validation.context.organizationId)
+      .single();
+
+    if (error) {
+      console.error('❌ [GET_WITH_ORG] Erro ao buscar:', error);
+      
+      if (error.code === 'PGRST116') {
+        return { 
+          data: null,
+          organization: null,
+          error: 'Análise não encontrada ou você não tem permissão' 
+        };
+      }
+      
+      throw error;
+    }
+
+    // Validação de segurança
+    if (data.organization_id !== validation.context.organizationId) {
+      console.error('❌ [GET_WITH_ORG] ACESSO NÃO AUTORIZADO');
+      return { 
+        data: null,
+        organization: null,
+        error: 'Sem permissão para acessar esta análise' 
+      };
+    }
+
+    console.log('✅ [GET_WITH_ORG] Análise e organização encontradas');
+
+    // Converter análise
+    const convertedAnalysis = convertDBToSoilDataFormat(data);
+    
+    return { 
+      data: convertedAnalysis,
+      organization: data.organizations,
+      error: null 
+    };
+  } catch (error: any) {
+    console.error('❌ [GET_WITH_ORG] Erro:', error);
+    return { 
+      data: null,
+      organization: null,
+      error: error.message || 'Erro ao buscar análise com organização' 
+    };
   }
 };
 
