@@ -310,29 +310,14 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
         <SecondaryMacronutrientsSection
           S={formData.S}
           organicMatter={formData.organicMatter}
+          argila={formData.argila}
           onSChange={(value) => handleInputChange('S', value)}
           onOrganicMatterChange={(value) => handleInputChange('organicMatter', value)}
+          onArgilaChange={(value) => handleInputChange('argila', value)}
           errors={errors}
           selectedUnits={selectedUnits}
           onUnitChange={handleUnitChange}
         />
-        {/* Argila */}
-        <div className="mt-3 md:mt-4 space-y-2">
-          <Label htmlFor="argila" className="text-xs md:text-sm font-medium text-gray-700">Argila (%)</Label>
-          <Input 
-            id="argila" 
-            type="number" 
-            step="0.1"
-            min="0"
-            max="100"
-            placeholder="Ex: 35"
-            value={formData.argila || 35}
-            onChange={(e) => handleInputChange('argila', parseFloat(e.target.value) || 0)}
-            className="h-9 md:h-10 text-xs md:text-sm"
-          />
-          {errors.argila && <p className="text-xs md:text-sm text-red-500">{errors.argila}</p>}
-          <p className="text-[10px] md:text-xs text-gray-500">% de argila no solo</p>
-        </div>
       </div>
 
       {/* Micronutrientes */}
