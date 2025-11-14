@@ -133,6 +133,9 @@ export type Database = {
           iron: number | null;
           manganese: number | null;
           zinc: number | null;
+          molybdenum: number | null;
+          clay_content: number | null;
+          cec: number | null;
           plot_id: string | null;
           created_at: string;
         };
@@ -154,6 +157,9 @@ export type Database = {
           iron?: number | null;
           manganese?: number | null;
           zinc?: number | null;
+          molybdenum?: number | null;
+          clay_content?: number | null;
+          cec?: number | null;
           plot_id?: string | null;
           created_at?: string;
         };
@@ -175,6 +181,9 @@ export type Database = {
           iron?: number | null;
           manganese?: number | null;
           zinc?: number | null;
+          molybdenum?: number | null;
+          clay_content?: number | null;
+          cec?: number | null;
           plot_id?: string | null;
           created_at?: string;
         };
