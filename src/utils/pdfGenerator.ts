@@ -10,6 +10,7 @@ import {
   determinarClasseArgila, 
   getTexturaClasseArgila 
 } from './soilCalculations';
+import { getCropIdentifier } from '@/components/BasicInfoSection';
 
 // Estendendo o jsPDF com autotable
 declare module 'jspdf' {
@@ -555,6 +556,56 @@ function getTextureClass(value: number | undefined): string {
   return "Muito Argiloso";
 }
 
+/**
+ * Retorna informações sobre estágios fenológicos e descrições baseado na cultura
+ */
+function getCropStageInfo(cultureName?: string): {
+  description: string;
+  nitrogenStages: string[];
+  microStages: string[];
+} {
+  const cropId = cultureName ? getCropIdentifier(cultureName) : 'soja';
+  
+  // Usar o nome original da cultura ou normalizar se necessário
+  let cultureDisplayName = cultureName || 'soja';
+  // Garantir primeira letra maiúscula e resto minúsculo para exibição consistente
+  cultureDisplayName = cultureDisplayName.charAt(0).toUpperCase() + cultureDisplayName.slice(1).toLowerCase();
+  
+  switch (cropId) {
+    case 'milho':
+      return {
+        description: `Aplicação de nitrogênio em cobertura entre os estágios V4-V8 do ${cultureDisplayName}.`,
+        nitrogenStages: ['V4-V6', 'V6-V8', 'V4-V6', 'V4-V6', 'V4-V8'],
+        microStages: ['V3-V5', 'V3-V5', 'V4-V6', 'V4-V6', 'V4-V6', 'V4-V6', 'V4-V6', 'V4-V6', 'Plantio']
+      };
+    case 'algodao':
+      return {
+        description: `Aplicação de nitrogênio em cobertura entre os estágios de crescimento inicial do ${cultureDisplayName}.`,
+        nitrogenStages: ['Início floração', 'Pós-floração', 'Início floração', 'Início floração', 'Início floração'],
+        microStages: ['Pré-floração', 'Pré-floração', 'Pré-floração', 'Pré-floração', 'Pré-floração', 'Pré-floração', 'Pré-floração', 'Pré-floração', 'Plantio']
+      };
+    case 'cafe':
+      return {
+        description: `Aplicação de nitrogênio em cobertura durante o período vegetativo do ${cultureDisplayName}.`,
+        nitrogenStages: ['Pós-florada', 'Crescimento', 'Pós-florada', 'Pós-florada', 'Crescimento'],
+        microStages: ['Crescimento', 'Crescimento', 'Crescimento', 'Crescimento', 'Crescimento', 'Crescimento', 'Crescimento', 'Crescimento', 'Plantio']
+      };
+    case 'cana':
+      return {
+        description: `Aplicação de nitrogênio em cobertura durante o perfilhamento do ${cultureDisplayName}.`,
+        nitrogenStages: ['Perfilhamento', 'Crescimento', 'Perfilhamento', 'Perfilhamento', 'Crescimento'],
+        microStages: ['Inicial', 'Inicial', 'Inicial', 'Inicial', 'Inicial', 'Inicial', 'Inicial', 'Inicial', 'Plantio']
+      };
+    case 'soja':
+    default:
+      return {
+        description: `Aplicação de nitrogênio em cobertura entre os estágios V4-V8 da ${cultureDisplayName}.`,
+        nitrogenStages: ['V4-V6', 'V6-V8', 'V4-V6', 'V4-V6', 'V4-V8'],
+        microStages: ['V3-V5', 'V3-V5', 'V4-V6', 'V4-V6', 'V4-V6', 'V4-V6', 'V4-V6', 'V4-V6', 'Plantio']
+      };
+  }
+}
+
 export const generatePDF = async (
   soilData: SoilData, 
   farmName?: string, 
@@ -1087,14 +1138,25 @@ export const generatePDF = async (
       currentY = 45;
     }
     
-    // Card background (altura aumentada para mais linhas)
+    // Descrição - dinâmica baseada na cultura (calcular antes de desenhar o card)
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    const stageInfo = getCropStageInfo(cultureName);
+    const descText = pdf.splitTextToSize(stageInfo.description, contentWidth - 12);
+    const descHeight = Array.isArray(descText) ? descText.length * 4 : 4;
+    
+    // Calcular altura do card dinamicamente baseado no tamanho da descrição
+    // Altura base: 8 (título) + espaço + descrição + espaço + tabela (~50mm)
+    const cardHeight = Math.max(68, 8 + 6 + descHeight + 4 + 50);
+    
+    // Card background (altura dinâmica para acomodar descrições mais longas)
     pdf.setFillColor(252, 251, 245);
-    pdf.roundedRect(marginX, currentY, contentWidth, 68, 8, 8, 'F');
+    pdf.roundedRect(marginX, currentY, contentWidth, cardHeight, 8, 8, 'F');
     
     // Border
     pdf.setDrawColor(94, 82, 64);
     pdf.setLineWidth(0.3);
-    pdf.roundedRect(marginX, currentY, contentWidth, 68, 8, 8, 'S');
+    pdf.roundedRect(marginX, currentY, contentWidth, cardHeight, 8, 8, 'S');
     
     // Título
     pdf.setFontSize(16);
@@ -1106,18 +1168,21 @@ export const generatePDF = async (
     pdf.setFontSize(9);
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(107, 114, 128);
-    pdf.text('Aplicação de nitrogênio em cobertura entre os estágios V4-V8 da soja.', marginX + 6, currentY + 14);
+    pdf.text(descText, marginX + 6, currentY + 14);
     
-    // Tabela (MAIS FONTES DE NITROGÊNIO)
+    // Calcular posição Y da tabela baseado no tamanho da descrição
+    const tableStartY = currentY + 14 + descHeight + 4;
+    
+    // Tabela (MAIS FONTES DE NITROGÊNIO) - estágios dinâmicos baseados na cultura
     autoTable(pdf, {
-      startY: currentY + 18,
+      startY: tableStartY,
       head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
       body: [
-        ['Ureia (45% N)', '100', 'kg/ha', '', 'V4-V6'],
-        ['Sulfato de Amônio (21% N)', '200', 'kg/ha', '', 'V6-V8'],
-        ['Nitrato de Amônio (33% N)', '140', 'kg/ha', '', 'V4-V6'],
-        ['Ureia Revestida (44% N)', '105', 'kg/ha', '', 'V4-V6'],
-        ['Nitrato de Cálcio (15% N)', '300', 'kg/ha', '', 'V4-V8']
+        ['Ureia (45% N)', '100', 'kg/ha', '', stageInfo.nitrogenStages[0]],
+        ['Sulfato de Amônio (21% N)', '200', 'kg/ha', '', stageInfo.nitrogenStages[1]],
+        ['Nitrato de Amônio (33% N)', '140', 'kg/ha', '', stageInfo.nitrogenStages[2]],
+        ['Ureia Revestida (44% N)', '105', 'kg/ha', '', stageInfo.nitrogenStages[3]],
+        ['Nitrato de Cálcio (15% N)', '300', 'kg/ha', '', stageInfo.nitrogenStages[4]]
       ],
       theme: 'plain',
       styles: {
@@ -1189,20 +1254,21 @@ export const generatePDF = async (
     const splitDesc4 = pdf.splitTextToSize(desc4, contentWidth - 12);
     pdf.text(splitDesc4, marginX + 6, currentY + 14);
     
-    // Tabela
+    // Tabela - estágios dinâmicos baseados na cultura
+    const microStageInfo = getCropStageInfo(cultureName);
     autoTable(pdf, {
       startY: currentY + 22,
       head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
       body: [
-        ['Ácido Bórico', '2.0', 'kg/ha', 'foliar', 'V3-V5'],
-        ['Bórax', '3.0', 'kg/ha', 'foliar', 'V3-V5'],
-        ['Sulfato de Zinco', '3.0', 'kg/ha', 'foliar', 'V4-V6'],
-        ['Óxido de Zinco', '2.0', 'kg/ha', 'foliar', 'V4-V6'],
-        ['Sulfato de Cobre', '1.5', 'kg/ha', 'foliar', 'V4-V6'],
-        ['Óxido de Cobre', '4.0', 'kg/ha', 'foliar', 'V4-V6'],
-        ['Sulfato de Manganês', '3.0', 'kg/ha', 'foliar', 'V4-V6'],
-        ['Óxido de Manganês', '2.5', 'kg/ha', 'foliar', 'V4-V6'],
-        ['Molibdato de Sódio', '0.1', 'kg/ha', 'sementes', 'Plantio']
+        ['Ácido Bórico', '2.0', 'kg/ha', 'foliar', microStageInfo.microStages[0]],
+        ['Bórax', '3.0', 'kg/ha', 'foliar', microStageInfo.microStages[1]],
+        ['Sulfato de Zinco', '3.0', 'kg/ha', 'foliar', microStageInfo.microStages[2]],
+        ['Óxido de Zinco', '2.0', 'kg/ha', 'foliar', microStageInfo.microStages[3]],
+        ['Sulfato de Cobre', '1.5', 'kg/ha', 'foliar', microStageInfo.microStages[4]],
+        ['Óxido de Cobre', '4.0', 'kg/ha', 'foliar', microStageInfo.microStages[5]],
+        ['Sulfato de Manganês', '3.0', 'kg/ha', 'foliar', microStageInfo.microStages[6]],
+        ['Óxido de Manganês', '2.5', 'kg/ha', 'foliar', microStageInfo.microStages[7]],
+        ['Molibdato de Sódio', '0.1', 'kg/ha', 'sementes', microStageInfo.microStages[8]]
       ],
       theme: 'plain',
       styles: {
