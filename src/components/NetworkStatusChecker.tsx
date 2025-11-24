@@ -40,34 +40,49 @@ export function NetworkStatusChecker() {
         // Apenas verificar se estamos online
         if (navigator.onLine) {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          // Timeout mais longo para mobile (10 segundos)
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          const timeoutDuration = isMobile ? 10000 : 5000;
+          const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
           
-          // Verificar conexão com o Supabase
-          const result = await pingServer();
-          clearTimeout(timeoutId);
-          
-          if (result.status === 'error') {
-            throw new Error('Falha ao conectar com o servidor');
-          }
-          
-          // Se chegamos aqui, a conexão está boa
-          if (hasConnectivityIssues) {
-            setHasConnectivityIssues(false);
-            toast({
-              title: "Conexão estável",
-              description: "A conexão com o servidor foi reestabelecida.",
-              variant: "default",
-            });
+          try {
+            // Verificar conexão com o Supabase passando o signal
+            const result = await pingServer(controller.signal);
+            clearTimeout(timeoutId);
+            
+            if (result.status === 'error') {
+              throw new Error(result.message || 'Falha ao conectar com o servidor');
+            }
+            
+            // Se chegamos aqui, a conexão está boa
+            if (hasConnectivityIssues) {
+              setHasConnectivityIssues(false);
+              toast({
+                title: "Conexão estável",
+                description: "A conexão com o servidor foi reestabelecida.",
+                variant: "default",
+              });
+            }
+          } catch (error: any) {
+            clearTimeout(timeoutId);
+            // Se foi timeout, tratar como problema de conectividade
+            if (error?.name === 'AbortError' || error?.message?.includes('Timeout')) {
+              throw new Error('Timeout: Verifique sua conexão com a internet');
+            }
+            throw error;
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         // Se estamos "online" mas a requisição falhou, temos problemas de conectividade
         if (navigator.onLine && !hasConnectivityIssues) {
           setHasConnectivityIssues(true);
           console.warn('Problemas de conectividade detectados:', error);
+          const errorMessage = error?.message || 'Sua conexão com o servidor está instável.';
           toast({
             title: "Problemas de conectividade",
-            description: "Sua conexão com o servidor está instável.",
+            description: errorMessage.includes('Timeout') 
+              ? "Sua conexão está muito lenta. Verifique sua internet."
+              : "Sua conexão com o servidor está instável. Verifique sua internet.",
             variant: "destructive",
             duration: 5000,
           });
@@ -78,8 +93,8 @@ export function NetworkStatusChecker() {
     // Verificar a cada 30 segundos
     const intervalId = setInterval(checkConnectivity, 30000);
     
-    // Verificar imediatamente no carregamento
-    checkConnectivity();
+    // Verificar imediatamente no carregamento (com delay para evitar falsos positivos)
+    setTimeout(checkConnectivity, 2000);
 
     // Limpar ouvintes e intervalos
     return () => {
