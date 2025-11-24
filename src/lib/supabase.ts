@@ -10,9 +10,32 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Supabase URL ou Anon Key não encontrados. Verifique suas variáveis de ambiente.');
 }
 
+// Configuração otimizada para mobile
 export const supabase = createClient(
   supabaseUrl || '',
-  supabaseAnonKey || ''
+  supabaseAnonKey || '',
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+      // Timeout mais longo para mobile
+      flowType: 'pkce',
+    },
+    global: {
+      // Headers para melhor compatibilidade mobile
+      headers: {
+        'x-client-info': 'fertilisolo-web',
+      },
+    },
+    realtime: {
+      // Configurações para conexões instáveis
+      params: {
+        eventsPerSecond: 10,
+      },
+    },
+  }
 );
 
 // Funções para acessar dados de referência sem autenticação

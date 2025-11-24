@@ -40,10 +40,12 @@ export function NetworkStatusChecker() {
         // Apenas verificar se estamos online
         if (navigator.onLine) {
           const controller = new AbortController();
-          // Timeout mais longo para mobile (10 segundos)
+          // Timeout mais longo para mobile (15 segundos) para dar mais tempo
           const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-          const timeoutDuration = isMobile ? 10000 : 5000;
-          const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
+          const timeoutDuration = isMobile ? 15000 : 8000; // 15s mobile, 8s desktop
+          const timeoutId = setTimeout(() => {
+            controller.abort();
+          }, timeoutDuration);
           
           try {
             // Verificar conexão com o Supabase passando o signal
@@ -51,41 +53,53 @@ export function NetworkStatusChecker() {
             clearTimeout(timeoutId);
             
             if (result.status === 'error') {
-              throw new Error(result.message || 'Falha ao conectar com o servidor');
+              // Não mostrar erro se for apenas um problema temporário
+              // Só mostrar se for timeout ou erro persistente
+              if (result.message?.includes('Timeout') || result.message?.includes('lenta')) {
+                throw new Error(result.message);
+              }
+              // Para outros erros, não considerar como problema crítico
+              // Pode ser apenas um problema temporário
+              return;
             }
             
             // Se chegamos aqui, a conexão está boa
             if (hasConnectivityIssues) {
               setHasConnectivityIssues(false);
               toast({
-                title: "Conexão estável",
+                title: "Conexão restaurada",
                 description: "A conexão com o servidor foi reestabelecida.",
                 variant: "default",
+                duration: 3000,
               });
             }
           } catch (error: any) {
             clearTimeout(timeoutId);
             // Se foi timeout, tratar como problema de conectividade
-            if (error?.name === 'AbortError' || error?.message?.includes('Timeout')) {
+            if (error?.name === 'AbortError' || error?.message?.includes('Timeout') || error?.message?.includes('lenta')) {
               throw new Error('Timeout: Verifique sua conexão com a internet');
             }
-            throw error;
+            // Para outros erros, não propagar - pode ser temporário
+            console.warn('Erro ao verificar conectividade (pode ser temporário):', error);
+            return;
           }
         }
       } catch (error: any) {
         // Se estamos "online" mas a requisição falhou, temos problemas de conectividade
+        // Mas só mostrar se for realmente um problema (timeout)
         if (navigator.onLine && !hasConnectivityIssues) {
-          setHasConnectivityIssues(true);
-          console.warn('Problemas de conectividade detectados:', error);
-          const errorMessage = error?.message || 'Sua conexão com o servidor está instável.';
-          toast({
-            title: "Problemas de conectividade",
-            description: errorMessage.includes('Timeout') 
-              ? "Sua conexão está muito lenta. Verifique sua internet."
-              : "Sua conexão com o servidor está instável. Verifique sua internet.",
-            variant: "destructive",
-            duration: 5000,
-          });
+          const isTimeout = error?.message?.includes('Timeout') || error?.message?.includes('lenta');
+          
+          if (isTimeout) {
+            setHasConnectivityIssues(true);
+            console.warn('Problemas de conectividade detectados (timeout):', error);
+            toast({
+              title: "Conexão lenta",
+              description: "Sua conexão está muito lenta. Verifique sua internet ou tente novamente em alguns instantes.",
+              variant: "destructive",
+              duration: 8000, // Mostrar por mais tempo
+            });
+          }
         }
       }
     };
