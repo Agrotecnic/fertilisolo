@@ -448,7 +448,7 @@ const Index = () => {
                   Visualize e gerencie suas análises salvas no banco de dados
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pt-4 md:pt-6">
+              <CardContent className="pt-3 md:pt-6 px-3 md:px-6 pb-3 md:pb-6">
                 <UserAnalysisHistory />
               </CardContent>
             </Card>

@@ -184,14 +184,14 @@ export const UserAnalysisHistory: React.FC = () => {
       const totalChecks = Object.keys(results.isAdequate).length;
       
       if (adequateCount === totalChecks) {
-        return <Badge className="bg-green-100 text-green-800">Adequado</Badge>;
+        return <Badge className="bg-green-100 text-green-800 text-xs px-2 py-0.5">Adequado</Badge>;
       } else if (adequateCount >= totalChecks / 2) {
-        return <Badge className="bg-yellow-100 text-yellow-800">Parcial</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5">Parcial</Badge>;
       } else {
-        return <Badge className="bg-red-100 text-red-800">Deficiente</Badge>;
+        return <Badge className="bg-red-100 text-red-800 text-xs px-2 py-0.5">Deficiente</Badge>;
       }
     } catch (error) {
-      return <Badge className="bg-gray-100 text-gray-800">Indeterminado</Badge>;
+      return <Badge className="bg-gray-100 text-gray-800 text-xs px-2 py-0.5">Indeterminado</Badge>;
     }
   };
 
@@ -219,86 +219,87 @@ export const UserAnalysisHistory: React.FC = () => {
   return (
     <div className="grid md:grid-cols-3 gap-4">
       <div className="md:col-span-2">
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           {history.map((analysis, index) => (
             <Card key={index} className="bg-white/80 backdrop-blur-sm border hover:border-primary/50 transition-colors">
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-primary">{analysis.location}</CardTitle>
-                    <CardDescription className="flex items-center gap-1 mt-1">
-                      <Calendar className="h-3 w-3" />
-                      {analysis.date}
+              <CardHeader className="pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-primary text-sm md:text-base truncate">{analysis.location}</CardTitle>
+                    <CardDescription className="flex items-center gap-1 mt-1 text-xs">
+                      <Calendar className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">{analysis.date}</span>
                     </CardDescription>
                   </div>
-                  <div>{getStatusBadge(analysis)}</div>
+                  <div className="flex-shrink-0">{getStatusBadge(analysis)}</div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 gap-2 text-xs mb-3">
-                  <div className="bg-gray-50 p-1 rounded">
-                    <span className="text-gray-500">P:</span> <span className="font-medium">{analysis.P}</span>
+              <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                <div className="grid grid-cols-3 gap-1.5 md:gap-2 text-xs mb-2 md:mb-3">
+                  <div className="bg-gray-50 p-1.5 md:p-2 rounded text-center">
+                    <span className="text-gray-500 block">P:</span> <span className="font-medium">{analysis.P}</span>
                   </div>
-                  <div className="bg-gray-50 p-1 rounded">
-                    <span className="text-gray-500">K:</span> <span className="font-medium">{analysis.K}</span>
+                  <div className="bg-gray-50 p-1.5 md:p-2 rounded text-center">
+                    <span className="text-gray-500 block">K:</span> <span className="font-medium">{analysis.K}</span>
                   </div>
-                  <div className="bg-gray-50 p-1 rounded">
-                    <span className="text-gray-500">Ca:</span> <span className="font-medium">{analysis.Ca}</span>
+                  <div className="bg-gray-50 p-1.5 md:p-2 rounded text-center">
+                    <span className="text-gray-500 block">Ca:</span> <span className="font-medium">{analysis.Ca}</span>
                   </div>
                 </div>
 
-                <div className="flex justify-between mt-2">
-                  <div className="flex space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="text-xs h-8"
-                      onClick={() => handleViewDetails(analysis)}
-                    >
-                      <Eye className="h-3 w-3 mr-1" />
-                      Ver detalhes
-                    </Button>
-                    
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-xs h-8 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                          disabled={deleting}
+                <div className="flex flex-wrap gap-1.5 md:gap-2 mt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-xs h-7 md:h-8 px-2 md:px-3 flex-1 min-w-0"
+                    onClick={() => handleViewDetails(analysis)}
+                  >
+                    <Eye className="h-3 w-3 md:mr-1 flex-shrink-0" />
+                    <span className="hidden sm:inline">Ver detalhes</span>
+                    <span className="sm:hidden">Detalhes</span>
+                  </Button>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-xs h-7 md:h-8 px-2 md:px-3 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 flex-1 min-w-0"
+                        disabled={deleting}
+                      >
+                        <Trash2 className="h-3 w-3 md:mr-1 flex-shrink-0" />
+                        <span className="hidden sm:inline">Excluir</span>
+                        <span className="sm:hidden">Excluir</span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Excluir análise</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja excluir esta análise? Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction 
+                          className="bg-red-600 hover:bg-red-700"
+                          onClick={() => handleDelete(analysis)}
                         >
-                          <Trash2 className="h-3 w-3 mr-1" />
                           Excluir
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Excluir análise</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Tem certeza que deseja excluir esta análise? Esta ação não pode ser desfeita.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction 
-                            className="bg-red-600 hover:bg-red-700"
-                            onClick={() => handleDelete(analysis)}
-                          >
-                            Excluir
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                   
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="text-xs h-8 border-green-600 text-green-700 hover:bg-green-50"
+                    className="text-xs h-7 md:h-8 px-2 md:px-3 border-green-600 text-green-700 hover:bg-green-50 flex-1 min-w-0"
                     onClick={() => handleExportPDF(analysis)}
                   >
-                    <Download className="h-3 w-3 mr-1" />
-                    Exportar PDF
+                    <Download className="h-3 w-3 md:mr-1 flex-shrink-0" />
+                    <span className="hidden sm:inline">Exportar PDF</span>
+                    <span className="sm:hidden">PDF</span>
                   </Button>
                 </div>
               </CardContent>
@@ -310,11 +311,11 @@ export const UserAnalysisHistory: React.FC = () => {
       <div className="md:sticky md:top-4 h-fit">
         {selectedAnalysis ? (
           <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-            <CardHeader>
-              <CardTitle className="text-green-800">Detalhes da Análise</CardTitle>
-              <CardDescription>{selectedAnalysis.location} - {selectedAnalysis.date}</CardDescription>
+            <CardHeader className="px-3 md:px-6 pt-3 md:pt-6 pb-2">
+              <CardTitle className="text-green-800 text-sm md:text-base">Detalhes da Análise</CardTitle>
+              <CardDescription className="text-xs">{selectedAnalysis.location} - {selectedAnalysis.date}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
               <div className="space-y-4">
                 {/* Dados Básicos */}
                 <div>
