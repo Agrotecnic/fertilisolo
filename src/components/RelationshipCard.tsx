@@ -63,7 +63,7 @@ export const RelationshipCard: React.FC<RelationshipCardProps> = ({ soilData, re
               {results.isAdequate.P ? 'Adequado' : 'Baixo'}
             </Badge>
             <p className="text-sm text-gray-600 mt-2">
-              Mínimo para cerrados: 15 mg/dm³
+              Mínimo: 15 mg/dm³
             </p>
           </div>
         </CardContent>
