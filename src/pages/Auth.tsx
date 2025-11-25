@@ -8,14 +8,19 @@ import { Container, Paper } from '@mantine/core';
 
 const Auth = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string>('login');
+  const location = window.location;
+
+  // Detectar se está na rota /signup e ativar automaticamente a tab de signup
+  const initialTab = location.pathname === '/signup' ? 'signup' : 'login';
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
 
   const handleLoginSuccess = () => {
     navigate('/dashboard');
   };
 
   const handleSignupSuccess = () => {
-    setActiveTab('login');
+    // Após signup bem-sucedido, redirecionar para dashboard ao invés de tab login
+    navigate('/dashboard');
   };
 
   const handleCreateAccountClick = () => {

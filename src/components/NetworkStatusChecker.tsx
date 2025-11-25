@@ -9,25 +9,37 @@ export function NetworkStatusChecker() {
 
   // Verificar status de conexão inicial e configurar ouvintes
   useEffect(() => {
+    // Verificar se estamos na página de login/auth/signup - não mostrar toasts nessas páginas
+    const isAuthPage = window.location.pathname === '/' ||
+                        window.location.pathname === '/login' ||
+                        window.location.pathname === '/auth' ||
+                        window.location.pathname === '/signup';
+
     const handleOnline = () => {
       setIsOnline(true);
-      toast({
-        title: "Conexão restaurada",
-        description: "Sua conexão com a internet foi restabelecida.",
-        variant: "default",
-      });
+      // Não mostrar toast na página de login/auth para evitar confusão
+      if (!isAuthPage) {
+        toast({
+          title: "Conexão restaurada",
+          description: "Sua conexão com a internet foi restabelecida.",
+          variant: "default",
+        });
+      }
       // Resetar o flag de problemas de conectividade quando online
       setHasConnectivityIssues(false);
     };
 
     const handleOffline = () => {
       setIsOnline(false);
-      toast({
-        title: "Sem conexão",
-        description: "Você está offline. Algumas funcionalidades podem não estar disponíveis.",
-        variant: "destructive",
-        duration: 5000,
-      });
+      // Não mostrar toast na página de login/auth para evitar confusão
+      if (!isAuthPage) {
+        toast({
+          title: "Sem conexão",
+          description: "Você está offline. Algumas funcionalidades podem não estar disponíveis.",
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
     };
 
     // Ouvintes de eventos para conexão
@@ -36,22 +48,32 @@ export function NetworkStatusChecker() {
 
     // Verificar conexão com o servidor periodicamente
     const checkConnectivity = async () => {
+      // Verificar se estamos na página de login/auth - não fazer verificações nessas páginas
+      const isAuthPage = window.location.pathname === '/' ||
+                          window.location.pathname === '/login' ||
+                          window.location.pathname === '/auth';
+
+      // Pular verificação na página de auth para não interferir no login
+      if (isAuthPage) {
+        return;
+      }
+
       try {
         // Apenas verificar se estamos online
         if (navigator.onLine) {
           const controller = new AbortController();
-          // Timeout mais longo para mobile (15 segundos) para dar mais tempo
+          // Timeout muito mais longo e tolerante para mobile
           const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-          const timeoutDuration = isMobile ? 15000 : 8000; // 15s mobile, 8s desktop
+          const timeoutDuration = isMobile ? 30000 : 20000; // 30s mobile, 20s desktop
           const timeoutId = setTimeout(() => {
             controller.abort();
           }, timeoutDuration);
-          
+
           try {
             // Verificar conexão com o Supabase passando o signal
             const result = await pingServer(controller.signal);
             clearTimeout(timeoutId);
-            
+
             if (result.status === 'error') {
               // Não mostrar erro se for apenas um problema temporário
               // Só mostrar se for timeout ou erro persistente
@@ -62,7 +84,7 @@ export function NetworkStatusChecker() {
               // Pode ser apenas um problema temporário
               return;
             }
-            
+
             // Se chegamos aqui, a conexão está boa
             if (hasConnectivityIssues) {
               setHasConnectivityIssues(false);
@@ -89,7 +111,7 @@ export function NetworkStatusChecker() {
         // Mas só mostrar se for realmente um problema (timeout)
         if (navigator.onLine && !hasConnectivityIssues) {
           const isTimeout = error?.message?.includes('Timeout') || error?.message?.includes('lenta');
-          
+
           if (isTimeout) {
             setHasConnectivityIssues(true);
             console.warn('Problemas de conectividade detectados (timeout):', error);
@@ -104,11 +126,11 @@ export function NetworkStatusChecker() {
       }
     };
 
-    // Verificar a cada 30 segundos
-    const intervalId = setInterval(checkConnectivity, 30000);
-    
-    // Verificar imediatamente no carregamento (com delay para evitar falsos positivos)
-    setTimeout(checkConnectivity, 2000);
+    // Verificar a cada 60 segundos (reduzido para ser menos agressivo)
+    const intervalId = setInterval(checkConnectivity, 60000);
+
+    // Verificar após 5 segundos do carregamento (aumentado para evitar falsos positivos)
+    setTimeout(checkConnectivity, 5000);
 
     // Limpar ouvintes e intervalos
     return () => {

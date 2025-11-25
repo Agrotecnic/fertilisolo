@@ -85,20 +85,40 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onCreateAc
         // Se erro de autenticação, já foi registrado no rate limit acima
         throw error;
       }
-      
+
       // Limpar rate limit em caso de sucesso
       clearRateLimit('login', sanitizedEmail);
-      
+
       onLoginSuccess();
       toast({
         title: 'Login realizado com sucesso!',
         description: 'Você está autenticado.',
       });
     } catch (error: any) {
+      // Determinar o tipo de erro e fornecer mensagem apropriada
+      let errorTitle = 'Falha no login';
+      let errorDescription = error.message || 'Ocorreu um erro ao fazer login.';
+
+      // Erros de autenticação
+      if (error.message?.includes('Invalid login credentials') || error.message?.includes('Invalid email or password')) {
+        errorTitle = 'Credenciais inválidas';
+        errorDescription = 'Email ou senha incorretos. Verifique seus dados e tente novamente.';
+      }
+      // Erros de rede
+      else if (error.message?.includes('fetch') || error.message?.includes('network') || error.message?.includes('Failed to fetch')) {
+        errorTitle = 'Problema de conexão';
+        errorDescription = 'Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.';
+      }
+      // Erros de timeout
+      else if (error.message?.includes('timeout') || error.message?.includes('timed out')) {
+        errorTitle = 'Conexão muito lenta';
+        errorDescription = 'A conexão está demorando muito. Verifique sua internet e tente novamente.';
+      }
+
       toast({
         variant: 'destructive',
-        title: 'Falha no login',
-        description: error.message || 'Ocorreu um erro ao fazer login.',
+        title: errorTitle,
+        description: errorDescription,
       });
     } finally {
       setIsLoading(false);

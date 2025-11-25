@@ -128,18 +128,27 @@ const AppContent = () => {
             </ProtectedRoute>
           } 
         />
-        <Route 
-          path="/login" 
+        <Route
+          path="/login"
           element={
             <PublicRoute>
               <Auth />
             </PublicRoute>
-          } 
+          }
+        />
+        {/* Rota de signup - para links de convite */}
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <Auth />
+            </PublicRoute>
+          }
         />
         {/* Rota de redefinição de senha */}
-        <Route 
-          path="/reset-password" 
-          element={<ResetPassword />} 
+        <Route
+          path="/reset-password"
+          element={<ResetPassword />}
         />
         {/* Rota de Metodologia Técnica - pública e educativa */}
         <Route 

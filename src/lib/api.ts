@@ -24,7 +24,7 @@ export async function pingServer(signal?: AbortSignal) {
     if (supabaseUrl) {
       // Usar a URL base do Supabase com um endpoint que sempre responde
       const healthUrl = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/`;
-      
+
       const fetchPromise = fetch(healthUrl, {
         method: 'GET',
         headers: {
@@ -41,14 +41,18 @@ export async function pingServer(signal?: AbortSignal) {
         throw new Error('Resposta inválida');
       });
 
-      // Timeout manual adicional para garantir
+      // Timeout mais longo e tolerante, especialmente para mobile
       const timeoutPromise = new Promise<never>((_, reject) => {
+        // 30 segundos para mobile, 20 para desktop - muito mais tolerante
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const timeoutDuration = isMobile ? 30000 : 20000;
+
         const timeout = setTimeout(() => {
           if (!signal?.aborted) {
             reject(new Error('Timeout: Conexão muito lenta'));
           }
-        }, signal ? 15000 : 10000); // 15s se tiver signal, 10s caso contrário
-        
+        }, timeoutDuration);
+
         // Limpar timeout se signal for abortado
         if (signal) {
           signal.addEventListener('abort', () => {
@@ -59,10 +63,10 @@ export async function pingServer(signal?: AbortSignal) {
 
       try {
         await Promise.race([fetchPromise, timeoutPromise]);
-        
+
         // Se chegou aqui, a conexão está funcionando
-        return { 
-          status: 'ok', 
+        return {
+          status: 'ok',
           message: 'Conexão com o servidor estabelecida',
           timestamp: new Date().toISOString(),
           connected: true
@@ -79,8 +83,8 @@ export async function pingServer(signal?: AbortSignal) {
   } catch (error: any) {
     // Se foi cancelado por timeout, retornar erro específico
     if (error?.name === 'AbortError' || error?.message?.includes('Timeout') || error?.message?.includes('cancelada')) {
-      return { 
-        status: 'error', 
+      return {
+        status: 'error',
         message: 'Timeout: Conexão muito lenta. Verifique sua internet.',
         timestamp: new Date().toISOString()
       };
