@@ -13,7 +13,7 @@ interface SoilInsightsProps {
 
 const calculateSoilQualityScore = (results: CalculationResult): number => {
   const { saturations, caeMgRatio, isAdequate } = results;
-  
+
   let score = 0;
   let totalChecks = 0;
 
@@ -49,25 +49,29 @@ export const SoilInsights: React.FC<SoilInsightsProps> = ({ soilData, results })
   const qualityScore = calculateSoilQualityScore(results);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Score principal - destaque no topo */}
-      <div className="w-full">
+      <div className="w-full animate-in fade-in zoom-in-95 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
         <SoilQualityScore results={results} />
       </div>
-      
+
       {/* Grid principal com fatores limitantes e padrões críticos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <LimitingFactors results={results} />
-        <CriticalPatterns soilData={soilData} results={results} />
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
+          <LimitingFactors results={results} />
+        </div>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
+          <CriticalPatterns soilData={soilData} results={results} />
+        </div>
       </div>
-      
+
       {/* Recomendações estratégicas - largura total para melhor legibilidade */}
-      <div className="w-full">
+      <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '400ms' }}>
         <StrategicRecommendations soilData={soilData} results={results} />
       </div>
-      
+
       {/* Cronograma de implementação - largura total */}
-      <div className="w-full">
+      <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '500ms' }}>
         <ImplementationPlan qualityScore={qualityScore} />
       </div>
     </div>

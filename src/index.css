@@ -29,14 +29,14 @@
     --accent-foreground: 0 0% 100%;
 
     /* Neutros - Cinzas elegantes */
-    --muted: 200 18% 46%; /* #546E7A */
-    --muted-foreground: 0 0% 100%;
+    --muted: 200 18% 92%; /* Fundo sutil para cards ou destaques claros */
+    --muted-foreground: 200 18% 46%; /* #546E7A - Cinza elegante médio - Perfeito para textos pequenos */
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 200 15% 73%; /* #78909C */
-    --input: 200 15% 73%; /* #78909C */
+    --border: 200 15% 85%; /* Bordas mais suaves */
+    --input: 200 15% 85%; 
     --ring: 145 65% 24%; /* #1B5E20 */
 
     --radius: 0.5rem;
@@ -70,8 +70,8 @@
     --accent: 36 90% 55%; /* Slightly lighter #FF8F00 for dark mode */
     --accent-foreground: 0 0% 100%;
 
-    --muted: 200 15% 60%; /* Lighter #546E7A for dark mode */
-    --muted-foreground: 0 0% 95%;
+    --muted: 200 18% 30%; /* Fundo sutil mais escuro para cards no modo noturno */
+    --muted-foreground: 200 15% 80%; /* Cinza muito claro, otimizado para ler sobre fundos escuros */
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;

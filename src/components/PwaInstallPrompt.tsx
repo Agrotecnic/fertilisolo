@@ -26,35 +26,35 @@ export const PwaInstallPrompt: React.FC = () => {
   // Função para verificar se o app já está instalado
   const checkIfInstalled = () => {
     // No iOS
-    const isIOSInstalled = 
-      (window.navigator as IOSNavigator).standalone || 
+    const isIOSInstalled =
+      (window.navigator as IOSNavigator).standalone ||
       window.matchMedia('(display-mode: standalone)').matches;
-    
+
     // No Android/Chrome
-    const isAndroidInstalled = 
+    const isAndroidInstalled =
       window.matchMedia('(display-mode: standalone)').matches;
-    
+
     return isIOSInstalled || isAndroidInstalled;
   };
 
   // Verificar status de instalação na inicialização
   useEffect(() => {
     setIsInstalled(checkIfInstalled());
-    
+
     // Se for um dispositivo móvel, mostrar banner após 3 segundos
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
+
     if (isMobile && !checkIfInstalled()) {
       // Em dispositivos iOS, não temos o evento beforeinstallprompt
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      
+
       if (isIOS) {
         // Em iOS, sempre mostrar o banner após 3 segundos
         setTimeout(() => {
           setShowInstallBanner(true);
           toast({
-            title: 'Instalar aplicativo',
-            description: 'Para instalar o FertiliSolo no iOS, toque em "Compartilhar" e depois em "Adicionar à Tela de Início".',
+            title: 'Adicionar à Tela Inicial',
+            description: 'Para acessar o FertiliSolo facilmente no iOS, toque em "Compartilhar" e depois em "Adicionar à Tela de Início".',
             duration: 10000,
           });
         }, 3000);
@@ -66,7 +66,7 @@ export const PwaInstallPrompt: React.FC = () => {
     // Verificar status online/offline
     const handleOnlineStatus = () => {
       setIsOnline(navigator.onLine);
-      
+
       if (navigator.onLine) {
         toast({
           title: 'Você está online',
@@ -76,7 +76,7 @@ export const PwaInstallPrompt: React.FC = () => {
       } else {
         toast({
           title: 'Você está offline',
-          description: 'O aplicativo continuará funcionando com recursos limitados.',
+          description: 'A plataforma continuará funcionando com recursos limitados.',
           variant: 'destructive'
         });
       }
@@ -93,15 +93,15 @@ export const PwaInstallPrompt: React.FC = () => {
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       // Mostrar que o app é instalável
       setIsInstallable(true);
-      
+
       // Mostrar o banner de instalação automaticamente após 1 segundo
       setTimeout(() => {
         toast({
-          title: 'Instalar aplicativo',
-          description: 'O FertiliSolo pode ser instalado para uso offline.',
+          title: 'Adicionar à Tela Inicial',
+          description: 'O FertiliSolo pode ser adicionado à sua tela para acesso rápido e uso offline.',
           action: (
-            <ToastAction altText="Instalar" onClick={handleInstallClick}>
-              Instalar
+            <ToastAction altText="Adicionar" onClick={handleInstallClick}>
+              Adicionar
             </ToastAction>
           ),
           duration: 10000,
@@ -116,10 +116,10 @@ export const PwaInstallPrompt: React.FC = () => {
       setIsInstallable(false);
       setDeferredPrompt(null);
       setIsInstalled(true);
-      
+
       toast({
-        title: 'Aplicativo instalado',
-        description: 'O FertiliSolo foi instalado com sucesso!',
+        title: 'Atalho criado',
+        description: 'O FertiliSolo foi adicionado à sua tela inicial com sucesso!',
         variant: 'default'
       });
     });
@@ -135,18 +135,18 @@ export const PwaInstallPrompt: React.FC = () => {
     if (deferredPrompt) {
       // Mostrar o prompt de instalação
       await deferredPrompt.prompt();
-      
+
       // Esperar pela escolha do usuário
       const { outcome } = await deferredPrompt.userChoice;
-      
+
       if (outcome === 'accepted') {
         toast({
           title: 'Obrigado!',
-          description: 'O aplicativo está sendo instalado.',
+          description: 'O atalho está sendo criado.',
           variant: 'default'
         });
       }
-      
+
       // Limpar o prompt salvo
       setDeferredPrompt(null);
       setIsInstallable(false);
@@ -155,8 +155,8 @@ export const PwaInstallPrompt: React.FC = () => {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       if (isIOS) {
         toast({
-          title: 'Instalar no iOS',
-          description: 'Para instalar o FertiliSolo, toque no botão "Compartilhar" e depois em "Adicionar à Tela de Início".',
+          title: 'Adicionar no iOS',
+          description: 'Para adicionar o FertiliSolo à sua tela, toque no botão "Compartilhar" e depois em "Adicionar à Tela de Início".',
           duration: 10000,
         });
       }
@@ -171,13 +171,13 @@ export const PwaInstallPrompt: React.FC = () => {
   if (isIOS && showInstallBanner) {
     return (
       <div className="fixed bottom-0 left-0 right-0 bg-green-600 text-white p-4 shadow-lg z-50">
-        <h3 className="text-lg font-bold mb-2">Instale o FertiliSolo</h3>
-        <p className="text-sm mb-2">Para instalar o app no seu dispositivo iOS:</p>
+        <h3 className="text-lg font-bold mb-2">Adicione o FertiliSolo</h3>
+        <p className="text-sm mb-2">Para acessar a plataforma rapidamente no seu iOS:</p>
         <ol className="text-sm mb-4 list-decimal pl-5">
           <li>Toque no botão <span className="font-bold">Compartilhar</span> abaixo</li>
           <li>Role e toque em <span className="font-bold">Adicionar à Tela de Início</span></li>
         </ol>
-        <Button 
+        <Button
           onClick={() => setShowInstallBanner(false)}
           variant="secondary"
           className="w-full"
@@ -191,12 +191,12 @@ export const PwaInstallPrompt: React.FC = () => {
   // Se for instalável ou dispositivo móvel, mostre o botão
   if (isInstallable || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     return (
-      <Button 
+      <Button
         onClick={handleInstallClick}
         className="fixed bottom-4 right-4 z-50 bg-green-600 hover:bg-green-700 shadow-lg flex items-center gap-2"
       >
         <Download className="h-4 w-4" />
-        Instalar App
+        Adicionar à Tela Inicial
       </Button>
     );
   }

@@ -119,12 +119,13 @@ const Index = () => {
         title: "Análise salva com sucesso!",
         description: "Os dados foram salvos no banco de dados.",
       });
-    } catch (error: any) {
-      console.error('🎯 [ANALYSIS] Erro no processo de salvamento:', error);
+    } catch (error) {
+      const err = error as Error;
+      console.error('🎯 [ANALYSIS] Erro no processo de salvamento:', err);
       toast({
         variant: 'destructive',
         title: "Erro ao salvar análise",
-        description: error.message || "Ocorreu um erro ao salvar os dados."
+        description: err.message || "Ocorreu um erro ao salvar os dados."
       });
     } finally {
       setIsLoading(false);

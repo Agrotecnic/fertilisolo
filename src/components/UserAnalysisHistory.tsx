@@ -8,9 +8,10 @@ import { getUserSoilAnalyses, deleteSoilAnalysis } from '@/lib/services';
 import { calculateSoilAnalysis } from '@/utils/soilCalculations';
 import { Trash2, Eye, MapPin, Calendar, AlertTriangle, Download } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import * as pdfGenerator from '@/utils/pdfGenerator';
+// Import removido para fazer dynamic import sob demanda
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useTheme } from '@/providers/ThemeProvider';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const UserAnalysisHistory: React.FC = () => {
   const { theme, logo, organizationName } = useTheme();
@@ -28,14 +29,15 @@ export const UserAnalysisHistory: React.FC = () => {
     try {
       const { data, error } = await getUserSoilAnalyses();
       if (error) throw error;
-      
+
       setHistory(data || []);
-    } catch (error: any) {
-      console.error('Erro ao carregar histórico de análises:', error);
+    } catch (error) {
+      const err = error as Error;
+      console.error('Erro ao carregar histórico de análises:', err);
       toast({
         variant: 'destructive',
         title: 'Erro ao carregar análises',
-        description: error.message || 'Não foi possível carregar as análises do servidor.'
+        description: err.message || 'Não foi possível carregar as análises do servidor.'
       });
     } finally {
       setLoading(false);
@@ -80,7 +82,7 @@ export const UserAnalysisHistory: React.FC = () => {
 
       // Calcular resultados da análise para incluir no PDF
       const results = calculateSoilAnalysis(analysis);
-      
+
       // Converter logo para base64 se disponível
       let logoBase64: string | undefined = undefined;
       if (logo) {
@@ -109,16 +111,19 @@ export const UserAnalysisHistory: React.FC = () => {
         organizationName: themeOptions.organizationName
       });
 
+      // Import dinâmico para não carregar a biblioteca de PDF no bundle principal
+      const pdfGenerator = await import('@/utils/pdfGenerator');
+
       // Gerar PDF com personalização
       await pdfGenerator.generatePDFReport(
-        analysis, 
+        analysis,
         results,
         undefined,
         themeOptions
       );
-      
+
       console.log('✅ PDF gerado e salvo com sucesso');
-      
+
       toast({
         title: "PDF Gerado",
         description: "O relatório foi gerado com sucesso.",
@@ -135,7 +140,7 @@ export const UserAnalysisHistory: React.FC = () => {
 
   const handleDelete = async (analysis: SoilData) => {
     console.log("Tentando excluir análise:", analysis);
-    
+
     if (!analysis.id) {
       toast({
         variant: 'destructive',
@@ -148,29 +153,30 @@ export const UserAnalysisHistory: React.FC = () => {
     setDeleting(true);
     try {
       const { success, error } = await deleteSoilAnalysis(analysis.id);
-      
+
       if (error) throw error;
-      
+
       if (success) {
         // Se a análise excluída for a selecionada, limpe a seleção
         if (selectedAnalysis && selectedAnalysis.id === analysis.id) {
           setSelectedAnalysis(null);
         }
-        
+
         // Recarregar a lista de análises
         await loadHistory();
-        
+
         toast({
           title: "Análise excluída",
           description: "A análise foi excluída com sucesso."
         });
       }
-    } catch (error: any) {
-      console.error('Erro ao excluir análise:', error);
+    } catch (error) {
+      const err = error as Error;
+      console.error('Erro ao excluir análise:', err);
       toast({
         variant: 'destructive',
         title: 'Erro ao excluir análise',
-        description: error.message || 'Não foi possível excluir a análise.'
+        description: err.message || 'Não foi possível excluir a análise.'
       });
     } finally {
       setDeleting(false);
@@ -182,7 +188,7 @@ export const UserAnalysisHistory: React.FC = () => {
       const results = calculateSoilAnalysis(analysis);
       const adequateCount = Object.values(results.isAdequate).filter(Boolean).length;
       const totalChecks = Object.keys(results.isAdequate).length;
-      
+
       if (adequateCount === totalChecks) {
         return <Badge className="bg-green-100 text-green-800 text-xs px-2 py-0.5">Adequado</Badge>;
       } else if (adequateCount >= totalChecks / 2) {
@@ -197,9 +203,47 @@ export const UserAnalysisHistory: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center p-8">
-        <div className="animate-pulse text-center">
-          <p>Carregando análises...</p>
+      <div className="grid md:grid-cols-3 gap-4 animate-in fade-in duration-500">
+        <div className="md:col-span-2 space-y-3 md:space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="bg-white/80 border">
+              <CardHeader className="pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-3 w-1/4" />
+                  </div>
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                </div>
+              </CardHeader>
+              <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                <div className="grid grid-cols-3 gap-1.5 md:gap-2 mb-2 md:mb-3">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="flex gap-1.5 md:gap-2 mt-2">
+                  <Skeleton className="h-8 flex-1" />
+                  <Skeleton className="h-8 flex-1" />
+                  <Skeleton className="h-8 flex-1" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="hidden md:block">
+          <Card className="bg-white/80">
+            <CardHeader className="px-3 md:px-6 pt-3 md:pt-6 pb-2">
+              <Skeleton className="h-6 w-1/2 mb-2" />
+              <Skeleton className="h-4 w-1/3" />
+            </CardHeader>
+            <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+              <div className="space-y-4">
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-40 w-full" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -248,9 +292,9 @@ export const UserAnalysisHistory: React.FC = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-1.5 md:gap-2 mt-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="text-xs h-7 md:h-8 px-2 md:px-3 flex-1 min-w-0"
                     onClick={() => handleViewDetails(analysis)}
                   >
@@ -258,12 +302,12 @@ export const UserAnalysisHistory: React.FC = () => {
                     <span className="hidden sm:inline">Ver detalhes</span>
                     <span className="sm:hidden">Detalhes</span>
                   </Button>
-                  
+
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className="text-xs h-7 md:h-8 px-2 md:px-3 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 flex-1 min-w-0"
                         disabled={deleting}
                       >
@@ -281,7 +325,7 @@ export const UserAnalysisHistory: React.FC = () => {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction 
+                        <AlertDialogAction
                           className="bg-red-600 hover:bg-red-700"
                           onClick={() => handleDelete(analysis)}
                         >
@@ -290,10 +334,10 @@ export const UserAnalysisHistory: React.FC = () => {
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="text-xs h-7 md:h-8 px-2 md:px-3 border-green-600 text-green-700 hover:bg-green-50 flex-1 min-w-0"
                     onClick={() => handleExportPDF(analysis)}
                   >
@@ -393,18 +437,18 @@ export const UserAnalysisHistory: React.FC = () => {
                 </div>
 
                 <div className="mt-4 space-y-3">
-                  <Button 
+                  <Button
                     className="w-full bg-green-600 hover:bg-green-700 text-white"
                     onClick={() => handleExportPDF(selectedAnalysis)}
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Exportar como PDF
                   </Button>
-                  
+
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         className="w-full border-red-300 text-red-600 hover:bg-red-50"
                         disabled={deleting}
                       >
@@ -421,7 +465,7 @@ export const UserAnalysisHistory: React.FC = () => {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction 
+                        <AlertDialogAction
                           className="bg-red-600 hover:bg-red-700"
                           onClick={() => handleDelete(selectedAnalysis)}
                         >
