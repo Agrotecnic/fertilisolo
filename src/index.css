@@ -89,6 +89,30 @@
     --sidebar-border: 145 50% 25%; /* Even darker #1B5E20 for dark mode */
     --sidebar-ring: 36 90% 55%; /* Slightly lighter #FF8F00 for dark mode */
   }
+
+  /* Landing page: isola completamente do tema de organização.
+     CSS custom properties definidas aqui sobrepõem herança do <html>
+     (onde o JS de org-theme define inline styles), garantindo que
+     visitantes públicos e usuários de org vejam sempre o brand padrão. */
+  [data-landing-page] {
+    --background: 0 0% 98%;
+    --foreground: 200 18% 26%;
+    --card: 0 0% 96%;
+    --card-foreground: 200 18% 26%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 18% 26%;
+    --primary: 145 65% 24%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 213 86% 42%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 36 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 200 18% 92%;
+    --muted-foreground: 200 18% 40%;
+    --border: 200 15% 85%;
+    --input: 200 15% 85%;
+    --ring: 145 65% 24%;
+  }
 }
 
 @layer base {

@@ -8,7 +8,7 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden">
+    <div data-landing-page className="min-h-screen flex flex-col overflow-x-hidden">
       {/* Navbar */}
       <nav className="bg-white border-b border-gray-200 fixed w-full z-50 overflow-hidden">
         <div className="max-w-7xl mx-auto flex justify-between items-center py-3 px-4 md:py-4 md:px-6 lg:px-8">
@@ -96,10 +96,10 @@ const LandingPage: React.FC = () => {
       <section className="py-16 md:py-24 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
               Tudo o que você precisa para otimizar sua adubação
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Ferramentas completas para análise de solo e recomendação precisa de fertilizantes
             </p>
           </div>
@@ -190,10 +190,10 @@ const LandingPage: React.FC = () => {
       <section className="py-16 md:py-24 bg-gray-50 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
               Como funciona
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Um processo simples para maximizar a produtividade da sua lavoura
             </p>
           </div>
@@ -254,10 +254,10 @@ const LandingPage: React.FC = () => {
       <section className="py-16 md:py-24 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
               Benefícios do FertiliSolo
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Otimize recursos e maximize resultados com nossa plataforma
             </p>
           </div>
@@ -327,7 +327,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-16 md:py-24 lg:py-32 bg-gradient-to-br from-primary via-primary to-secondary overflow-hidden">
+      <section className="relative py-16 md:py-24 lg:py-32 bg-gradient-to-br from-[#1B5E20] via-[#1B5E20] to-[#1565C0] overflow-hidden">
         {/* Decorative background elements */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3 pointer-events-none"></div>
@@ -343,7 +343,7 @@ const LandingPage: React.FC = () => {
             <Button
               onClick={() => navigate('/login')}
               size="xl"
-              className="w-full sm:w-auto h-14 px-10 text-lg bg-white text-primary hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all hover:scale-105 button-ripple"
+              className="w-full sm:w-auto h-14 px-10 text-lg bg-white text-[#1B5E20] hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all hover:scale-105 button-ripple"
             >
               Criar conta gratuita
               <ArrowRight className="ml-2 h-5 w-5" />
