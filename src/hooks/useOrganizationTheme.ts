@@ -21,6 +21,70 @@ interface UseOrganizationThemeReturn {
   refetch: () => Promise<void>;
 }
 
+const THEME_STORAGE_KEY = 'org_theme_cache';
+
+/** Aplica CSS variables a partir de um objeto de tema (pode ser chamado fora do React) */
+function applyCachedTheme(themeData: OrganizationTheme) {
+  const root = document.documentElement;
+  try {
+    if (themeData.primary_color) {
+      const hsl = hexToHSL(themeData.primary_color);
+      root.style.setProperty('--primary', hsl);
+      root.style.setProperty('--sidebar-background', hsl);
+      root.style.setProperty('--sidebar-border', hsl);
+    }
+    if (themeData.primary_foreground) {
+      const hsl = hexToHSL(themeData.primary_foreground);
+      root.style.setProperty('--primary-foreground', hsl);
+      root.style.setProperty('--sidebar-foreground', hsl);
+      root.style.setProperty('--sidebar-primary', hsl);
+    }
+    if (themeData.secondary_color) root.style.setProperty('--secondary', hexToHSL(themeData.secondary_color));
+    if (themeData.secondary_foreground) root.style.setProperty('--secondary-foreground', hexToHSL(themeData.secondary_foreground));
+    if (themeData.accent_color) {
+      const hsl = hexToHSL(themeData.accent_color);
+      root.style.setProperty('--accent', hsl);
+      root.style.setProperty('--ring', hsl);
+      root.style.setProperty('--sidebar-accent', hsl);
+      root.style.setProperty('--sidebar-ring', hsl);
+    }
+    if (themeData.accent_foreground) {
+      const hsl = hexToHSL(themeData.accent_foreground);
+      root.style.setProperty('--accent-foreground', hsl);
+      root.style.setProperty('--sidebar-accent-foreground', hsl);
+      root.style.setProperty('--sidebar-primary-foreground', hsl);
+    }
+    if (themeData.background_color) root.style.setProperty('--background', hexToHSL(themeData.background_color));
+    if (themeData.foreground_color) root.style.setProperty('--foreground', hexToHSL(themeData.foreground_color));
+    if (themeData.card_color) {
+      const hsl = hexToHSL(themeData.card_color);
+      root.style.setProperty('--card', hsl);
+      root.style.setProperty('--popover', hsl);
+    }
+    if (themeData.card_foreground) {
+      const hsl = hexToHSL(themeData.card_foreground);
+      root.style.setProperty('--card-foreground', hsl);
+      root.style.setProperty('--popover-foreground', hsl);
+    }
+    if (themeData.border_color) root.style.setProperty('--border', hexToHSL(themeData.border_color));
+    if (themeData.input_color) root.style.setProperty('--input', hexToHSL(themeData.input_color));
+    if (themeData.muted_color) root.style.setProperty('--muted', hexToHSL(themeData.muted_color));
+    if (themeData.muted_foreground) root.style.setProperty('--muted-foreground', hexToHSL(themeData.muted_foreground));
+    if (themeData.border_radius) root.style.setProperty('--radius', themeData.border_radius);
+    if (themeData.font_family && themeData.font_family !== 'Roboto') {
+      document.body.style.fontFamily = `'${themeData.font_family}', sans-serif`;
+    }
+  } catch (_) { /* ignore */ }
+}
+
+// Aplica o tema do cache ANTES do primeiro render do React
+try {
+  const cached = localStorage.getItem(THEME_STORAGE_KEY);
+  if (cached) {
+    applyCachedTheme(JSON.parse(cached));
+  }
+} catch (_) { /* ignore */ }
+
 export function useOrganizationTheme(): UseOrganizationThemeReturn {
   const { user } = useAuth();
   const [theme, setTheme] = useState<OrganizationTheme | null>(null);
@@ -70,8 +134,10 @@ export function useOrganizationTheme(): UseOrganizationThemeReturn {
 
       if (themeData) {
         console.log('🎨 Tema carregado:', themeData);
+        // Persiste no localStorage para aplicação imediata no próximo carregamento
+        try { localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(themeData)); } catch (_) {}
         setTheme(themeData);
-        applyTheme(themeData);
+        applyCachedTheme(themeData);
       }
     } catch (err: any) {
       console.error('Erro ao carregar tema da organização:', err);
@@ -85,110 +151,6 @@ export function useOrganizationTheme(): UseOrganizationThemeReturn {
     loadTheme();
   }, [user]);
   
-  // Re-aplicar tema sempre que mudar
-  useEffect(() => {
-    if (theme) {
-      console.log('🔄 Re-aplicando tema...');
-      applyTheme(theme);
-    }
-  }, [theme]);
-
-  /**
-   * Aplica o tema customizado ao documento
-   */
-  const applyTheme = (themeData: OrganizationTheme) => {
-    const root = document.documentElement;
-
-    try {
-      console.log('🎨 Aplicando tema nas variáveis CSS...');
-
-      // Cores primárias
-      if (themeData.primary_color) {
-        const hsl = hexToHSL(themeData.primary_color);
-        root.style.setProperty('--primary', hsl);
-        // Sidebar usa a cor primária como fundo
-        root.style.setProperty('--sidebar-background', hsl);
-        root.style.setProperty('--sidebar-border', hsl);
-      }
-      if (themeData.primary_foreground) {
-        const hsl = hexToHSL(themeData.primary_foreground);
-        root.style.setProperty('--primary-foreground', hsl);
-        root.style.setProperty('--sidebar-foreground', hsl);
-        root.style.setProperty('--sidebar-primary', hsl);
-      }
-
-      // Cores secundárias
-      if (themeData.secondary_color) {
-        root.style.setProperty('--secondary', hexToHSL(themeData.secondary_color));
-      }
-      if (themeData.secondary_foreground) {
-        root.style.setProperty('--secondary-foreground', hexToHSL(themeData.secondary_foreground));
-      }
-
-      // Accent (dourado) — também usado no ring de foco e sidebar accent
-      if (themeData.accent_color) {
-        const hsl = hexToHSL(themeData.accent_color);
-        root.style.setProperty('--accent', hsl);
-        root.style.setProperty('--ring', hsl);           // Focus ring dourado
-        root.style.setProperty('--sidebar-accent', hsl);
-        root.style.setProperty('--sidebar-ring', hsl);
-      }
-      if (themeData.accent_foreground) {
-        const hsl = hexToHSL(themeData.accent_foreground);
-        root.style.setProperty('--accent-foreground', hsl);
-        root.style.setProperty('--sidebar-accent-foreground', hsl);
-        root.style.setProperty('--sidebar-primary-foreground', hsl);
-      }
-
-      // Background e foreground
-      if (themeData.background_color) {
-        root.style.setProperty('--background', hexToHSL(themeData.background_color));
-      }
-      if (themeData.foreground_color) {
-        root.style.setProperty('--foreground', hexToHSL(themeData.foreground_color));
-      }
-
-      // Card — também usado para popovers e dropdowns
-      if (themeData.card_color) {
-        const hsl = hexToHSL(themeData.card_color);
-        root.style.setProperty('--card', hsl);
-        root.style.setProperty('--popover', hsl);
-      }
-      if (themeData.card_foreground) {
-        const hsl = hexToHSL(themeData.card_foreground);
-        root.style.setProperty('--card-foreground', hsl);
-        root.style.setProperty('--popover-foreground', hsl);
-      }
-
-      // Bordas e inputs
-      if (themeData.border_color) {
-        root.style.setProperty('--border', hexToHSL(themeData.border_color));
-      }
-      if (themeData.input_color) {
-        root.style.setProperty('--input', hexToHSL(themeData.input_color));
-      }
-
-      // Muted
-      if (themeData.muted_color) {
-        root.style.setProperty('--muted', hexToHSL(themeData.muted_color));
-      }
-      if (themeData.muted_foreground) {
-        root.style.setProperty('--muted-foreground', hexToHSL(themeData.muted_foreground));
-      }
-
-      // Border radius e fonte
-      if (themeData.border_radius) {
-        root.style.setProperty('--radius', themeData.border_radius);
-      }
-      if (themeData.font_family && themeData.font_family !== 'Roboto') {
-        document.body.style.fontFamily = `'${themeData.font_family}', sans-serif`;
-      }
-
-      console.log('✅ Tema premium aplicado com sucesso!');
-    } catch (err) {
-      console.error('❌ Erro ao aplicar tema:', err);
-    }
-  };
 
   /**
    * Função para recarregar o tema manualmente
