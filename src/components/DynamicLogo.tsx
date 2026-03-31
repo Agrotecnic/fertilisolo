@@ -109,29 +109,50 @@ function FertilisoloDefaultLogo({ className }: { className?: string }) {
 
 export function DynamicLogo({ 
   className, 
-  fallbackSrc,
+  fallbackSrc = '/logo-fertilisolo.png',
   alt,
   size = 'md'
 }: DynamicLogoProps) {
   const { logo, organizationName } = useTheme();
   const [imgError, setImgError] = useState(false);
+  const [fallbackError, setFallbackError] = useState(false);
 
   const logoAlt = alt || organizationName || 'FertiliSolo';
   const sizeClass = sizeClasses[size];
+  const src = logo || fallbackSrc;
 
-  // Se há logo de organização e não deu erro ao carregar, mostra como <img>
-  if (logo && !imgError) {
+  // Se PNG (org ou padrão) carregou com sucesso, exibe como <img>
+  if (!imgError) {
     return (
       <img
-        src={logo}
+        src={src}
         alt={logoAlt}
         className={cn(sizeClass, className)}
-        onError={() => setImgError(true)}
+        onError={() => {
+          if (!logo || imgError) {
+            setFallbackError(true);
+          } else {
+            // Org logo falhou → tenta o logo padrão
+            setImgError(true);
+          }
+        }}
       />
     );
   }
 
-  // Fallback: logo SVG padrão do FertiliSolo (nunca falha)
+  // Logo org falhou mas PNG padrão está disponível
+  if (!fallbackError) {
+    return (
+      <img
+        src={fallbackSrc}
+        alt={logoAlt}
+        className={cn(sizeClass, className)}
+        onError={() => setFallbackError(true)}
+      />
+    );
+  }
+
+  // Último recurso: SVG inline (nunca falha)
   return (
     <FertilisoloDefaultLogo
       className={cn(sizeClass, 'text-[#1B5E20]', className)}

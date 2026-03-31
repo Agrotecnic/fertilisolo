@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => ({
     componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['robots.txt', 'icone-fertilisolo.svg', 'logo-fertilisolo.png'],
+      includeAssets: ['robots.txt', 'logo-fertilisolo.png'],
       manifest: {
         name: 'FertiliSolo',
         short_name: 'FertiliSolo',
@@ -77,9 +77,9 @@ export default defineConfig(({ mode }) => ({
             purpose: 'any'
           },
           {
-            src: '/icone-fertilisolo.svg',
+            src: '/logo-fertilisolo.png',
             sizes: '72x72 96x96 128x128 144x144 152x152 192x192 384x384 512x512',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'maskable'
           }
         ]
