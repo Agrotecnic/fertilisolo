@@ -22,6 +22,7 @@ interface UseOrganizationThemeReturn {
 }
 
 const THEME_STORAGE_KEY = 'org_theme_cache';
+const ORG_ID_STORAGE_KEY = 'org_id_cache';
 
 /** Aplica CSS variables a partir de um objeto de tema (pode ser chamado fora do React) */
 function applyCachedTheme(themeData: OrganizationTheme) {
@@ -77,11 +78,13 @@ function applyCachedTheme(themeData: OrganizationTheme) {
   } catch (_) { /* ignore */ }
 }
 
-// Aplica o tema do cache ANTES do primeiro render do React
+// Aplica o tema do cache ANTES do primeiro render do React (elimina FOUC)
 try {
   const cached = localStorage.getItem(THEME_STORAGE_KEY);
   if (cached) {
     applyCachedTheme(JSON.parse(cached));
+    // Marca a raiz para que componentes saibam que um tema org está ativo
+    document.documentElement.setAttribute('data-org-theme', 'true');
   }
 } catch (_) { /* ignore */ }
 
@@ -89,13 +92,24 @@ export function useOrganizationTheme(): UseOrganizationThemeReturn {
   const { user } = useAuth();
   const [theme, setTheme] = useState<OrganizationTheme | null>(null);
   const [logo, setLogo] = useState<string | null>(null);
-  const [organizationId, setOrganizationId] = useState<string | null>(null);
+  // Inicializa com o valor cacheado para evitar flash no Header
+  const [organizationId, setOrganizationId] = useState<string | null>(
+    () => { try { return localStorage.getItem(ORG_ID_STORAGE_KEY); } catch (_) { return null; } }
+  );
   const [organizationName, setOrganizationName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const loadTheme = async () => {
     if (!user) {
+      // Limpa cache de tema ao sair (para não vazar tema entre usuários)
+      try {
+        localStorage.removeItem(THEME_STORAGE_KEY);
+        localStorage.removeItem(ORG_ID_STORAGE_KEY);
+        document.documentElement.removeAttribute('data-org-theme');
+      } catch (_) {}
+      setOrganizationId(null);
+      setTheme(null);
       setLoading(false);
       return;
     }
@@ -135,7 +149,11 @@ export function useOrganizationTheme(): UseOrganizationThemeReturn {
       if (themeData) {
         console.log('🎨 Tema carregado:', themeData);
         // Persiste no localStorage para aplicação imediata no próximo carregamento
-        try { localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(themeData)); } catch (_) {}
+        try {
+          localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(themeData));
+          localStorage.setItem(ORG_ID_STORAGE_KEY, org.id);
+          document.documentElement.setAttribute('data-org-theme', 'true');
+        } catch (_) {}
         setTheme(themeData);
         applyCachedTheme(themeData);
       }
