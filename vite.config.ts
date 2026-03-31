@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' &&
     componentTagger(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['robots.txt', 'icone-fertilisolo.svg', 'logo-fertilisolo.png'],
       manifest: {
         name: 'FertiliSolo',
