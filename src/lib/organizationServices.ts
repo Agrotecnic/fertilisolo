@@ -256,7 +256,7 @@ export async function getOrganizationTheme(organizationId: string) {
       .from('organization_themes')
       .select('*')
       .eq('organization_id', organizationId)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     
@@ -280,7 +280,7 @@ export async function updateOrganizationTheme(
       .update(themeUpdates)
       .eq('organization_id', organizationId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     
