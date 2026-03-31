@@ -28,7 +28,7 @@ export const FarmManagementButton: React.FC<FarmManagementButtonProps> = ({ onDa
         <Button 
           variant="outline" 
           size="sm" 
-          className="mt-1 border-green-600 text-green-700 hover:bg-green-50"
+          className="mt-1 border-primary text-primary hover:bg-primary/10"
         >
           <PlusCircle className="h-4 w-4 mr-1" />
           Gerenciar Fazendas/Talhões

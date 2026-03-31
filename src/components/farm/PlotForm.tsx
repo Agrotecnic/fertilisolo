@@ -186,7 +186,7 @@ export const PlotForm: React.FC<PlotFormProps> = ({ farms, selectedFarmId, onPlo
 
           <Button 
             type="submit" 
-            className="w-full bg-green-600 hover:bg-green-700" 
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" 
             disabled={isLoading}
           >
             {isLoading ? (

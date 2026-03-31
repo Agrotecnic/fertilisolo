@@ -122,13 +122,14 @@ export default defineConfig(({ mode }) => ({
           },
           {
             urlPattern: /\.(?:js|css)$/i,
-            handler: 'StaleWhileRevalidate',
+            handler: 'NetworkFirst',
             options: {
               cacheName: 'static-resources',
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 dias
-              }
+                maxAgeSeconds: 60 * 60 * 24 // 1 dia
+              },
+              networkTimeoutSeconds: 5
             }
           },
           {

@@ -254,7 +254,7 @@ const Index = () => {
             <Link to="/metodologia" className="hidden md:block">
               <Button 
                 variant="outline" 
-                className="border-green-600 text-green-700 hover:bg-green-50 shadow-md flex items-center gap-2 text-sm md:text-base py-1 px-2 md:py-2 md:px-4"
+                className="border-primary text-primary hover:bg-primary/10 shadow-md flex items-center gap-2 text-sm md:text-base py-1 px-2 md:py-2 md:px-4"
               >
                 <BookOpen className="h-4 w-4 md:h-5 md:w-5" />
                 Metodologia Técnica
