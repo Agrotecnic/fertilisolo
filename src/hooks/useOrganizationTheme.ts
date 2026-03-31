@@ -101,38 +101,46 @@ export function useOrganizationTheme(): UseOrganizationThemeReturn {
 
     try {
       console.log('🎨 Aplicando tema nas variáveis CSS...');
-      
-      // Aplicar cores primárias
+
+      // Cores primárias
       if (themeData.primary_color) {
         const hsl = hexToHSL(themeData.primary_color);
         root.style.setProperty('--primary', hsl);
-        console.log('✅ Primary:', themeData.primary_color, '→', hsl);
+        // Sidebar usa a cor primária como fundo
+        root.style.setProperty('--sidebar-background', hsl);
+        root.style.setProperty('--sidebar-border', hsl);
       }
       if (themeData.primary_foreground) {
-        root.style.setProperty('--primary-foreground', hexToHSL(themeData.primary_foreground));
+        const hsl = hexToHSL(themeData.primary_foreground);
+        root.style.setProperty('--primary-foreground', hsl);
+        root.style.setProperty('--sidebar-foreground', hsl);
+        root.style.setProperty('--sidebar-primary', hsl);
       }
 
-      // Aplicar cores secundárias
+      // Cores secundárias
       if (themeData.secondary_color) {
-        const hsl = hexToHSL(themeData.secondary_color);
-        root.style.setProperty('--secondary', hsl);
-        console.log('✅ Secondary:', themeData.secondary_color, '→', hsl);
+        root.style.setProperty('--secondary', hexToHSL(themeData.secondary_color));
       }
       if (themeData.secondary_foreground) {
         root.style.setProperty('--secondary-foreground', hexToHSL(themeData.secondary_foreground));
       }
 
-      // Aplicar cores de destaque (accent)
+      // Accent (dourado) — também usado no ring de foco e sidebar accent
       if (themeData.accent_color) {
         const hsl = hexToHSL(themeData.accent_color);
         root.style.setProperty('--accent', hsl);
-        console.log('✅ Accent:', themeData.accent_color, '→', hsl);
+        root.style.setProperty('--ring', hsl);           // Focus ring dourado
+        root.style.setProperty('--sidebar-accent', hsl);
+        root.style.setProperty('--sidebar-ring', hsl);
       }
       if (themeData.accent_foreground) {
-        root.style.setProperty('--accent-foreground', hexToHSL(themeData.accent_foreground));
+        const hsl = hexToHSL(themeData.accent_foreground);
+        root.style.setProperty('--accent-foreground', hsl);
+        root.style.setProperty('--sidebar-accent-foreground', hsl);
+        root.style.setProperty('--sidebar-primary-foreground', hsl);
       }
 
-      // Aplicar cores de background
+      // Background e foreground
       if (themeData.background_color) {
         root.style.setProperty('--background', hexToHSL(themeData.background_color));
       }
@@ -140,15 +148,19 @@ export function useOrganizationTheme(): UseOrganizationThemeReturn {
         root.style.setProperty('--foreground', hexToHSL(themeData.foreground_color));
       }
 
-      // Aplicar cores de card
+      // Card — também usado para popovers e dropdowns
       if (themeData.card_color) {
-        root.style.setProperty('--card', hexToHSL(themeData.card_color));
+        const hsl = hexToHSL(themeData.card_color);
+        root.style.setProperty('--card', hsl);
+        root.style.setProperty('--popover', hsl);
       }
       if (themeData.card_foreground) {
-        root.style.setProperty('--card-foreground', hexToHSL(themeData.card_foreground));
+        const hsl = hexToHSL(themeData.card_foreground);
+        root.style.setProperty('--card-foreground', hsl);
+        root.style.setProperty('--popover-foreground', hsl);
       }
 
-      // Aplicar cores de borda e input
+      // Bordas e inputs
       if (themeData.border_color) {
         root.style.setProperty('--border', hexToHSL(themeData.border_color));
       }
@@ -156,7 +168,7 @@ export function useOrganizationTheme(): UseOrganizationThemeReturn {
         root.style.setProperty('--input', hexToHSL(themeData.input_color));
       }
 
-      // Aplicar cores muted
+      // Muted
       if (themeData.muted_color) {
         root.style.setProperty('--muted', hexToHSL(themeData.muted_color));
       }
@@ -164,18 +176,15 @@ export function useOrganizationTheme(): UseOrganizationThemeReturn {
         root.style.setProperty('--muted-foreground', hexToHSL(themeData.muted_foreground));
       }
 
-      // Aplicar configurações de estilo
+      // Border radius e fonte
       if (themeData.border_radius) {
         root.style.setProperty('--radius', themeData.border_radius);
       }
-
-      // Aplicar fonte personalizada (se especificada)
       if (themeData.font_family && themeData.font_family !== 'Roboto') {
         document.body.style.fontFamily = `'${themeData.font_family}', sans-serif`;
       }
 
-      console.log('✅ Tema aplicado com sucesso! Variáveis CSS atualizadas.');
-      console.log('📊 Verifique com: getComputedStyle(document.documentElement).getPropertyValue("--primary")');
+      console.log('✅ Tema premium aplicado com sucesso!');
     } catch (err) {
       console.error('❌ Erro ao aplicar tema:', err);
     }
