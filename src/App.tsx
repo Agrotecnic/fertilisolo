@@ -35,8 +35,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  console.log("ProtectedRoute - User:", user ? "Logado" : "Não logado", "Loading:", loading);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -46,8 +44,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!user) {
-    console.log("Redirecionando para / porque o usuário não está autenticado");
-    // Salva a localização atual para redirecionar de volta após o login
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 
@@ -58,8 +54,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   
-  console.log("PublicRoute - User:", user ? "Logado" : "Não logado", "Loading:", loading);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -69,7 +63,6 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (user) {
-    console.log("Redirecionando para /dashboard porque o usuário já está autenticado");
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -155,11 +148,15 @@ const AppContent = () => {
           path="/metodologia" 
           element={<TechnicalMethodology />} 
         />
-        {/* Rotas de teste */}
-        <Route path="/teste-dados" element={<DataTester />} />
-        <Route path="/diagnostico" element={<SupabaseConnectionTest />} />
-        <Route path="/config" element={<EnvConfigHelper />} />
-        <Route path="/relatorio" element={<ReportGenerator />} />
+        {/* Rotas de teste — disponíveis apenas em desenvolvimento */}
+        {import.meta.env.DEV && (
+          <>
+            <Route path="/teste-dados" element={<DataTester />} />
+            <Route path="/diagnostico" element={<SupabaseConnectionTest />} />
+            <Route path="/config" element={<EnvConfigHelper />} />
+            <Route path="/relatorio" element={<ReportGenerator />} />
+          </>
+        )}
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

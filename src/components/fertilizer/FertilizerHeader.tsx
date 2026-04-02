@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Sprout } from 'lucide-react';
 import { SoilData, CalculationResult } from '@/types/soilAnalysis';
 import { generatePDFReport } from '@/utils/pdfGenerator';
 import { toast } from '@/components/ui/use-toast';
 import { useTheme } from '@/providers/ThemeProvider';
+import { FertilizerSelectionDialog } from '@/components/FertilizerSelectionDialog';
 
 interface FertilizerHeaderProps {
   soilData: SoilData;
@@ -18,6 +19,8 @@ export const FertilizerHeader: React.FC<FertilizerHeaderProps> = ({
   cultureName
 }) => {
   const { theme, logo, organizationName } = useTheme();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Função auxiliar para converter imagem URL para base64
   const convertImageToBase64 = async (url: string): Promise<string> => {
@@ -36,85 +39,47 @@ export const FertilizerHeader: React.FC<FertilizerHeaderProps> = ({
     }
   };
 
-  const handleExportPDF = async () => {
+  const handleGeneratePDF = async (selectedFertilizers: string[]) => {
+    setIsGenerating(true);
     try {
-      console.log('═══════════════════════════════════════════════════════');
-      console.log('🎨 INICIANDO GERAÇÃO DE PDF COM PERSONALIZAÇÃO');
-      console.log('═══════════════════════════════════════════════════════');
-      console.log('📊 Dados do tema:', {
-        temTheme: !!theme,
-        temLogo: !!logo,
-        organizationName: organizationName,
-        primaryColor: theme?.primary_color,
-        secondaryColor: theme?.secondary_color
-      });
-      console.log('🖼️ URL do Logo:', logo);
-      console.log('═══════════════════════════════════════════════════════');
-
       toast({
         title: "Gerando PDF...",
         description: "O arquivo PDF está sendo gerado, aguarde um momento.",
       });
-      
-      // Converter logo para base64 se disponível
+
       let logoBase64: string | undefined = undefined;
       if (logo) {
         try {
-          console.log('🖼️ Convertendo logo para base64...');
           logoBase64 = await convertImageToBase64(logo);
-          console.log('✅ Logo convertido com sucesso');
-        } catch (error) {
-          console.warn('⚠️ Erro ao converter logo, PDF será gerado sem logo:', error);
+        } catch {
+          // continua sem logo
         }
       }
 
-      // Preparar opções de tema para o PDF
       const themeOptions = {
         primaryColor: theme?.primary_color,
         secondaryColor: theme?.secondary_color,
         accentColor: theme?.accent_color,
         logo: logoBase64,
-        organizationName: organizationName || 'Fertilisolo'
+        organizationName: organizationName || 'Fertilisolo',
       };
 
-      console.log('📄 Opções de tema para PDF:', {
-        primaryColor: themeOptions.primaryColor,
-        secondaryColor: themeOptions.secondaryColor,
-        hasLogo: !!themeOptions.logo,
-        organizationName: themeOptions.organizationName
-      });
+      await generatePDFReport(soilData, results, cultureName, themeOptions, selectedFertilizers);
 
-      console.log('🔍 soilData ANTES de gerar PDF:', soilData);
-      console.log('🔍 Nutrientes no soilData (MAIÚSCULAS):', {
-        P: soilData.P,
-        K: soilData.K,
-        Ca: soilData.Ca,
-        Mg: soilData.Mg,
-        S: soilData.S,
-        B: soilData.B,
-        Zn: soilData.Zn,
-        Cu: soilData.Cu,
-        Mn: soilData.Mn,
-        Fe: soilData.Fe
-      });
-
-      // Gerar PDF com personalização
-      await generatePDFReport(soilData, results, cultureName, themeOptions);
-      
-      console.log('✅ PDF gerado e salvo com sucesso');
-
+      setDialogOpen(false);
       toast({
         title: "Relatório exportado com sucesso!",
         description: "O arquivo PDF foi gerado e está sendo baixado.",
       });
     } catch (error) {
-      console.error("❌ Erro ao gerar PDF:", error);
-      
+      console.error("Erro ao gerar PDF:", error);
       toast({
         title: "Erro ao exportar relatório",
         description: "Não foi possível gerar o arquivo PDF. Verifique o console para mais detalhes.",
         variant: "destructive",
       });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -138,14 +103,21 @@ export const FertilizerHeader: React.FC<FertilizerHeaderProps> = ({
             </p>
           )}
         </div>
-        <Button 
-          onClick={handleExportPDF} 
+        <Button
+          onClick={() => setDialogOpen(true)}
           className="bg-green-600 hover:bg-green-700 shadow-md w-full sm:w-auto flex-shrink-0"
         >
           <FileText className="h-4 w-4 mr-2 flex-shrink-0" />
           <span className="whitespace-nowrap">Exportar PDF</span>
         </Button>
       </div>
+
+      <FertilizerSelectionDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onGenerate={handleGeneratePDF}
+        isGenerating={isGenerating}
+      />
     </div>
   );
 };

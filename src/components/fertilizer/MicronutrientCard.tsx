@@ -47,7 +47,7 @@ export const MicronutrientCard: React.FC<MicronutrientCardProps> = ({
             Correção Necessária
           </Badge>
         </CardTitle>
-        <CardDescription className="text-xs">
+        <CardDescription className="text-sm">
           Necessário: {formatNumber(needValue)} kg/ha
         </CardDescription>
       </CardHeader>
@@ -71,13 +71,13 @@ export const MicronutrientCard: React.FC<MicronutrientCardProps> = ({
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex-1">
                     <h4 className="font-medium text-gray-900 text-sm">{source.name}</h4>
-                    <p className="text-xs text-gray-600">{formatNumberOptional(source.concentration)}{source.unit}</p>
+                    <p className="text-xs md:text-sm text-gray-600">{formatNumberOptional(source.concentration)}{source.unit}</p>
                   </div>
-                  <Badge variant="secondary" className="text-orange-700 bg-orange-100 text-xs">
+                  <Badge variant="secondary" className="text-orange-700 bg-orange-100 text-xs flex-shrink-0">
                     {formatNumber(recommendation, 1)} kg/ha
                   </Badge>
                 </div>
-                <p className="text-xs text-gray-700">{source.benefits}</p>
+                <p className="text-sm text-gray-700">{source.benefits}</p>
               </div>
             );
           })}

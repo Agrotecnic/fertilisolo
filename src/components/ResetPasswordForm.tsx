@@ -11,6 +11,7 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { updateUserPassword, getCurrentSession } from '@/lib/custom-email-handler';
 import { DynamicLogo } from '@/components/DynamicLogo';
+import { supabase } from '@/lib/supabase';
 
 const formSchema = z.object({
   password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
@@ -34,13 +35,39 @@ export const ResetPasswordForm: React.FC = () => {
   });
 
   useEffect(() => {
-    async function checkSession() {
-      const session = await getCurrentSession();
-      setIsSessionValid(!!session);
+    let resolved = false;
+
+    const resolve = (valid: boolean) => {
+      if (resolved) return;
+      resolved = true;
+      setIsSessionValid(valid);
       setIsCheckingSession(false);
-    }
-    
-    checkSession();
+    };
+
+    // Aguarda o evento PASSWORD_RECOVERY que o Supabase dispara
+    // após concluir a troca do code PKCE contido no link do email.
+    // Sem esse listener, getCurrentSession() retorna null (corrida de eventos)
+    // e o formulário exibe "Link Inválido" indevidamente.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        resolve(true);
+      } else if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
+        resolve(true);
+      }
+    });
+
+    // Fallback: se a sessão de recuperação já estiver estabelecida (ex.: reload da página)
+    getCurrentSession().then(session => {
+      if (session) resolve(true);
+    });
+
+    // Timeout de segurança: se nenhum evento disparar em 8s, exibe link inválido
+    const timeout = setTimeout(() => resolve(false), 8000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const onSubmit = async (data: FormData) => {

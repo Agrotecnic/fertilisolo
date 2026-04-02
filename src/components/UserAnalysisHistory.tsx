@@ -291,14 +291,14 @@ export const UserAnalysisHistory: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-1.5 md:gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-xs h-7 md:h-8 px-2 md:px-3 flex-1 min-w-0"
+                    className="text-xs h-9 px-3 flex-1 min-w-0"
                     onClick={() => handleViewDetails(analysis)}
                   >
-                    <Eye className="h-3 w-3 md:mr-1 flex-shrink-0" />
+                    <Eye className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
                     <span className="hidden sm:inline">Ver detalhes</span>
                     <span className="sm:hidden">Detalhes</span>
                   </Button>
@@ -308,12 +308,11 @@ export const UserAnalysisHistory: React.FC = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-xs h-7 md:h-8 px-2 md:px-3 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 flex-1 min-w-0"
+                        className="text-xs h-9 px-3 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 flex-1 min-w-0"
                         disabled={deleting}
                       >
-                        <Trash2 className="h-3 w-3 md:mr-1 flex-shrink-0" />
-                        <span className="hidden sm:inline">Excluir</span>
-                        <span className="sm:hidden">Excluir</span>
+                        <Trash2 className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+                        <span>Excluir</span>
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
@@ -338,10 +337,10 @@ export const UserAnalysisHistory: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-xs h-7 md:h-8 px-2 md:px-3 border-green-600 text-green-700 hover:bg-green-50 flex-1 min-w-0"
+                    className="text-xs h-9 px-3 border-green-600 text-green-700 hover:bg-green-50 flex-1 min-w-0"
                     onClick={() => handleExportPDF(analysis)}
                   >
-                    <Download className="h-3 w-3 md:mr-1 flex-shrink-0" />
+                    <Download className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
                     <span className="hidden sm:inline">Exportar PDF</span>
                     <span className="sm:hidden">PDF</span>
                   </Button>
