@@ -85,6 +85,8 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       workbox: {
+        // Aumentar limite para o bundle principal (pré-existente acima de 2MB)
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MB
         // Estratégias de cache
         runtimeCaching: [
           {
