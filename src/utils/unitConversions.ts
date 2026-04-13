@@ -38,8 +38,10 @@ export const convertFromStandardUnit = (
  * Converte todos os valores do SoilData para unidades padrão
  */
 export const convertSoilDataToStandard = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any,
   selectedUnits: SelectedUnits
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any => {
   const standardData = { ...data };
 

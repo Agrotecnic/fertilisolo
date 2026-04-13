@@ -21,6 +21,7 @@ export const InviteLinkGenerator: React.FC<InviteLinkGeneratorProps> = ({ organi
   const [expiresInDays, setExpiresInDays] = useState(7);
   const [maxUses, setMaxUses] = useState<number | undefined>(undefined);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
   const [invites, setInvites] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +34,8 @@ export const InviteLinkGenerator: React.FC<InviteLinkGeneratorProps> = ({ organi
       const { data, error } = await getOrganizationInvites(organizationId);
       if (error) throw error;
       setInvites(data || []);
-    } catch (error: any) {
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+    } catch (error) {
       console.error('Erro ao carregar convites:', error);
     }
   };
@@ -62,7 +64,8 @@ export const InviteLinkGenerator: React.FC<InviteLinkGeneratorProps> = ({ organi
       setRole('member');
       setExpiresInDays(7);
       setMaxUses(undefined);
-    } catch (error: any) {
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+    } catch (error) {
       console.error('Erro ao gerar link:', error);
       toast({
         variant: 'destructive',
@@ -95,7 +98,8 @@ export const InviteLinkGenerator: React.FC<InviteLinkGeneratorProps> = ({ organi
         description: 'Este link não pode mais ser usado.',
       });
       await loadInvites();
-    } catch (error: any) {
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+    } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Erro',
@@ -132,6 +136,7 @@ export const InviteLinkGenerator: React.FC<InviteLinkGeneratorProps> = ({ organi
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label className="text-gray-900 font-semibold">Função</Label>
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               <Select value={role} onValueChange={(v) => setRole(v as any)}>
                 <SelectTrigger className="bg-white">
                   <SelectValue />

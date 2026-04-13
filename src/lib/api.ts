@@ -71,7 +71,7 @@ export async function pingServer(signal?: AbortSignal) {
           timestamp: new Date().toISOString(),
           connected: true
         };
-      } catch (fetchError: any) {
+      } catch (fetchError) {
         // Se foi timeout ou abort, não tentar fallback
         if (fetchError?.name === 'AbortError' || fetchError?.message?.includes('Timeout') || fetchError?.message?.includes('cancelada')) {
           throw fetchError;
@@ -80,7 +80,7 @@ export async function pingServer(signal?: AbortSignal) {
         console.warn('Fetch falhou, tentando fallback:', fetchError);
       }
     }
-  } catch (error: any) {
+  } catch (error) {
     // Se foi cancelado por timeout, retornar erro específico
     if (error?.name === 'AbortError' || error?.message?.includes('Timeout') || error?.message?.includes('cancelada')) {
       return {
@@ -120,7 +120,7 @@ export async function pingServer(signal?: AbortSignal) {
       timestamp: new Date().toISOString(),
       connected: true
     };
-  } catch (error: any) {
+  } catch (error) {
     // Se foi cancelado por timeout, retornar erro específico
     if (error?.name === 'AbortError' || error?.message?.includes('Timeout') || error?.message?.includes('cancelada')) {
       return { 

@@ -127,7 +127,7 @@ export function ThemeEditor() {
       setTimeout(() => {
         window.location.reload();
       }, 500);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao salvar tema:', error);
       toast({
         variant: 'destructive',

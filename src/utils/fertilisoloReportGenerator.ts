@@ -40,6 +40,7 @@ interface PDFThemeOptions {
 // Estendendo o jsPDF com autotable
 declare module 'jspdf' {
   interface jsPDF {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
     autoTable: (options: any) => jsPDF;
   }
 }
@@ -464,6 +465,7 @@ function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   pdf.text('Recomendações de Fertilizantes', 15, 230);
   
   // Preparar as recomendações de fertilizantes
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recommendedFertilizers: any[] = [];
   
   // Adicionar recomendações baseadas nas análises
@@ -553,6 +555,7 @@ function generatePage1(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   });
   
   // SEÇÃO 6: Notas e Recomendações Especiais
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const finalY = (pdf as any).lastAutoTable.finalY + 15;
   
   pdf.setFontSize(14);
@@ -645,6 +648,7 @@ function generatePage2(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   pdf.text('Tabela Completa de Fertilizantes', 15, 32);
   
   // Preparar dados para a tabela completa de fertilizantes
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fertilizerRows: any[] = [];
   
   // CALCÁRIOS
@@ -1056,6 +1060,7 @@ function generatePage3(pdf: jsPDF, soilData: SoilData, results: CalculationResul
   });
   
   // Observações Importantes sobre Manejo de Nutrientes
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const finalY = (pdf as any).lastAutoTable.finalY + 15;
   
   pdf.setFontSize(14);

@@ -84,7 +84,7 @@ export function LogoUploader() {
       setTimeout(() => {
         window.location.reload();
       }, 500);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao fazer upload:', error);
       toast({
         variant: 'destructive',
@@ -116,7 +116,7 @@ export function LogoUploader() {
 
       // Recarregar tema
       await refetch();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao remover logo:', error);
       toast({
         variant: 'destructive',

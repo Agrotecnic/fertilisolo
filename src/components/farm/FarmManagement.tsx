@@ -42,7 +42,8 @@ export const FarmManagement: React.FC<FarmManagementProps> = ({ onDataUpdated })
       if (data.length > 0 && !selectedFarm) {
         setSelectedFarm(data[0]);
       }
-    } catch (error: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error) {
       console.error('Erro ao buscar fazendas:', error);
       toast({
         variant: 'destructive',
@@ -61,7 +62,8 @@ export const FarmManagement: React.FC<FarmManagementProps> = ({ onDataUpdated })
       if (error) throw error;
       
       setPlots(data);
-    } catch (error: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error) {
       console.error('Erro ao buscar talhões:', error);
       toast({
         variant: 'destructive',
@@ -104,7 +106,8 @@ export const FarmManagement: React.FC<FarmManagementProps> = ({ onDataUpdated })
       // Atualizar lista de fazendas
       await fetchFarms();
       if (onDataUpdated) onDataUpdated();
-    } catch (error: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error) {
       console.error('Erro ao adicionar fazenda:', error);
       toast({
         variant: 'destructive',
@@ -159,7 +162,8 @@ export const FarmManagement: React.FC<FarmManagementProps> = ({ onDataUpdated })
         await fetchPlots(selectedFarm.id);
       }
       if (onDataUpdated) onDataUpdated();
-    } catch (error: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error) {
       console.error('Erro ao adicionar talhão:', error);
       toast({
         variant: 'destructive',

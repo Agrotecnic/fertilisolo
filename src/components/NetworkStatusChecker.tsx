@@ -95,7 +95,7 @@ export function NetworkStatusChecker() {
                 duration: 3000,
               });
             }
-          } catch (error: any) {
+          } catch (error) {
             clearTimeout(timeoutId);
             // Se foi timeout, tratar como problema de conectividade
             if (error?.name === 'AbortError' || error?.message?.includes('Timeout') || error?.message?.includes('lenta')) {
@@ -106,7 +106,7 @@ export function NetworkStatusChecker() {
             return;
           }
         }
-      } catch (error: any) {
+      } catch (error) {
         // Se estamos "online" mas a requisição falhou, temos problemas de conectividade
         // Mas só mostrar se for realmente um problema (timeout)
         if (navigator.onLine && !hasConnectivityIssues) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -7,10 +7,10 @@ import { AnalysisResults } from '@/components/AnalysisResults';
 import { FertilizerRecommendations } from '@/components/FertilizerRecommendations';
 import { UserAnalysisHistory } from '@/components/UserAnalysisHistory';
 import { SoilInsights } from '@/components/SoilInsights';
-import { Calculator, Leaf, FileText, History, Brain, LogOut, PlusCircleIcon, SearchIcon, ClipboardListIcon, SettingsIcon, FileTextIcon, AreaChartIcon, Database, BookOpen } from 'lucide-react';
+import { Calculator, Leaf, FileText, Brain, LogOut, Database, BookOpen } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -57,12 +57,32 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+const VALID_TABS = ['input', 'results', 'insights', 'recommendations', 'history'] as const;
+type TabValue = typeof VALID_TABS[number];
+
 const Index = () => {
   const [soilData, setSoilData] = useState<SoilData | null>(null);
   const [results, setResults] = useState<CalculationResult | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('input');
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Derive active tab from URL; fall back to 'input'
+  const rawTab = searchParams.get('tab') ?? 'input';
+  const activeTab: TabValue = (VALID_TABS as readonly string[]).includes(rawTab)
+    ? (rawTab as TabValue)
+    : 'input';
+
+  const setActiveTab = useCallback(
+    (tab: string) => {
+      setSearchParams(prev => {
+        const next = new URLSearchParams(prev);
+        next.set('tab', tab);
+        return next;
+      }, { replace: true });
+    },
+    [setSearchParams],
+  );
   const [plots, setPlots] = useState<Plot[]>([]);
   const [farms, setFarms] = useState<Farm[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -95,33 +115,21 @@ const Index = () => {
   });
 
   const handleAnalysisComplete = async (data: SoilData, calculatedResults: CalculationResult) => {
-    console.log('🎯 [ANALYSIS] handleAnalysisComplete chamado!');
-    console.log('🎯 [ANALYSIS] Dados recebidos:', data);
-    
     setSoilData(data);
     setResults(calculatedResults);
     setActiveTab('results');
-    
+
     // Salvar no Supabase
     try {
-      console.log('🎯 [ANALYSIS] Iniciando salvamento no Supabase...');
       setIsLoading(true);
-      
       const { data: savedAnalysis, error } = await saveSoilAnalysis(data, null);
-      
-      if (error) {
-        console.error('🎯 [ANALYSIS] Erro ao salvar:', error);
-        throw error;
-      }
-      
-      console.log('🎯 [ANALYSIS] Análise salva com sucesso!', savedAnalysis);
+      if (error) throw error;
       toast({
         title: "Análise salva com sucesso!",
         description: "Os dados foram salvos no banco de dados.",
       });
     } catch (error) {
       const err = error as Error;
-      console.error('🎯 [ANALYSIS] Erro no processo de salvamento:', err);
       toast({
         variant: 'destructive',
         title: "Erro ao salvar análise",
@@ -155,7 +163,6 @@ const Index = () => {
     }
   };
 
-  const titleStyle = { fontFamily: 'Inter, sans-serif' };
 
   const onSelectPlot = async (plotId: string) => {
     // Se o valor for 'none', limpe os dados
@@ -224,15 +231,6 @@ const Index = () => {
     return value.toFixed(2);
   };
 
-  useEffect(() => {
-    if (activeTab === 'results') {
-      console.log("DEBUG - Renderizando aba results. soilData:", soilData, "results:", results);
-    } else if (activeTab === 'insights') {
-      console.log("DEBUG - Renderizando aba insights. soilData:", soilData, "results:", results);
-    } else if (activeTab === 'recommendations') {
-      console.log("DEBUG - Renderizando aba recommendations. soilData:", soilData, "results:", results);
-    }
-  }, [activeTab, soilData, results]);
 
   return (
     <div className="min-h-screen bg-bg-light">
@@ -327,7 +325,7 @@ const Index = () => {
           <TabsContent value="input">
             <Card className="bg-white border-border shadow-sm">
               <CardHeader className="border-b border-border">
-                <CardTitle className="text-lg md:text-xl text-primary flex items-center gap-2" style={titleStyle}>
+                <CardTitle className="text-lg md:text-xl text-primary flex items-center gap-2">
                   <Calculator className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                   Entrada de Dados da Análise do Solo
                 </CardTitle>
@@ -398,7 +396,7 @@ const Index = () => {
             {soilData && results ? (
               <div className="space-y-4 md:space-y-6">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl md:text-2xl font-bold text-primary" style={titleStyle}>Resultados da Análise</h2>
+                  <h2 className="text-xl md:text-2xl font-bold text-primary">Resultados da Análise</h2>
                   <Button onClick={resetAnalysis} variant="outline" className="border-primary text-primary hover:bg-primary/10 text-xs md:text-sm py-1 px-2 md:py-2 md:px-4">
                     Nova Análise
                   </Button>
@@ -415,7 +413,7 @@ const Index = () => {
           <TabsContent value="insights">
             {soilData && results ? (
               <div className="space-y-4 md:space-y-6">
-                <h2 className="text-xl md:text-2xl font-bold text-primary" style={titleStyle}>Insights da Análise</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-primary">Insights da Análise</h2>
                 <SoilInsights soilData={soilData} results={results} />
               </div>
             ) : (
@@ -428,7 +426,7 @@ const Index = () => {
           <TabsContent value="recommendations">
             {soilData && results ? (
               <div className="space-y-4 md:space-y-6">
-                <h2 className="text-xl md:text-2xl font-bold text-primary" style={titleStyle}>Recomendações de Adubação</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-primary">Recomendações de Adubação</h2>
                 <FertilizerRecommendations soilData={soilData} results={results} cultureName={getCropIdentifier(soilData.crop)} />
               </div>
             ) : (
@@ -441,7 +439,7 @@ const Index = () => {
           <TabsContent value="history">
             <Card className="bg-white border-border shadow-sm">
               <CardHeader className="border-b border-border">
-                <CardTitle className="text-lg md:text-xl text-primary flex items-center gap-2" style={titleStyle}>
+                <CardTitle className="text-lg md:text-xl text-primary flex items-center gap-2">
                   <Database className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                   Histórico de Análises
                 </CardTitle>

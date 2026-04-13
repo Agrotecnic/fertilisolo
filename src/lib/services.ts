@@ -147,7 +147,7 @@ export const saveFarm = async (farm: Farm) => {
     if (error) throw error;
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao salvar fazenda:', error);
     return { data: null, error };
   }
@@ -177,7 +177,7 @@ export const getUserFarms = async () => {
     if (error) throw error;
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao buscar fazendas:', error);
     return { data: [], error };
   }
@@ -214,7 +214,7 @@ export const savePlot = async (plot: Plot) => {
     if (error) throw error;
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao salvar talhão:', error);
     return { data: null, error };
   }
@@ -245,7 +245,7 @@ export const getFarmPlots = async (farmId: string) => {
     if (error) throw error;
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao buscar talhões:', error);
     return { data: [], error };
   }
@@ -333,7 +333,7 @@ export const saveSoilAnalysis = async (analysis: SoilData, plotId?: string) => {
     
     console.log('✅ [SAVE] Análise salva com sucesso!', data);
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ [SAVE] Erro ao salvar análise de solo:', error);
     console.error('❌ [SAVE] Detalhes do erro:', {
       message: error.message,
@@ -385,7 +385,7 @@ export const getUserSoilAnalyses = async () => {
     }) : [];
     
     return { data: convertedData, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao buscar análises de solo:', error);
     return { data: [], error };
   }
@@ -456,7 +456,7 @@ export const getSoilAnalysisById = async (analysisId: string) => {
     const converted = convertDBToSoilDataFormat(data);
     
     return { data: converted, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ [GET_BY_ID] Erro ao buscar análise por ID:', error);
     return { 
       data: null, 
@@ -538,7 +538,7 @@ export const getSoilAnalysisWithOrganization = async (analysisId: string) => {
       organization: data.organizations,
       error: null 
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ [GET_WITH_ORG] Erro:', error);
     return { 
       data: null,
@@ -605,7 +605,7 @@ export const saveFertilizerRecommendation = async (recommendation: FertilizerRec
     if (error) throw error;
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao salvar recomendação de fertilizante:', error);
     return { data: null, error };
   }
@@ -659,7 +659,7 @@ export const deleteSoilAnalysis = async (analysisId: string) => {
     if (error) throw error;
     
     return { success: true, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao deletar análise de solo:', error);
     return { success: false, error };
   }

@@ -57,7 +57,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
         title: 'Email enviado!',
         description: 'Verifique sua caixa de entrada para redefinir sua senha.',
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Falha ao enviar email',

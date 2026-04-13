@@ -75,6 +75,7 @@ export const sanitizeText = (text: string, maxLength?: number): string => {
     // Remove tags HTML
     .replace(/<[^>]*>/g, '')
     // Remove caracteres de controle (exceto quebras de linha e tabs)
+    // eslint-disable-next-line no-control-regex
     .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '')
     // Normaliza espaços em branco múltiplos
     .replace(/\s+/g, ' ')
@@ -112,6 +113,7 @@ export const sanitizeURL = (url: string): string | null => {
   
   try {
     // Remover espaços e caracteres de controle
+    // eslint-disable-next-line no-control-regex
     const cleaned = url.trim().replace(/[\x00-\x1F\x7F]/g, '');
     
     // Se não começa com http:// ou https://, adicionar https://
@@ -144,6 +146,7 @@ export const sanitizeEmail = (email: string): string => {
     .toLowerCase()
     .trim()
     // Remove caracteres de controle
+    // eslint-disable-next-line no-control-regex
     .replace(/[\x00-\x1F\x7F]/g, '')
     // Remove espaços
     .replace(/\s/g, '');
@@ -174,6 +177,7 @@ export const sanitizeFilename = (filename: string): string => {
   
   return filename
     // Remove caracteres perigosos para nomes de arquivo
+    // eslint-disable-next-line no-control-regex
     .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
     // Remove espaços múltiplos
     .replace(/\s+/g, ' ')
@@ -209,7 +213,8 @@ export const sanitizeInput = (
   }
   
   // Remover caracteres de controle
-  sanitized = sanitized.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
+  sanitized = sanitized// eslint-disable-next-line no-control-regex
+    .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
   
   // Normalizar espaços
   sanitized = sanitized.replace(/\s+/g, ' ').trim();

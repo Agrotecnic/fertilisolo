@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ import { SecondaryMacronutrientsSection } from '@/components/SecondaryMacronutri
 import { MicronutrientsSection } from '@/components/MicronutrientsSection';
 import { UnitSelector } from '@/components/UnitSelector';
 import { FormattedInput } from '@/components/FormattedInput';
-// Removendo importações complexas por enquanto
+import { CheckCircle2, Circle } from 'lucide-react';
 
 interface SoilAnalysisFormProps {
   onAnalysisComplete: (data: SoilData, results: CalculationResult) => void;
@@ -33,18 +33,31 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
     location: '',
     crop: '',
     targetYield: undefined, // Permite campo vazio
-    organicMatter: '' as any, // Permite campo vazio
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    organicMatter: '' as any, // permite string vazia no campo antes da digitação
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     T: '' as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Ca: '' as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Mg: '' as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     K: '' as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     P: '' as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     S: '' as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     B: '' as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Cu: '' as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Fe: '' as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Mn: '' as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Zn: '' as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Mo: '' as any,
     argila: 35, // Mantém valor padrão para argila
   });
@@ -97,6 +110,26 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
     Zn: 'mg_dm3',
     Mo: 'mg_dm3'
   });
+
+  // ── Stepper: track which sections have been touched ──────────────────
+  const [visitedSections, setVisitedSections] = useState<Set<number>>(new Set([0]));
+  const markSectionVisited = useCallback((idx: number) => {
+    setVisitedSections(prev => new Set(prev).add(idx));
+  }, []);
+
+  // Section completion helpers
+  const isBasicInfoComplete = Boolean(formData.location?.trim() && formData.crop?.trim());
+  const isPrimaryComplete   = (formData.T as number) > 0;
+  const isSecondaryComplete = true; // optional fields
+  const isMicroComplete     = true; // optional fields
+
+  const steps = [
+    { label: 'Dados Básicos',     complete: isBasicInfoComplete },
+    { label: 'Macronutrientes',   complete: isPrimaryComplete   },
+    { label: 'Secundários',       complete: isSecondaryComplete },
+    { label: 'Micronutrientes',   complete: isMicroComplete     },
+  ];
+  // ─────────────────────────────────────────────────────────────────────
 
   const handleInputChange = (field: keyof typeof formData, value: string | number) => {
     const numericFields = ['organicMatter', 'T', 'Ca', 'Mg', 'K', 'P', 'S', 'B', 'Cu', 'Fe', 'Mn', 'Zn', 'Mo'];
@@ -264,29 +297,89 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+      {/* Global error live region */}
       {errors.general && (
-        <Alert variant="destructive" className="mb-4">
+        <Alert variant="destructive" className="mb-4" role="alert" aria-live="assertive">
           <AlertDescription>{errors.general}</AlertDescription>
         </Alert>
       )}
 
-      <BasicInfoSection
-        location={formData.location || ''}
-        crop={formData.crop || ''}
-        date={formData.date}
-        targetYield={formData.targetYield}
-        isAutoFilled={isAutoFilled}
-        onLocationChange={(value) => handleInputChange('location', value)}
-        onCropChange={(value) => handleInputChange('crop', value)}
-        onDateChange={(value) => handleInputChange('date', value)}
-        onTargetYieldChange={(value) => handleInputChange('targetYield', value)}
-        errors={errors}
-      />
+      {/* ── Stepper ──────────────────────────────────────────────────────── */}
+      <nav aria-label="Progresso do formulário">
+        <ol className="flex items-center gap-0 overflow-x-auto">
+          {steps.map((step, idx) => {
+            const isLast = idx === steps.length - 1;
+            return (
+              <li key={step.label} className="flex items-center flex-shrink-0">
+                <div className="flex flex-col items-center gap-1">
+                  <span
+                    className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold border-2 transition-colors ${
+                      step.complete
+                        ? 'bg-primary border-primary text-primary-foreground'
+                        : visitedSections.has(idx)
+                        ? 'border-primary text-primary bg-transparent'
+                        : 'border-border text-muted-foreground bg-transparent'
+                    }`}
+                    aria-label={`Etapa ${idx + 1}: ${step.label}${step.complete ? ' — concluída' : ''}`}
+                  >
+                    {step.complete ? (
+                      <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <span aria-hidden="true">{idx + 1}</span>
+                    )}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground hidden sm:block whitespace-nowrap">{step.label}</span>
+                </div>
+                {!isLast && (
+                  <span
+                    className={`h-[2px] w-8 sm:w-12 mx-1 rounded transition-colors ${
+                      step.complete ? 'bg-primary' : 'bg-border'
+                    }`}
+                    aria-hidden="true"
+                  />
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+      {/* ─────────────────────────────────────────────────────────────────── */}
+
+      {/* Field-level errors live region (for screen readers on submit) */}
+      {Object.keys(errors).filter(k => k !== 'general').length > 0 && (
+        <div role="alert" aria-live="assertive" className="sr-only">
+          {Object.entries(errors)
+            .filter(([k]) => k !== 'general')
+            .map(([k, msg]) => <span key={k}>{msg}. </span>)
+          }
+        </div>
+      )}
+
+      <div onFocus={() => markSectionVisited(0)}>
+        <BasicInfoSection
+          location={formData.location || ''}
+          crop={formData.crop || ''}
+          date={formData.date}
+          targetYield={formData.targetYield}
+          isAutoFilled={isAutoFilled}
+          onLocationChange={(value) => handleInputChange('location', value)}
+          onCropChange={(value) => handleInputChange('crop', value)}
+          onDateChange={(value) => handleInputChange('date', value)}
+          onTargetYieldChange={(value) => handleInputChange('targetYield', value)}
+          errors={errors}
+        />
+      </div>
 
       {/* Macronutrientes Primários */}
-      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-800 mb-3">Macronutrientes Primários</h3>
+      <div
+        className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+        onFocus={() => markSectionVisited(1)}
+      >
+        <h3 className="text-sm font-semibold text-gray-800 mb-3">
+          Macronutrientes Primários <span className="text-destructive" aria-hidden="true">*</span>
+          <span className="sr-only">(obrigatório: CTC deve ser maior que zero)</span>
+        </h3>
         <PrimaryMacronutrientsSection
           T={formData.T}
           Ca={formData.Ca}
@@ -305,7 +398,10 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
       </div>
 
       {/* Macronutrientes Secundários e Argila */}
-      <div className="bg-gray-50 p-3 md:p-4 rounded-lg border border-gray-200">
+      <div
+        className="bg-gray-50 p-3 md:p-4 rounded-lg border border-gray-200"
+        onFocus={() => markSectionVisited(2)}
+      >
         <h3 className="text-xs md:text-sm font-semibold text-gray-800 mb-3">Macronutrientes Secundários e Argila</h3>
         <SecondaryMacronutrientsSection
           S={formData.S}
@@ -321,7 +417,10 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
       </div>
 
       {/* Micronutrientes */}
-      <div className="bg-gray-50 p-3 md:p-4 rounded-lg border border-gray-200">
+      <div
+        className="bg-gray-50 p-3 md:p-4 rounded-lg border border-gray-200"
+        onFocus={() => markSectionVisited(3)}
+      >
         <h3 className="text-xs md:text-sm font-semibold text-gray-800 mb-3">Micronutrientes</h3>
         <MicronutrientsSection
           B={formData.B}
@@ -343,13 +442,12 @@ export const SoilAnalysisForm: React.FC<SoilAnalysisFormProps> = ({
       </div>
 
       <div className="flex justify-center pt-4 md:pt-6">
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           size="lg"
           className="bg-primary hover:bg-primary/90 text-primary-foreground w-full md:w-auto px-4 md:px-8 py-3 text-sm md:text-base font-medium"
         >
-          <span className="block md:inline">Calcular Saturações e</span>
-          <span className="block md:inline md:ml-1">Recomendações</span>
+          Calcular Saturações e Recomendações
         </Button>
       </div>
     </form>

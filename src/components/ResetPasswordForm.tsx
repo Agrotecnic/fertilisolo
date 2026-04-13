@@ -87,7 +87,7 @@ export const ResetPasswordForm: React.FC = () => {
       setTimeout(() => {
         navigate('/login');
       }, 2000);
-    } catch (error: any) {
+    } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Falha ao redefinir senha',

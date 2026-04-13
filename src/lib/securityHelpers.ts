@@ -69,7 +69,7 @@ export async function getSecurityContext(): Promise<SecurityValidation> {
         role: userOrg.role
       }
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao obter contexto de segurança:', error);
     return {
       isValid: false,
@@ -232,6 +232,7 @@ export async function getSecureSoilAnalyses(plotId?: string) {
 /**
  * Adiciona automaticamente organization_id aos dados a serem inseridos
  */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function addOrganizationIdToData<T extends Record<string, any>>(
   data: T
 ): Promise<{ data: T & { organization_id: string } | null; error?: string }> {
@@ -252,6 +253,7 @@ export async function addOrganizationIdToData<T extends Record<string, any>>(
 /**
  * Valida e adiciona organization_id a múltiplos registros
  */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function addOrganizationIdToMultipleData<T extends Record<string, any>>(
   dataArray: T[]
 ): Promise<{ data: (T & { organization_id: string })[] | null; error?: string }> {

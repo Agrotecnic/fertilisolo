@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { CheckCircle2 } from 'lucide-react';
 
 interface BasicInfoSectionProps {
   location: string;
@@ -80,26 +81,47 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
       <CardContent className="space-y-2 px-2 md:px-3 pb-2 md:pb-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <div>
-            <Label htmlFor="location" className="text-gray-700 text-xs font-medium">
-              Nome do Talhão *
+            <Label htmlFor="location" className="text-gray-700 text-xs font-medium flex items-center gap-1">
+              Nome do Talhão <span className="text-destructive" aria-hidden="true">*</span>
+              <span className="sr-only">(obrigatório)</span>
               {isAutoFilled && (
-                <span className="ml-2 text-green-600 text-[10px] md:text-xs">✓ Preenchido automaticamente</span>
+                <span className="ml-1 inline-flex items-center gap-0.5 text-green-600 text-[10px] md:text-xs">
+                  <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
+                  Preenchido automaticamente
+                </span>
               )}
             </Label>
             <Input
+              id="location"
               type="text"
               value={location}
               onChange={(e) => onLocationChange(e.target.value)}
               placeholder="Ex: Talhão 1A, Área Norte"
+              aria-required="true"
+              aria-describedby={errors.location ? 'location-error' : undefined}
+              aria-invalid={Boolean(errors.location)}
               className={`h-8 md:h-7 text-xs text-gray-800 ${errors.location ? 'border-red-500' : isAutoFilled ? 'border-green-500 bg-green-50' : ''}`}
             />
-            {errors.location && <span className="text-red-500 text-[10px] md:text-xs">{errors.location}</span>}
+            {errors.location && (
+              <span id="location-error" role="alert" className="text-red-500 text-[10px] md:text-xs flex items-center gap-1 mt-0.5">
+                {errors.location}
+              </span>
+            )}
           </div>
-          
+
           <div>
-            <Label htmlFor="crop" className="text-gray-700 text-xs font-medium">Cultura *</Label>
+            <Label htmlFor="crop" className="text-gray-700 text-xs font-medium">
+              Cultura <span className="text-destructive" aria-hidden="true">*</span>
+              <span className="sr-only">(obrigatório)</span>
+            </Label>
             <Select value={crop} onValueChange={onCropChange}>
-              <SelectTrigger className={`h-8 md:h-7 text-xs text-gray-800 ${errors.crop ? 'border-red-500' : ''}`}>
+              <SelectTrigger
+                id="crop"
+                aria-required="true"
+                aria-invalid={Boolean(errors.crop)}
+                aria-describedby={errors.crop ? 'crop-error' : undefined}
+                className={`h-8 md:h-7 text-xs text-gray-800 ${errors.crop ? 'border-red-500' : ''}`}
+              >
                 <SelectValue placeholder="Selecione a cultura" className="text-gray-800" />
               </SelectTrigger>
               <SelectContent>
@@ -110,7 +132,11 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
                 ))}
               </SelectContent>
             </Select>
-            {errors.crop && <span className="text-red-500 text-[10px] md:text-xs">{errors.crop}</span>}
+            {errors.crop && (
+              <span id="crop-error" role="alert" className="text-red-500 text-[10px] md:text-xs flex items-center gap-1 mt-0.5">
+                {errors.crop}
+              </span>
+            )}
           </div>
         </div>
 

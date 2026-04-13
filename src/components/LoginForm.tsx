@@ -94,7 +94,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onCreateAc
         title: 'Login realizado com sucesso!',
         description: 'Você está autenticado.',
       });
-    } catch (error: any) {
+    } catch (error) {
       // Determinar o tipo de erro e fornecer mensagem apropriada
       let errorTitle = 'Falha no login';
       let errorDescription = error.message || 'Ocorreu um erro ao fazer login.';

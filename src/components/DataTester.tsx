@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { getCrops, getFertilizerSources } from '../lib/supabase';
 
 export default function DataTester() {
-  const [crops, setCrops] = useState<any[]>([]);
-  const [fertilizers, setFertilizers] = useState<any[]>([]);
+  const [crops, setCrops] = useState<Record<string, unknown>[]>([]);
+  const [fertilizers, setFertilizers] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +26,7 @@ export default function DataTester() {
           throw new Error(`Erro ao buscar fertilizantes: ${fertilizersResult.error.message}`);
         }
         setFertilizers(fertilizersResult.data || []);
-      } catch (err: any) {
+      } catch (err) {
         console.error('Erro ao carregar dados:', err);
         setError(err.message || 'Erro desconhecido ao carregar dados');
       } finally {

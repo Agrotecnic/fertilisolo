@@ -63,7 +63,7 @@ export async function getUserOrganization() {
     }
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao buscar organização do usuário:', error);
     return { data: null, error };
   }
@@ -100,7 +100,7 @@ export async function getUserOrganizations() {
     if (error) throw error;
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao buscar organizações do usuário:', error);
     return { data: null, error };
   }
@@ -146,7 +146,7 @@ export async function createOrganization(name: string, slug: string) {
     if (themeError) throw themeError;
 
     return { data: org, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao criar organização:', error);
     return { data: null, error };
   }
@@ -167,7 +167,7 @@ export async function updateOrganization(organizationId: string, updates: Organi
     if (error) throw error;
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao atualizar organização:', error);
     return { data: null, error };
   }
@@ -186,7 +186,7 @@ export async function deleteOrganization(organizationId: string) {
     if (error) throw error;
     
     return { data: true, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao deletar organização:', error);
     return { data: false, error };
   }
@@ -241,7 +241,7 @@ export async function getUserOrganizationTheme() {
     }
     
     return { data: theme, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao buscar tema da organização:', error);
     return { data: null, error };
   }
@@ -261,7 +261,7 @@ export async function getOrganizationTheme(organizationId: string) {
     if (error) throw error;
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao buscar tema:', error);
     return { data: null, error };
   }
@@ -285,7 +285,7 @@ export async function updateOrganizationTheme(
     if (error) throw error;
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao atualizar tema:', error);
     return { data: null, error };
   }
@@ -311,7 +311,7 @@ export async function createOrganizationTheme(
     if (error) throw error;
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao criar tema:', error);
     return { data: null, error };
   }
@@ -381,7 +381,7 @@ export async function getOrganizationMembers(organizationId: string) {
     }
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao buscar membros:', error);
     return { data: null, error };
   }
@@ -409,7 +409,7 @@ export async function addOrganizationMember(
     if (error) throw error;
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao adicionar membro:', error);
     return { data: null, error };
   }
@@ -428,7 +428,7 @@ export async function removeOrganizationMember(userOrganizationId: string) {
     if (error) throw error;
     
     return { data: true, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao remover membro:', error);
     return { data: false, error };
   }
@@ -452,7 +452,7 @@ export async function updateMemberRole(
     if (error) throw error;
     
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao atualizar função do membro:', error);
     return { data: null, error };
   }
@@ -492,6 +492,7 @@ export async function checkUserPermission(organizationId: string): Promise<boole
 export async function uploadOrganizationLogo(
   organizationId: string,
   file: File
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<{ data: string | null; error: any }> {
   try {
     const fileExt = file.name.split('.').pop();
@@ -522,7 +523,7 @@ export async function uploadOrganizationLogo(
     if (updateError) throw updateError;
 
     return { data: publicUrl, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao fazer upload do logo:', error);
     return { data: null, error };
   }
@@ -553,7 +554,7 @@ export async function removeOrganizationLogo(organizationId: string, logoUrl: st
     if (updateError) throw updateError;
 
     return { data: true, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao remover logo:', error);
     return { data: false, error };
   }
@@ -610,7 +611,7 @@ export async function createInviteLink(
     // Retornar URL completa
     const inviteUrl = `${window.location.origin}/signup?invite=${token}`;
     return { data, inviteUrl, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao criar link de convite:', error);
     return { data: null, inviteUrl: null, error };
   }
@@ -641,7 +642,7 @@ export async function validateInvite(token: string) {
     }
 
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao validar convite:', error);
     return { data: null, error };
   }
@@ -662,7 +663,7 @@ export async function acceptInvite(token: string, userId: string) {
     if (!data) throw new Error('Não foi possível aceitar o convite');
 
     return { data: true, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao aceitar convite:', error);
     return { data: false, error };
   }
@@ -682,7 +683,7 @@ export async function getOrganizationInvites(organizationId: string) {
 
     if (error) throw error;
     return { data, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao listar convites:', error);
     return { data: null, error };
   }
@@ -700,7 +701,7 @@ export async function deactivateInvite(inviteId: string) {
 
     if (error) throw error;
     return { data: true, error: null };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao desativar convite:', error);
     return { data: false, error };
   }

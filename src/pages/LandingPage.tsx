@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Check, Leaf, BarChart, BarChart2, Beaker, Database, Shield, BookOpen } from 'lucide-react';
+import { ArrowRight, Check, Leaf, BarChart, BarChart2, Beaker, Database, Shield, BookOpen, Sparkles, UserPlus, LogIn } from 'lucide-react';
 import { DynamicLogo } from '@/components/DynamicLogo';
 
 const LandingPage: React.FC = () => {
@@ -19,16 +19,20 @@ const LandingPage: React.FC = () => {
           <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
             <Link to="/metodologia">
               <Button variant="ghost" size="sm" className="text-sm md:text-base hidden md:flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
+                <BookOpen className="h-4 w-4" aria-hidden="true" />
                 Metodologia
               </Button>
             </Link>
             <Link to="/login">
-              <Button variant="ghost" size="sm" className="text-sm md:text-base">Login</Button>
+              <Button variant="ghost" size="sm" className="text-sm md:text-base flex items-center gap-1.5" aria-label="Entrar na sua conta">
+                <LogIn className="h-4 w-4" aria-hidden="true" />
+                <span>Entrar</span>
+              </Button>
             </Link>
-            <Link to="/login">
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm md:text-base">
-                Registrar
+            <Link to="/signup">
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm md:text-base flex items-center gap-1.5" aria-label="Criar conta gratuita">
+                <UserPlus className="h-4 w-4" aria-hidden="true" />
+                <span>Criar conta</span>
               </Button>
             </Link>
           </div>
@@ -47,7 +51,8 @@ const LandingPage: React.FC = () => {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                   </span>
-                  ✨ Transforme sua análise de solo
+                  <Sparkles className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+                  Transforme sua análise de solo
                 </span>
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground tracking-tight mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '100ms' }}>
@@ -57,23 +62,26 @@ const LandingPage: React.FC = () => {
                 Sistema corporativo completo para análise de solo e recomendações hiperprecisas de adubação baseadas em saturação de bases.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                <Link to="/login" className="w-full sm:w-auto">
+                <Link to="/signup" className="w-full sm:w-auto">
                   <Button
                     variant="modern"
                     size="lg"
                     className="w-full sm:w-auto"
+                    aria-label="Criar conta gratuita no FertiliSolo"
                   >
-                    Começar agora
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    Criar conta grátis
+                    <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
                   </Button>
                 </Link>
-                <Link to="/relatorio" className="w-full sm:w-auto">
+                <Link to="/login" className="w-full sm:w-auto">
                   <Button
                     variant="outline"
                     size="lg"
                     className="w-full"
+                    aria-label="Entrar na conta existente"
                   >
-                    Ver demonstração
+                    <LogIn className="mr-2 h-4 w-4" aria-hidden="true" />
+                    Já tenho conta
                   </Button>
                 </Link>
               </div>
@@ -339,22 +347,26 @@ const LandingPage: React.FC = () => {
           <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '200ms' }}>
             Junte-se a produtores e agrônomos que já estão otimizando suas colheitas com o FertiliSolo.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 animate-in fade-in zoom-in-95 duration-700" style={{ animationDelay: '400ms' }}>
+          <div className="flex flex-col sm:flex-row justify-center gap-4 animate-in fade-in zoom-in-95 duration-700 [animation-delay:400ms]">
             <Button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/signup')}
               size="xl"
-              className="w-full sm:w-auto h-14 px-10 text-lg bg-white text-[#1B5E20] hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all hover:scale-105 button-ripple"
+              className="w-full sm:w-auto h-14 px-10 text-lg bg-white text-[#1B5E20] hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all hover:scale-105 button-ripple flex items-center gap-2"
+              aria-label="Criar conta gratuita no FertiliSolo"
             >
+              <UserPlus className="h-5 w-5" aria-hidden="true" />
               Criar conta gratuita
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="ml-1 h-5 w-5" aria-hidden="true" />
             </Button>
-            <Link to="/relatorio" className="w-full sm:w-auto">
+            <Link to="/login" className="w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="xl"
-                className="w-full h-14 px-10 text-lg border-white/30 text-white hover:bg-white/10 hover:border-white transition-all backdrop-blur-sm"
+                className="w-full h-14 px-10 text-lg border-white/30 text-white hover:bg-white/10 hover:border-white transition-all backdrop-blur-sm flex items-center gap-2"
+                aria-label="Entrar na conta existente"
               >
-                Falar com consultor
+                <LogIn className="h-5 w-5" aria-hidden="true" />
+                Já tenho conta
               </Button>
             </Link>
           </div>

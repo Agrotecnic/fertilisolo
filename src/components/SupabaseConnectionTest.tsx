@@ -27,7 +27,7 @@ export default function SupabaseConnectionTest() {
         message: error ? `Erro de conexão: ${error.message}` : 'Conexão estabelecida com sucesso'
       };
       setTestResults(prev => ({ ...prev, 'connection': connectionTest }));
-    } catch (error: any) {
+    } catch (error) {
       setTestResults(prev => ({ 
         ...prev, 
         'connection': {
@@ -49,7 +49,7 @@ export default function SupabaseConnectionTest() {
             : 'Nenhuma cultura encontrada'
       };
       setTestResults(prev => ({ ...prev, 'crops': cropsTest }));
-    } catch (error: any) {
+    } catch (error) {
       setTestResults(prev => ({ 
         ...prev, 
         'crops': {
@@ -71,7 +71,7 @@ export default function SupabaseConnectionTest() {
             : 'Nenhum fertilizante encontrado'
       };
       setTestResults(prev => ({ ...prev, 'fertilizers': fertilizersTest }));
-    } catch (error: any) {
+    } catch (error) {
       setTestResults(prev => ({ 
         ...prev, 
         'fertilizers': {
@@ -91,7 +91,7 @@ export default function SupabaseConnectionTest() {
           : 'Acesso direto às tabelas está funcionando'
       };
       setTestResults(prev => ({ ...prev, 'directAccess': directAccessTest }));
-    } catch (error: any) {
+    } catch (error) {
       setTestResults(prev => ({ 
         ...prev, 
         'directAccess': {
@@ -111,7 +111,7 @@ export default function SupabaseConnectionTest() {
           : 'Função RPC está funcionando'
       };
       setTestResults(prev => ({ ...prev, 'rpc': rpcTest }));
-    } catch (error: any) {
+    } catch (error) {
       setTestResults(prev => ({ 
         ...prev, 
         'rpc': {

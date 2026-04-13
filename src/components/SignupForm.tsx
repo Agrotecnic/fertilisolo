@@ -30,6 +30,7 @@ interface SignupFormProps {
 export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [inviteInfo, setInviteInfo] = useState<any>(null);
   const [loadingInvite, setLoadingInvite] = useState(false);
   const { toast } = useToast();
@@ -129,7 +130,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
       }
       
       onSignupSuccess();
-    } catch (error: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error) {
       console.error('Erro no cadastro:', error);
       toast({
         variant: 'destructive',

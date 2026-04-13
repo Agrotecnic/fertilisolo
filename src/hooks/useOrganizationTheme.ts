@@ -107,7 +107,7 @@ export function useOrganizationTheme(): UseOrganizationThemeReturn {
         localStorage.removeItem(THEME_STORAGE_KEY);
         localStorage.removeItem(ORG_ID_STORAGE_KEY);
         document.documentElement.removeAttribute('data-org-theme');
-      } catch (_) {}
+      } catch (_) { /* intentional: localStorage may be unavailable */ }
       setOrganizationId(null);
       setTheme(null);
       setLoading(false);
@@ -134,6 +134,7 @@ export function useOrganizationTheme(): UseOrganizationThemeReturn {
         return;
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const org = userOrg.organizations as any;
       setOrganizationId(org.id);
       setOrganizationName(org.name);
@@ -153,11 +154,11 @@ export function useOrganizationTheme(): UseOrganizationThemeReturn {
           localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(themeData));
           localStorage.setItem(ORG_ID_STORAGE_KEY, org.id);
           document.documentElement.setAttribute('data-org-theme', 'true');
-        } catch (_) {}
+        } catch (_) { /* intentional: localStorage may be unavailable */ }
         setTheme(themeData);
         applyCachedTheme(themeData);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Erro ao carregar tema da organização:', err);
       setError(err);
     } finally {

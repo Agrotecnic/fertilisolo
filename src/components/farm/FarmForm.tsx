@@ -61,7 +61,7 @@ export const FarmForm: React.FC<FarmFormProps> = ({ onFarmSaved }) => {
       if (savedFarm && savedFarm[0]) {
         onFarmSaved(savedFarm[0]);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao salvar fazenda:', error);
       toast({
         variant: 'destructive',

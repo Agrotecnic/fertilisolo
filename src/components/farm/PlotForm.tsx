@@ -83,7 +83,7 @@ export const PlotForm: React.FC<PlotFormProps> = ({ farms, selectedFarmId, onPlo
       if (savedPlot && savedPlot[0]) {
         onPlotSaved(savedPlot[0]);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao salvar talhão:', error);
       toast({
         variant: 'destructive',

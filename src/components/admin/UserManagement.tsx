@@ -75,7 +75,8 @@ export function UserManagement() {
       if (error) throw error;
       
       setMembers(data || []);
-    } catch (error: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error) {
       console.error('Erro ao carregar membros:', error);
       toast({
         variant: 'destructive',
@@ -99,7 +100,8 @@ export function UserManagement() {
       });
 
       loadMembers();
-    } catch (error: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error) {
       console.error('Erro ao remover membro:', error);
       toast({
         variant: 'destructive',
@@ -121,7 +123,8 @@ export function UserManagement() {
       });
 
       loadMembers();
-    } catch (error: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error) {
       console.error('Erro ao atualizar função:', error);
       toast({
         variant: 'destructive',

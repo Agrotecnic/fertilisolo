@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="text-center">
             <Group justify="center" className="mb-2 md:mb-3">
               <DynamicLogo size="md" className="h-8 md:h-12" />
-              <Text className="text-2xl md:text-4xl font-bold text-primary-foreground" style={{ fontFamily: "Inter, sans-serif" }}>
+              <Text className="text-2xl md:text-4xl font-bold text-primary-foreground font-sans">
                 {title}
               </Text>
             </Group>
@@ -58,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="text-center">
           <Group justify="center" className="mb-2 md:mb-4">
             <DynamicLogo size="md" className="h-8 md:h-12" />
-            <Text className="text-2xl md:text-4xl font-bold text-primary" style={{ fontFamily: "Inter, sans-serif" }}>
+            <Text className="text-2xl md:text-4xl font-bold text-primary font-sans">
               {title}
             </Text>
           </Group>

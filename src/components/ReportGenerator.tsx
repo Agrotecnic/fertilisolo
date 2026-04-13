@@ -23,6 +23,7 @@ import { useTheme } from '@/providers/ThemeProvider';
 // Estendendo o jsPDF com autotable
 declare module 'jspdf' {
   interface jsPDF {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     autotable: (options: any) => jsPDF;
   }
 }
@@ -160,6 +161,7 @@ export default function ReportGenerator() {
       
       // Tabela de recomendações detalhadas
       const tableColumn = ["Fertilizante", "Quantidade", "Unidade", "Método de Aplicação", "Estágio"];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const tableRows: any[] = [];
       
       reportData.recommendations.forEach(rec => {
@@ -237,6 +239,7 @@ export default function ReportGenerator() {
       
       // Adicionar observações sobre micronutrientes
       pdf.setFontSize(12);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       pdf.text('Observações importantes sobre micronutrientes:', 15, ((pdf as any).lastAutoTable?.finalY || 150) + 15);
       
       const observations = [
@@ -247,6 +250,7 @@ export default function ReportGenerator() {
         "• Análises foliares podem complementar as informações do solo para ajuste preciso"
       ];
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let yPos = ((pdf as any).lastAutoTable?.finalY || 150) + 20;
       observations.forEach(obs => {
         pdf.text(obs, 15, yPos);

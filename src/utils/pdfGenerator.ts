@@ -15,6 +15,7 @@ import { getCropIdentifier } from '@/components/BasicInfoSection';
 // Estendendo o jsPDF com autotable
 declare module 'jspdf' {
   interface jsPDF {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
     autoTable: (options: any) => jsPDF;
   }
 }
@@ -765,6 +766,7 @@ export const generatePDF = async (
         1: { cellWidth: 50, halign: 'right' },
         2: { cellWidth: 'auto' },
       },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
       didParseCell: (data: any) => {
         if (data.section === 'body' && data.column.index === 2) {
           const v = String(data.cell.raw);
@@ -783,6 +785,7 @@ export const generatePDF = async (
       tableWidth: contentWidth,
     });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (pdf as any).lastAutoTable.finalY + 8;
 
     // ========== DIAGNÓSTICO DE FERTILIDADE ==========
@@ -891,6 +894,7 @@ export const generatePDF = async (
         margin: { left: marginX, right: marginX },
         tableWidth: contentWidth,
       });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
       currentY = (pdf as any).lastAutoTable.finalY + 6;
     }
 
@@ -1103,6 +1107,7 @@ export const generatePDF = async (
         2: { cellWidth: 65 },
         3: { cellWidth: 'auto' },
       },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
       didParseCell: (data: any) => {
         if (data.section === 'body' && data.column.index === 3) {
           const v = String(data.cell.raw);
@@ -1113,6 +1118,7 @@ export const generatePDF = async (
       margin: { left: marginX, right: marginX },
       tableWidth: contentWidth,
     });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (pdf as any).lastAutoTable.finalY + 10;
 
     // ========== FUNÇÃO HELPER: Desenhar Badge Colorido ==========
@@ -1191,12 +1197,15 @@ export const generatePDF = async (
         head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
         body: section1Rows,
         ...sectionTableStyles,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
         willDrawCell: (data: any) => { if (data.column.index === 3 && data.section === 'body') data.cell.text = ['']; },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
         didDrawCell: (data: any) => {
           if (data.column.index === 3 && data.section === 'body')
             drawBadge('A lanço', data.cell.x + 5, data.cell.y + data.cell.height / 2 + 1, 'lanco');
         },
       });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
       currentY = (pdf as any).lastAutoTable.finalY + 10;
     }
     
@@ -1227,12 +1236,15 @@ export const generatePDF = async (
         head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
         body: section2Rows,
         ...sectionTableStyles,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
         willDrawCell: (data: any) => { if (data.column.index === 3 && data.section === 'body') data.cell.text = ['']; },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
         didDrawCell: (data: any) => {
           if (data.column.index === 3 && data.section === 'body')
             drawBadge('Sulco', data.cell.x + 5, data.cell.y + data.cell.height / 2 + 1, 'sulco');
         },
       });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
       currentY = (pdf as any).lastAutoTable.finalY + 10;
     }
 
@@ -1262,12 +1274,15 @@ export const generatePDF = async (
         head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
         body: section3Rows,
         ...sectionTableStyles,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
         willDrawCell: (data: any) => { if (data.column.index === 3 && data.section === 'body') data.cell.text = ['']; },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
         didDrawCell: (data: any) => {
           if (data.column.index === 3 && data.section === 'body')
             drawBadge('Cobertura', data.cell.x + 5, data.cell.y + data.cell.height / 2 + 1, 'cobertura');
         },
       });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
       currentY = (pdf as any).lastAutoTable.finalY + 10;
     }
 
@@ -1298,7 +1313,9 @@ export const generatePDF = async (
         head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
         body: section4Rows,
         ...sectionTableStyles,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
         willDrawCell: (data: any) => { if (data.column.index === 3 && data.section === 'body') data.cell.text = ['']; },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
         didDrawCell: (data: any) => {
           if (data.column.index === 3 && data.section === 'body') {
             const isSem = data.cell.raw === 'sementes';
@@ -1306,6 +1323,7 @@ export const generatePDF = async (
           }
         },
       });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
       currentY = (pdf as any).lastAutoTable.finalY + 10;
     }
 
@@ -1328,12 +1346,15 @@ export const generatePDF = async (
         head: [['Fonte de Fertilizante', 'Quantidade', 'Unidade', 'Método', 'Estágio']],
         body: section5Rows,
         ...sectionTableStyles,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
         willDrawCell: (data: any) => { if (data.column.index === 3 && data.section === 'body') data.cell.text = ['']; },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
         didDrawCell: (data: any) => {
           if (data.column.index === 3 && data.section === 'body')
             drawBadge('Incorporado', data.cell.x + 5, data.cell.y + data.cell.height / 2 + 1, 'incorporado');
         },
       });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
       currentY = (pdf as any).lastAutoTable.finalY + 10;
     }
 
@@ -1463,6 +1484,7 @@ export const generatePDF = async (
     );
 
     // ========== NUMERAÇÃO DE PÁGINAS ==========
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const totalPages = (pdf as any).internal.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
       pdf.setPage(i);
